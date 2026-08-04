@@ -118,8 +118,11 @@ export async function createOrGetDraftInvoice(packageId: string) {
     return { error: createError.message }
   }
 
-  revalidatePath("/dashboard")
-  revalidatePath(`/dashboard/invoices/${packageId}`)
+  // No revalidatePath here: this function is called directly from the page's
+  // Server Component render path (see page.tsx), and calling revalidatePath
+  // during a render is unsupported by Next.js ("used revalidatePath during
+  // render"). The page is already rendering fresh, so there's nothing stale
+  // to invalidate for this particular call.
 
   return { success: true, invoice: created }
 }
