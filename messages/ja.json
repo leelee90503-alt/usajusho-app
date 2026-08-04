@@ -9,7 +9,123 @@
     "title": "USAJUSHO",
     "description": "米国から日本への転送サービス。専用の米国住所で、米国のオンラインショップを日本からご利用いただけます。",
     "signup": "会員登録",
-    "login": "ログイン"
+    "login": "ログイン",
+    "hero": {
+      "eyebrow": "米国 → 日本 転送サービス",
+      "headline": "あなただけの米国住所で、日本から米国ショッピングを。",
+      "description": "USAJUSHOが専用の米国住所を提供。届いた荷物は写真で確認し、まとめて日本へ発送できるので送料を抑えられます。",
+      "ctaPrimary": "無料で始める",
+      "ctaSecondary": "送料を計算",
+      "trustNote": "登録は無料。実際に発送するまで料金は発生しません。",
+      "previewLabel": "マイページ（プレビュー）",
+      "previewStatus": "入荷済み",
+      "previewItem1": "Amazon.com — ワイヤレスイヤホン",
+      "previewMeta1": "2.4kg・写真確認済み",
+      "previewItem2": "Nike.com — スニーカー 2足",
+      "previewMeta2": "1.8kg・統合配送を選択中"
+    },
+    "trust": {
+      "stat1Value": "100%",
+      "stat1Label": "全荷物を写真で検品",
+      "stat2Value": "最短1営業日",
+      "stat2Label": "入荷から検品まで",
+      "stat3Value": "18種類",
+      "stat3Label": "選べる付加サービス",
+      "stat4Value": "日本語対応",
+      "stat4Label": "サポート・書類まで"
+    },
+    "journey": {
+      "title": "荷物が届くまでの流れ",
+      "description": "会員登録から日本でのお受け取りまで、USAJUSHOが一連のプロセスをサポートします。",
+      "step1Title": "米国住所を取得",
+      "step1Description": "会員登録するとあなた専用の米国住所が発行されます。",
+      "step2Title": "米国ショップで購入",
+      "step2Description": "Amazonなど米国のオンラインショップでその住所宛に注文します。",
+      "step3Title": "入荷・検品・撮影",
+      "step3Description": "USAJUSHO倉庫が荷物を受け取り、内容を確認して写真を撮影します。",
+      "step4Title": "統合配送・送り状作成",
+      "step4Description": "マイページで荷物を確認し、まとめ配送や付加サービスを選択、商業送り状を作成します。",
+      "step5Title": "日本へ発送",
+      "step5Description": "USAJUSHOが日本へ向けて発送し、追跡番号をお知らせします。",
+      "step6Title": "日本でお受け取り",
+      "step6Description": "ご指定の日本国内の住所に荷物が届きます。"
+    },
+    "address": {
+      "title": "あなた専用の米国住所",
+      "description": "会員登録するとすぐに、USAJUSHO倉庫内のあなた専用の住所が発行されます。米国のオンラインショップでの発送先として、そのままご利用いただけます。",
+      "point1": "会員登録後すぐに発行、追加費用なし",
+      "point2": "複数のショップからの注文をこの住所にまとめられます",
+      "point3": "マイページからいつでも住所をコピーできます",
+      "sampleLabel": "住所サンプル",
+      "sampleName": "TARO YAMADA (USJ-00123)",
+      "sampleLine1": "123 Warehouse Ave, Suite 100",
+      "sampleLine2": "City, ST 00000",
+      "sampleLine3": "United States"
+    },
+    "inspection": {
+      "title": "荷物到着後、写真で確認できます",
+      "description": "倉庫に荷物が届くと、外装だけでなく必要に応じて内容物も撮影します。マイページからいつでも写真を確認し、安心して次のステップに進めます。"
+    },
+    "consolidation": {
+      "title": "まとめ配送で送料を節約",
+      "description": "複数の注文を1つの箱にまとめて発送することで、個別に発送するより送料を大きく抑えられます。不要な箱や納品書などを取り除く再梱包もご利用いただけます。",
+      "exampleLabel": "3個口 → 1個口にまとめて発送",
+      "exampleNote": "箱のサイズや重量によって節約額は異なります。"
+    },
+    "addons": {
+      "title": "必要な分だけ選べる付加サービス",
+      "description": "検品や梱包、保険まで、荷物の内容に合わせて必要なサービスだけを選んでご利用いただけます。",
+      "item1Title": "精密検品",
+      "item1Description": "商品の状態を詳しく確認します。",
+      "item2Title": "保護梱包・エアキャップ",
+      "item2Description": "壊れやすい商品を追加で保護します。",
+      "item3Title": "外箱・値札の除去",
+      "item3Description": "送り状や値札を取り外してから発送します。",
+      "item4Title": "追加保管",
+      "item4Description": "他の荷物が届くまで倉庫で保管します。",
+      "item5Title": "配送保険",
+      "item5Description": "万一の輸送事故に備えられます。",
+      "item6Title": "その他カスタム対応",
+      "item6Description": "特殊な梱包などはご相談ください。",
+      "footnote": "料金の詳細はログイン後のマイページでご確認いただけます。"
+    },
+    "calculator": {
+      "title": "送料を今すぐ計算",
+      "description": "荷物の重さを入力するだけで、日本までの概算送料をすぐに確認できます。",
+      "weightLabel": "荷物の重さ",
+      "weightPlaceholder": "例：2.5",
+      "resultLabel": "概算送料",
+      "unavailable": "重さを入力すると概算送料が表示されます。",
+      "disclaimer": "※ 実際の送料は荷物のサイズ・重量や選択した付加サービスにより異なります。最終金額はマイページの商業送り状でご確認ください。",
+      "currency": "¥"
+    },
+    "tracking": {
+      "title": "発送から到着まで追跡できます",
+      "description": "発送後は追跡番号が発行され、マイページからいつでも配送状況を確認できます。",
+      "exampleStatus": "日本の配送業者に引き渡し済み",
+      "exampleNote": "通常、発送から到着まで数日〜1週間程度です。"
+    },
+    "faq": {
+      "title": "よくあるご質問",
+      "q1Question": "米国住所はどうやって取得しますか？",
+      "q1Answer": "無料の会員登録が完了すると、すぐにあなた専用の米国住所が発行されます。",
+      "q2Question": "送料はいつ発生しますか？",
+      "q2Answer": "実際に日本へ発送する際にのみ発生します。会員登録や住所の利用自体は無料です。",
+      "q3Question": "まとめ配送とは何ですか？",
+      "q3Answer": "複数の荷物を1つにまとめて発送することで、個別に発送するより送料を抑えられるサービスです。",
+      "q4Question": "商業送り状（インボイス）は必要ですか？",
+      "q4Answer": "はい。海外へ発送するすべての荷物に必要な書類です。マイページから簡単に作成でき、必要に応じてスタッフが代行することも可能です。"
+    },
+    "cta": {
+      "title": "今すぐ無料で始めましょう",
+      "description": "会員登録は無料。専用の米国住所を取得して、米国のオンラインショッピングを日本から楽しみましょう。",
+      "button": "無料で会員登録する"
+    },
+    "footer": {
+      "tagline": "USAJUSHOは、米国から日本への荷物転送サービスです。",
+      "linksTitle": "アカウント",
+      "copyright": "© 2026 USAJUSHO. All rights reserved."
+    }
   },
   "login": {
     "title": "ログイン",

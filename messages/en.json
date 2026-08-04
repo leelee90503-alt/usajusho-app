@@ -9,7 +9,123 @@
     "title": "USAJUSHO",
     "description": "A US-to-Japan package forwarding service. Get your own US address and shop US online stores from Japan.",
     "signup": "Sign Up",
-    "login": "Log In"
+    "login": "Log In",
+    "hero": {
+      "eyebrow": "US → Japan Forwarding",
+      "headline": "Your own US address for shopping from Japan.",
+      "description": "USAJUSHO gives you a dedicated US address. Check every package by photo, then consolidate shipments to save on shipping.",
+      "ctaPrimary": "Start for Free",
+      "ctaSecondary": "Calculate Shipping",
+      "trustNote": "Signup is free — you're only charged when you actually ship.",
+      "previewLabel": "My Page (preview)",
+      "previewStatus": "Arrived",
+      "previewItem1": "Amazon.com — Wireless Earbuds",
+      "previewMeta1": "2.4kg · Photo verified",
+      "previewItem2": "Nike.com — Sneakers x2",
+      "previewMeta2": "1.8kg · Consolidation selected"
+    },
+    "trust": {
+      "stat1Value": "100%",
+      "stat1Label": "Every package photo-checked",
+      "stat2Value": "1 business day",
+      "stat2Label": "From arrival to inspection",
+      "stat3Value": "18 services",
+      "stat3Label": "Optional add-on services",
+      "stat4Value": "Japanese support",
+      "stat4Label": "From support to paperwork"
+    },
+    "journey": {
+      "title": "How your package gets to you",
+      "description": "From signup to delivery in Japan, USAJUSHO supports the whole process.",
+      "step1Title": "Get your US address",
+      "step1Description": "Sign up and receive your own dedicated US address immediately.",
+      "step2Title": "Shop US stores",
+      "step2Description": "Order from Amazon and other US online stores using that address.",
+      "step3Title": "Arrival, inspection, photos",
+      "step3Description": "Our warehouse receives your package, checks its contents, and photographs it.",
+      "step4Title": "Consolidate & create invoice",
+      "step4Description": "Review your packages, choose consolidation and add-on services, and create the commercial invoice.",
+      "step5Title": "Ship to Japan",
+      "step5Description": "USAJUSHO ships to Japan and provides a tracking number.",
+      "step6Title": "Delivered in Japan",
+      "step6Description": "Your package arrives at the Japan address you specify."
+    },
+    "address": {
+      "title": "Your own dedicated US address",
+      "description": "As soon as you sign up, you get your own address inside a USAJUSHO warehouse — ready to use as the shipping address at any US online store.",
+      "point1": "Issued immediately after signup, no extra fee",
+      "point2": "Consolidate orders from multiple stores at one address",
+      "point3": "Copy your address anytime from your dashboard",
+      "sampleLabel": "Sample address",
+      "sampleName": "TARO YAMADA (USJ-00123)",
+      "sampleLine1": "123 Warehouse Ave, Suite 100",
+      "sampleLine2": "City, ST 00000",
+      "sampleLine3": "United States"
+    },
+    "inspection": {
+      "title": "Check every arrival by photo",
+      "description": "When a package arrives at our warehouse, we photograph the exterior and, when needed, the contents. Review the photos anytime from your dashboard before deciding what's next."
+    },
+    "consolidation": {
+      "title": "Consolidate to save on shipping",
+      "description": "Combine multiple orders into a single shipment to cut shipping costs well below sending each one separately. Repackaging is also available to remove unneeded boxes and paperwork.",
+      "exampleLabel": "3 packages → consolidated into 1 shipment",
+      "exampleNote": "Savings vary depending on box size and weight."
+    },
+    "addons": {
+      "title": "Add only the services you need",
+      "description": "From inspection to packaging to insurance, choose exactly the services that fit your package.",
+      "item1Title": "Detailed inspection",
+      "item1Description": "A closer look at your item's condition.",
+      "item2Title": "Protective packaging / bubble wrap",
+      "item2Description": "Extra protection for fragile items.",
+      "item3Title": "Invoice / price-tag removal",
+      "item3Description": "Remove packing slips and price tags before shipping.",
+      "item4Title": "Extended storage",
+      "item4Description": "We hold your package until the rest arrive.",
+      "item5Title": "Shipping insurance",
+      "item5Description": "Coverage in case something goes wrong in transit.",
+      "item6Title": "Custom requests",
+      "item6Description": "Special packaging needs? Just ask.",
+      "footnote": "Full pricing details are available on your dashboard after logging in."
+    },
+    "calculator": {
+      "title": "Calculate your shipping cost now",
+      "description": "Enter your package weight to see an estimated shipping cost to Japan right away.",
+      "weightLabel": "Package weight",
+      "weightPlaceholder": "e.g. 2.5",
+      "resultLabel": "Estimated shipping cost",
+      "unavailable": "Enter a weight to see an estimated cost.",
+      "disclaimer": "* Actual shipping cost depends on package size, weight, and any add-on services selected. See your commercial invoice on the dashboard for the final amount.",
+      "currency": "¥"
+    },
+    "tracking": {
+      "title": "Track it from shipment to delivery",
+      "description": "Once shipped, you'll get a tracking number and can check delivery status anytime from your dashboard.",
+      "exampleStatus": "Handed off to Japan delivery carrier",
+      "exampleNote": "Delivery typically takes a few days to about a week after shipping."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1Question": "How do I get a US address?",
+      "q1Answer": "As soon as you complete free signup, your own dedicated US address is issued immediately.",
+      "q2Question": "When am I charged for shipping?",
+      "q2Answer": "Only when you actually ship a package to Japan. Signup and using the address itself are free.",
+      "q3Question": "What is consolidation?",
+      "q3Answer": "Combining multiple packages into a single shipment, which costs less than shipping each one separately.",
+      "q4Question": "Do I need a commercial invoice?",
+      "q4Answer": "Yes — it's required for every international shipment. You can create one easily from your dashboard, and our staff can also prepare it on your behalf if needed."
+    },
+    "cta": {
+      "title": "Get started for free today",
+      "description": "Signup is free. Get your dedicated US address and enjoy shopping US stores from Japan.",
+      "button": "Sign Up for Free"
+    },
+    "footer": {
+      "tagline": "USAJUSHO is a US-to-Japan package forwarding service.",
+      "linksTitle": "Account",
+      "copyright": "© 2026 USAJUSHO. All rights reserved."
+    }
   },
   "login": {
     "title": "Log In",
