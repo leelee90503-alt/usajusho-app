@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import SignOutButton from './sign-out-button'
 import PackageList from './package-list'
 import NotificationBell from './notification-bell'
+import Link from 'next/link'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -45,6 +46,7 @@ export default async function DashboardPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-[var(--usj-primary)]">USAJUSHO</h1>
           <div className="flex items-center gap-3">
+            <Link href="/dashboard/invoices" className="text-sm text-teal-700 hover:underline">{t("invoicesLink")}</Link>
             <NotificationBell notifications={notifications ?? []} />
             <SignOutButton />
           </div>

@@ -36,7 +36,8 @@
     "notifications": "通知",
     "welcome": "ようこそ、{name}さん",
     "myPackages": "届いた荷物",
-    "addressNote": "この住所を米国のオンラインショップでの配送先として使用してください。"
+    "addressNote": "この住所を米国のオンラインショップでの配送先として使用してください。",
+    "invoicesLink": "請求書"
   },
   "nav": {
     "adminPackages": "管理者: 荷物到着登録",
@@ -52,7 +53,7 @@
     "paySuccess": "お支払いが完了しました。",
     "trackingNumber": "追跡番号：",
     "weight": "重量：",
-    "weightUnit": "lbs",
+    "weightUnit": "kg",
     "quoteLabel": "送料の見積り：",
     "pay": "支払う",
     "statusArrived": "到着済み",
@@ -101,7 +102,7 @@
     "suiteSeparator": "・",
     "trackingNumber": "追跡番号：",
     "weight": "重量：",
-    "weightUnit": "lbs",
+    "weightUnit": "kg",
     "quoteAmountLabel": "見積金額：¥",
     "delete": "削除",
     "deleteConfirm": "{name}を削除しますか？",
@@ -110,18 +111,25 @@
     "quoteNoteFieldLabel": "メモ（任意）",
     "submitQuote": "見積を送信",
     "quoteInvalidAmount": "正しい金額を入力してください。",
-    "quoteSentSuccess": "見積を送信しました。"
+    "quoteSentSuccess": "見積を送信しました。",
+    "dimensions": "サイズ: ",
+    "dimensionsUnit": "cm",
+    "chargeableWeight": "請求重量: ",
+    "suggestedAmount": "料金表による目安: {amount}円"
   },
   "addPackageForm": {
     "heading": "新しい荷物を登録",
     "suiteLabel": "スイート番号（例：USJ-001001）",
     "itemNameLabel": "品名",
     "trackingNumberLabel": "追跡番号",
-    "weightLabel": "重量（lbs）",
+    "weightLabel": "重量 (kg)",
     "adminNoteLabel": "メモ（任意）",
     "submitting": "登録中...",
     "submit": "荷物を登録",
-    "success": "荷物を登録しました。"
+    "success": "荷物を登録しました。",
+    "lengthLabel": "長さ (cm)",
+    "widthLabel": "幅 (cm)",
+    "heightLabel": "高さ (cm)"
   },
   "settingsForm": {
     "statusConfigured": "メール送信は有効です",
@@ -146,5 +154,58 @@
     "step3Pre": "EmailJS の Account → Security で「API calls are disabled for non-browser applications」を",
     "step3Post": "無効にしてください（サーバーから送信するため必須です）。",
     "step4": "Service ID・Template ID・Public Key・Private Key を下のフォームに入力して保存してください。"
+  },
+  "adminPricing": {
+    "title": "配送料金の管理",
+    "backToPackages": "荷物管理に戻る",
+    "description": "見積もり計算に使うkgあたりの料金区分を管理します。料金は請求重量（実重量と容積重量のうち大きい方）に適用されます。",
+    "addHeading": "料金区分を追加",
+    "labelField": "ラベル",
+    "labelPlaceholder": "例: 標準 0-5kg",
+    "minWeightField": "最小重量 (kg)",
+    "maxWeightField": "最大重量 (kg)",
+    "maxWeightPlaceholder": "上限なしの場合は空欄",
+    "pricePerKgField": "kgあたりの単価 (円)",
+    "minChargeField": "最低料金 (円)",
+    "addSubmit": "追加",
+    "addSuccess": "料金区分を追加しました。",
+    "submitting": "保存中...",
+    "listHeading": "料金区分一覧 ({count})",
+    "empty": "まだ料金区分がありません。上のフォームから追加してください。",
+    "rangeLabel": "{min} - {max} kg",
+    "andAbove": "以上",
+    "priceLabel": "{price}円/kg",
+    "minChargeLabel": "最低{amount}円",
+    "edit": "編集",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "activate": "有効化",
+    "deactivate": "無効化",
+    "delete": "削除",
+    "deleteConfirm": "料金区分「{label}」を削除しますか？"
+  },
+  "invoiceList": {
+    "title": "請求書",
+    "backToDashboard": "ダッシュボードに戻る",
+    "description": "支払い済みの発送とその請求書です。",
+    "paidOn": "支払日: ",
+    "currency": "円",
+    "empty": "まだ請求書はありません。"
+  },
+  "invoiceDetail": {
+    "title": "請求書",
+    "backToInvoices": "請求書一覧に戻る",
+    "print": "印刷",
+    "suiteLabel": "スイート番号: ",
+    "itemNameLabel": "品名",
+    "trackingNumberLabel": "追跡番号",
+    "weightLabel": "重量",
+    "weightUnit": "kg",
+    "dimensionsLabel": "サイズ",
+    "dimensionsUnit": "cm",
+    "chargeableWeightLabel": "請求重量",
+    "paidOnLabel": "支払日",
+    "totalLabel": "合計",
+    "currency": "円"
   }
 }

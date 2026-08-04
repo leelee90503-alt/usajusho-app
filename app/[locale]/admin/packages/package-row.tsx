@@ -3,8 +3,25 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { updatePackageStatus, deletePackage, submitQuote } from "./actions"
+import { estimateQuote, type ShippingRate } from "@/lib/pricing"
 
-export default function PackageRow({ pkg }: { pkg: any }) {
+type PackageWithProfile = {
+  id: string
+  item_name: string
+  tracking_number: string | null
+  admin_note: string | null
+  status: string
+  weight_kg: number | null
+  length_cm: number | null
+  width_cm: number | null
+  height_cm: number | null
+  chargeable_weight_kg: number | null
+  quote_amount: number | null
+  quote_note: string | null
+  profiles?: { full_name: string | null; suite_number: string | null } | null
+}
+
+export default function PackageRow({ pkg, rates }: { pkg: PackageWithProfile; rates: ShippingRate[] }) {
   const t = useTranslations("packageRow")
   const tStatus = useTranslations("packageStatus")
   const STATUS_OPTIONS = [
@@ -15,7 +32,22 @@ export default function PackageRow({ pkg }: { pkg: any }) {
     { value: "shipped", label: tStatus("shipped") },
   ]
   const [isPending, startTransition] = useTransition()
-  const [quoteAmount, setQuoteAmount] = useState("")
+  const suggestion =
+    rates.length > 0
+      ? estimateQuote(
+          {
+            weightKg: pkg.weight_kg,
+            lengthCm: pkg.length_cm,
+            widthCm: pkg.width_cm,
+            heightCm: pkg.height_cm,
+          },
+          rates,
+        )
+      : null
+
+  const [quoteAmount, setQuoteAmount] = useState(() =>
+    suggestion?.amount != null ? String(suggestion.amount) : "",
+  )
   const [quoteNote, setQuoteNote] = useState("")
   const [quoteMessage, setQuoteMessage] = useState<string | null>(null)
 
@@ -62,8 +94,18 @@ export default function PackageRow({ pkg }: { pkg: any }) {
           {pkg.tracking_number && (
             <p className="mt-1 text-xs text-slate-500">{t("trackingNumber")}{pkg.tracking_number}</p>
           )}
-          {pkg.weight_lbs && (
-            <p className="mt-1 text-xs text-slate-500">{t("weight")}{pkg.weight_lbs} {t("weightUnit")}</p>
+          {pkg.weight_kg && (
+            <p className="mt-1 text-xs text-slate-500">{t("weight")}{pkg.weight_kg} {t("weightUnit")}</p>
+          )}
+          {pkg.length_cm && pkg.width_cm && pkg.height_cm && (
+            <p className="mt-1 text-xs text-slate-500">
+              {t("dimensions")}{pkg.length_cm} x {pkg.width_cm} x {pkg.height_cm} {t("dimensionsUnit")}
+            </p>
+          )}
+          {pkg.chargeable_weight_kg && (
+            <p className="mt-1 text-xs text-slate-500">
+              {t("chargeableWeight")}{pkg.chargeable_weight_kg} {t("weightUnit")}
+            </p>
           )}
           {pkg.admin_note && (
             <p className="mt-2 text-xs text-slate-600">{pkg.admin_note}</p>
@@ -130,6 +172,11 @@ export default function PackageRow({ pkg }: { pkg: any }) {
           >
             {t("submitQuote")}
           </button>
+          {suggestion?.amount != null && (
+            <p className="w-full text-xs text-teal-800">
+              {t("suggestedAmount", { amount: suggestion.amount.toLocaleString() })}
+            </p>
+          )}
           {quoteMessage && <p className="w-full text-xs text-teal-800">{quoteMessage}</p>}
         </div>
       )}

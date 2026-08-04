@@ -36,7 +36,8 @@
     "notifications": "Notifications",
     "welcome": "Welcome, {name}",
     "myPackages": "My Packages",
-    "addressNote": "Use this address as your shipping destination at US online stores."
+    "addressNote": "Use this address as your shipping destination at US online stores.",
+    "invoicesLink": "Invoices"
   },
   "nav": {
     "adminPackages": "Admin: Package Intake",
@@ -52,7 +53,7 @@
     "paySuccess": "Payment complete.",
     "trackingNumber": "Tracking number: ",
     "weight": "Weight: ",
-    "weightUnit": "lbs",
+    "weightUnit": "kg",
     "quoteLabel": "Shipping quote: ",
     "pay": "Pay",
     "statusArrived": "Arrived",
@@ -101,7 +102,7 @@
     "suiteSeparator": "· ",
     "trackingNumber": "Tracking number: ",
     "weight": "Weight: ",
-    "weightUnit": "lbs",
+    "weightUnit": "kg",
     "quoteAmountLabel": "Quote: ¥",
     "delete": "Delete",
     "deleteConfirm": "Delete {name}?",
@@ -110,18 +111,25 @@
     "quoteNoteFieldLabel": "Note (optional)",
     "submitQuote": "Send Quote",
     "quoteInvalidAmount": "Please enter a valid amount.",
-    "quoteSentSuccess": "Quote sent."
+    "quoteSentSuccess": "Quote sent.",
+    "dimensions": "Dimensions: ",
+    "dimensionsUnit": "cm",
+    "chargeableWeight": "Chargeable weight: ",
+    "suggestedAmount": "Suggested (from rate table): {amount} JPY"
   },
   "addPackageForm": {
     "heading": "Register a New Package",
     "suiteLabel": "Suite number (e.g. USJ-001001)",
     "itemNameLabel": "Item name",
     "trackingNumberLabel": "Tracking number",
-    "weightLabel": "Weight (lbs)",
+    "weightLabel": "Weight (kg)",
     "adminNoteLabel": "Note (optional)",
     "submitting": "Registering...",
     "submit": "Register Package",
-    "success": "Package registered."
+    "success": "Package registered.",
+    "lengthLabel": "Length (cm)",
+    "widthLabel": "Width (cm)",
+    "heightLabel": "Height (cm)"
   },
   "settingsForm": {
     "statusConfigured": "Email sending is enabled",
@@ -146,5 +154,58 @@
     "step3Pre": "On the EmailJS Account → Security page,",
     "step3Post": "turn off \"API calls are disabled for non-browser applications\" (required for sending from the server).",
     "step4": "Enter the Service ID, Template ID, Public Key, and Private Key into the form below and save."
+  },
+  "adminPricing": {
+    "title": "Shipping Rate Management",
+    "backToPackages": "Back to Package Management",
+    "description": "Manage the per-kg rate tiers used to calculate shipping quotes. Rates are applied to the chargeable weight (the greater of actual weight and volumetric weight).",
+    "addHeading": "Add a rate tier",
+    "labelField": "Label",
+    "labelPlaceholder": "e.g. Standard 0-5kg",
+    "minWeightField": "Min weight (kg)",
+    "maxWeightField": "Max weight (kg)",
+    "maxWeightPlaceholder": "Leave blank for no upper limit",
+    "pricePerKgField": "Price per kg (JPY)",
+    "minChargeField": "Minimum charge (JPY)",
+    "addSubmit": "Add rate",
+    "addSuccess": "Rate added.",
+    "submitting": "Saving...",
+    "listHeading": "Rate tiers ({count})",
+    "empty": "No rate tiers yet. Add one above.",
+    "rangeLabel": "{min} - {max} kg",
+    "andAbove": "and above",
+    "priceLabel": "{price} JPY/kg",
+    "minChargeLabel": "min {amount} JPY",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "delete": "Delete",
+    "deleteConfirm": "Delete the rate \"{label}\"?"
+  },
+  "invoiceList": {
+    "title": "Invoices",
+    "backToDashboard": "Back to Dashboard",
+    "description": "Paid shipments and their invoices.",
+    "paidOn": "Paid on ",
+    "currency": "JPY",
+    "empty": "No invoices yet."
+  },
+  "invoiceDetail": {
+    "title": "Invoice",
+    "backToInvoices": "Back to Invoices",
+    "print": "Print",
+    "suiteLabel": "Suite: ",
+    "itemNameLabel": "Item",
+    "trackingNumberLabel": "Tracking number",
+    "weightLabel": "Weight",
+    "weightUnit": "kg",
+    "dimensionsLabel": "Dimensions",
+    "dimensionsUnit": "cm",
+    "chargeableWeightLabel": "Chargeable weight",
+    "paidOnLabel": "Paid on",
+    "totalLabel": "Total",
+    "currency": "JPY"
   }
 }

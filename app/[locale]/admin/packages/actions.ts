@@ -5,6 +5,7 @@ import { getLocale } from 'next-intl/server'
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { notifyUser } from "@/lib/notifications"
+import { calculateChargeableWeight } from "@/lib/pricing"
 
 async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>> {
   const locale = await getLocale()
@@ -38,7 +39,10 @@ export async function addPackage(formData: FormData) {
   const suiteNumber = String(formData.get("suite_number") || "").trim()
   const itemName = String(formData.get("item_name") || "").trim()
   const trackingNumber = String(formData.get("tracking_number") || "").trim()
-  const weightLbs = formData.get("weight_lbs")
+  const weightKgRaw = formData.get("weight_kg")
+  const lengthCmRaw = formData.get("length_cm")
+  const widthCmRaw = formData.get("width_cm")
+  const heightCmRaw = formData.get("height_cm")
   const adminNote = String(formData.get("admin_note") || "").trim()
 
   if (!suiteNumber || !itemName) {
@@ -55,11 +59,28 @@ export async function addPackage(formData: FormData) {
     return { error: `スイート番号 ${suiteNumber} のユーザーが見つかりません。` }
   }
 
+  const weightKg = weightKgRaw ? Number(weightKgRaw) : null
+  const lengthCm = lengthCmRaw ? Number(lengthCmRaw) : null
+  const widthCm = widthCmRaw ? Number(widthCmRaw) : null
+  const heightCm = heightCmRaw ? Number(heightCmRaw) : null
+
+  const { volumetricWeightKg, chargeableWeightKg } = calculateChargeableWeight({
+    weightKg,
+    lengthCm,
+    widthCm,
+    heightCm,
+  })
+
   const { error: insertError } = await supabase.from("packages").insert({
     user_id: profile.id,
     item_name: itemName,
     tracking_number: trackingNumber || null,
-    weight_lbs: weightLbs ? Number(weightLbs) : null,
+    weight_kg: weightKg,
+    length_cm: lengthCm,
+    width_cm: widthCm,
+    height_cm: heightCm,
+    volumetric_weight_kg: volumetricWeightKg || null,
+    chargeable_weight_kg: chargeableWeightKg || null,
     admin_note: adminNote || null,
     status: "arrived",
   })
@@ -142,7 +163,7 @@ export async function submitQuote(packageId: string, quoteAmount: number, quoteN
       userId: updated.user_id,
       packageId,
       title: "送料の見積りが届きました",
-      body: `${updated.item_name} の送料見積り ￥${quoteAmount.toLocaleString()} が届きました。ダッシュボードからお支払いください。`,
+      body: `${updated.item_name} の送料見積り ¥${quoteAmount.toLocaleString()} が届きました。ダッシュボードからお支払いください。`,
     })
   }
 

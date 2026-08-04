@@ -63,9 +63,39 @@ export default function AddPackageForm() {
         <div>
           <label className="block text-xs font-medium text-slate-600">{t("weightLabel")}</label>
           <input
-            name="weight_lbs"
+            name="weight_kg"
             type="number"
             step="0.01"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-600">{t("lengthLabel")}</label>
+          <input
+            name="length_cm"
+            type="number"
+            step="0.1"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-600">{t("widthLabel")}</label>
+          <input
+            name="width_cm"
+            type="number"
+            step="0.1"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-600">{t("heightLabel")}</label>
+          <input
+            name="height_cm"
+            type="number"
+            step="0.1"
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />
         </div>
@@ -83,9 +113,7 @@ export default function AddPackageForm() {
       {message && (
         <p
           className={
-            message.type === "error"
-              ? "mt-3 text-sm text-red-600"
-              : "mt-3 text-sm text-teal-700"
+            message.type === "error" ? "mt-3 text-sm text-red-600" : "mt-3 text-sm text-teal-700"
           }
         >
           {message.text}

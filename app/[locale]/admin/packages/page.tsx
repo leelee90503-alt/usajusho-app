@@ -49,6 +49,13 @@ export default async function AdminPackagesPage({
     .select("*, profiles(full_name, suite_number)")
     .order("created_at", { ascending: false })
 
+  const { data: activeRates } = await supabase
+    .from("shipping_rates")
+    .select("*")
+    .eq("is_active", true)
+
+  const rates = activeRates ?? []
+
   const { count: userCount } = await supabase
     .from("profiles")
     .select("*", { count: "exact", head: true })
@@ -57,15 +64,15 @@ export default async function AdminPackagesPage({
 
   const statCounts = {
     total: packages.length,
-    arrived: packages.filter((p: any) => p.status === "arrived").length,
-    requested: packages.filter((p: any) => p.status === "requested").length,
-    quoted: packages.filter((p: any) => p.status === "quoted").length,
-    paid: packages.filter((p: any) => p.status === "paid").length,
-    shipped: packages.filter((p: any) => p.status === "shipped").length,
+    arrived: packages.filter((p) => p.status === "arrived").length,
+    requested: packages.filter((p) => p.status === "requested").length,
+    quoted: packages.filter((p) => p.status === "quoted").length,
+    paid: packages.filter((p) => p.status === "paid").length,
+    shipped: packages.filter((p) => p.status === "shipped").length,
   }
 
   const query = q.trim().toLowerCase()
-  const filteredPackages = packages.filter((pkg: any) => {
+  const filteredPackages = packages.filter((pkg) => {
     const matchesStatus = !status || pkg.status === status
     const matchesQuery =
       !query ||
@@ -81,6 +88,9 @@ export default async function AdminPackagesPage({
       <div className="mx-auto max-w-4xl px-6 py-10">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-slate-900">{t("title")}</h1>
+            <Link href="/admin/pricing" className="text-sm text-teal-700 hover:underline">
+              {t("pricingLink")}
+            </Link>
           <Link href="/admin/settings" className="text-sm text-teal-700 hover:underline">
             {t("settingsLink")}
           </Link>
@@ -163,8 +173,8 @@ export default async function AdminPackagesPage({
           </div>
 
           <div className="mt-3 space-y-3">
-            {filteredPackages.map((pkg: any) => (
-              <PackageRow key={pkg.id} pkg={pkg} />
+            {filteredPackages.map((pkg) => (
+              <PackageRow key={pkg.id} pkg={pkg} rates={rates} />
             ))}
 
             {filteredPackages.length === 0 && (
