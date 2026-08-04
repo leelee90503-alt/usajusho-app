@@ -33,11 +33,118 @@
   "dashboard": {
     "myAddress": "My US Address",
     "signOut": "Sign Out",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "welcome": "Welcome, {name}",
+    "myPackages": "My Packages",
+    "addressNote": "Use this address as your shipping destination at US online stores."
   },
   "nav": {
     "adminPackages": "Admin: Package Intake",
     "adminSettings": "Email Notification Settings",
     "backToPackages": "Back to Package Management"
+  },
+  "packageList": {
+    "empty": "No packages have arrived yet.",
+    "emptyHint": "Once you ship items to your US address above, they'll appear here.",
+    "selectPrompt": "Check the packages you'd like to ship, then request shipment.",
+    "requestShipment": "Request Shipment ({count})",
+    "requestSuccess": "Shipment requested.",
+    "paySuccess": "Payment complete.",
+    "trackingNumber": "Tracking number: ",
+    "weight": "Weight: ",
+    "weightUnit": "lbs",
+    "quoteLabel": "Shipping quote: ",
+    "pay": "Pay",
+    "statusArrived": "Arrived",
+    "statusRequested": "Shipment Requested",
+    "statusQuoted": "Quoted",
+    "statusPaid": "Paid",
+    "statusShipped": "Shipped"
+  },
+  "notificationBell": {
+    "title": "Notifications",
+    "empty": "No notifications.",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark read"
+  },
+  "adminPackages": {
+    "title": "Admin: Package Intake",
+    "settingsLink": "Email Notification Settings",
+    "description": "Enter a user's suite number to register an arrived package.",
+    "statTotal": "Total",
+    "statUsers": "Users",
+    "statArrived": "Arrived",
+    "statRequested": "Shipment Requested",
+    "statQuoted": "Quoted",
+    "statShipped": "Shipped",
+    "filterAll": "All",
+    "filterArrived": "Arrived",
+    "filterRequested": "Shipment Requested",
+    "filterQuoted": "Quoted",
+    "filterPaid": "Paid",
+    "filterShipped": "Shipped",
+    "searchPlaceholder": "Search by name, suite, or tracking number",
+    "searchButton": "Search",
+    "clear": "Clear",
+    "allPackages": "All Packages ({count})",
+    "emptyNone": "No packages have been registered yet.",
+    "emptyFiltered": "No packages match your filters."
+  },
+  "packageStatus": {
+    "arrived": "Arrived",
+    "requested": "Shipment Requested",
+    "quoted": "Quoted",
+    "paid": "Paid",
+    "shipped": "Shipped"
+  },
+  "packageRow": {
+    "suiteSeparator": "· ",
+    "trackingNumber": "Tracking number: ",
+    "weight": "Weight: ",
+    "weightUnit": "lbs",
+    "quoteAmountLabel": "Quote: ¥",
+    "delete": "Delete",
+    "deleteConfirm": "Delete {name}?",
+    "quoteAmountFieldLabel": "Quote amount (JPY)",
+    "quoteAmountPlaceholder": "3000",
+    "quoteNoteFieldLabel": "Note (optional)",
+    "submitQuote": "Send Quote",
+    "quoteInvalidAmount": "Please enter a valid amount.",
+    "quoteSentSuccess": "Quote sent."
+  },
+  "addPackageForm": {
+    "heading": "Register a New Package",
+    "suiteLabel": "Suite number (e.g. USJ-001001)",
+    "itemNameLabel": "Item name",
+    "trackingNumberLabel": "Tracking number",
+    "weightLabel": "Weight (lbs)",
+    "adminNoteLabel": "Note (optional)",
+    "submitting": "Registering...",
+    "submit": "Register Package",
+    "success": "Package registered."
+  },
+  "settingsForm": {
+    "statusConfigured": "Email sending is enabled",
+    "statusUnconfigured": "Not configured (in-app notifications only)",
+    "serviceIdLabel": "Service ID",
+    "templateIdLabel": "Template ID",
+    "publicKeyLabel": "Public Key",
+    "privateKeyLabel": "Private Key",
+    "privateKeyHint": "You can find your Private Key on the EmailJS Account → Security page.",
+    "saved": "Saved.",
+    "saving": "Saving...",
+    "save": "Save"
+  },
+  "adminSettings": {
+    "title": "Email Notification Settings",
+    "backLink": "Back to Package Management",
+    "description": "Enter your EmailJS account details to automatically email users when a package arrives, is quoted, or ships. Until configured, only in-app notifications are sent.",
+    "setupHeading": "Setup Steps",
+    "step1": "Create an account at emailjs.com and add an Email Service.",
+    "step2Pre": "Create an Email Template and use the",
+    "step2Post": "variables in the body.",
+    "step3Pre": "On the EmailJS Account → Security page,",
+    "step3Post": "turn off \"API calls are disabled for non-browser applications\" (required for sending from the server).",
+    "step4": "Enter the Service ID, Template ID, Public Key, and Private Key into the form below and save."
   }
 }

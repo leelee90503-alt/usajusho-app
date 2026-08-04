@@ -33,11 +33,118 @@
   "dashboard": {
     "myAddress": "私の米国住所",
     "signOut": "ログアウト",
-    "notifications": "通知"
+    "notifications": "通知",
+    "welcome": "ようこそ、{name}さん",
+    "myPackages": "届いた荷物",
+    "addressNote": "この住所を米国のオンラインショップでの配送先として使用してください。"
   },
   "nav": {
     "adminPackages": "管理者: 荷物到着登録",
     "adminSettings": "メール通知設定",
     "backToPackages": "荷物管理に戻る"
+  },
+  "packageList": {
+    "empty": "まだ届いた荷物はありません。",
+    "emptyHint": "上記の米国住所に商品を発送すると、ここに表示されます。",
+    "selectPrompt": "発送したい荷物にチェックを入れて、依頼してください。",
+    "requestShipment": "発送を依頼する（{count}）",
+    "requestSuccess": "発送を依頼しました。",
+    "paySuccess": "お支払いが完了しました。",
+    "trackingNumber": "追跡番号：",
+    "weight": "重量：",
+    "weightUnit": "lbs",
+    "quoteLabel": "送料の見積り：",
+    "pay": "支払う",
+    "statusArrived": "到着済み",
+    "statusRequested": "発送依頼済み",
+    "statusQuoted": "見積済み",
+    "statusPaid": "支払い済み",
+    "statusShipped": "発送完了"
+  },
+  "notificationBell": {
+    "title": "通知",
+    "empty": "通知はありません。",
+    "markAllRead": "すべて既読にする",
+    "markRead": "既読"
+  },
+  "adminPackages": {
+    "title": "管理者：荷物到着登録",
+    "settingsLink": "メール通知設定",
+    "description": "ユーザーのスイート番号を入力して、到着した荷物を登録してください。",
+    "statTotal": "全件",
+    "statUsers": "ユーザー数",
+    "statArrived": "到着済み",
+    "statRequested": "発送依頼済み",
+    "statQuoted": "見積済み",
+    "statShipped": "発送完了",
+    "filterAll": "すべて",
+    "filterArrived": "到着済み",
+    "filterRequested": "発送依頼済み",
+    "filterQuoted": "見積済み",
+    "filterPaid": "支払い済み",
+    "filterShipped": "発送完了",
+    "searchPlaceholder": "名前・スイート・追跡番号で検索",
+    "searchButton": "検索",
+    "clear": "クリア",
+    "allPackages": "全ての荷物（{count}）",
+    "emptyNone": "登録された荷物はまだありません。",
+    "emptyFiltered": "条件に一致する荷物がありません。"
+  },
+  "packageStatus": {
+    "arrived": "到着済み",
+    "requested": "発送依頼済み",
+    "quoted": "見積済み",
+    "paid": "支払い済み",
+    "shipped": "発送完了"
+  },
+  "packageRow": {
+    "suiteSeparator": "・",
+    "trackingNumber": "追跡番号：",
+    "weight": "重量：",
+    "weightUnit": "lbs",
+    "quoteAmountLabel": "見積金額：¥",
+    "delete": "削除",
+    "deleteConfirm": "{name}を削除しますか？",
+    "quoteAmountFieldLabel": "見積金額（円）",
+    "quoteAmountPlaceholder": "3000",
+    "quoteNoteFieldLabel": "メモ（任意）",
+    "submitQuote": "見積を送信",
+    "quoteInvalidAmount": "正しい金額を入力してください。",
+    "quoteSentSuccess": "見積を送信しました。"
+  },
+  "addPackageForm": {
+    "heading": "新しい荷物を登録",
+    "suiteLabel": "スイート番号（例：USJ-001001）",
+    "itemNameLabel": "品名",
+    "trackingNumberLabel": "追跡番号",
+    "weightLabel": "重量（lbs）",
+    "adminNoteLabel": "メモ（任意）",
+    "submitting": "登録中...",
+    "submit": "荷物を登録",
+    "success": "荷物を登録しました。"
+  },
+  "settingsForm": {
+    "statusConfigured": "メール送信は有効です",
+    "statusUnconfigured": "未設定（アプリ内通知のみ）",
+    "serviceIdLabel": "Service ID",
+    "templateIdLabel": "Template ID",
+    "publicKeyLabel": "Public Key",
+    "privateKeyLabel": "Private Key",
+    "privateKeyHint": "Private Key は EmailJS の Account → Security ページで確認できます。",
+    "saved": "保存しました。",
+    "saving": "保存中...",
+    "save": "保存する"
+  },
+  "adminSettings": {
+    "title": "メール通知設定",
+    "backLink": "荷物管理に戻る",
+    "description": "EmailJSのアカウント情報を入力すると、荷物の到着・見積り・発送完了時にユーザーへ自動でメールが送信されます。未設定の間はアプリ内通知のみが送られます。",
+    "setupHeading": "設定手順",
+    "step1": "emailjs.com でアカウントを作成し、Email Service を追加してください。",
+    "step2Pre": "Email Template を作成し、本文に",
+    "step2Post": "の変数を使ってください。",
+    "step3Pre": "EmailJS の Account → Security で「API calls are disabled for non-browser applications」を",
+    "step3Post": "無効にしてください（サーバーから送信するため必須です）。",
+    "step4": "Service ID・Template ID・Public Key・Private Key を下のフォームに入力して保存してください。"
   }
 }

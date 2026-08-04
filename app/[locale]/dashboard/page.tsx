@@ -52,7 +52,7 @@ export default async function DashboardPage() {
 
         <div className="mt-8">
           <h2 className="text-2xl font-bold text-slate-900">
-            ようこそ、{profile?.full_name || user.email}さん
+            {t("welcome", { name: profile?.full_name || user.email })}
           </h2>
           <p className="mt-1 text-sm text-slate-500">{user.email}</p>
         </div>
@@ -72,14 +72,14 @@ export default async function DashboardPage() {
               <p>United States</p>
             </div>
             <p className="mt-4 text-xs text-slate-400">
-              この住所を米国のオンラインショップでの配送先として使用してください。
+              {t("addressNote")}
             </p>
           </div>
         )}
 
         <div className="mt-8">
           <h3 className="text-lg font-semibold text-slate-900">
-            届いた荷物 / My Packages
+            {t("myPackages")}
           </h3>
           <PackageList packages={packages ?? []} />
         </div>

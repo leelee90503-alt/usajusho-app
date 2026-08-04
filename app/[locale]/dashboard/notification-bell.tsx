@@ -1,6 +1,7 @@
-"use client"
+'use client'
 
 import { useState, useTransition } from "react"
+import { useTranslations } from "next-intl"
 import { markNotificationRead, markAllNotificationsRead } from "./actions"
 
 type Notification = {
@@ -17,6 +18,7 @@ function formatDate(iso: string) {
 }
 
 export default function NotificationBell({ notifications }: { notifications: Notification[] }) {
+  const t = useTranslations("notificationBell")
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -40,7 +42,7 @@ export default function NotificationBell({ notifications }: { notifications: Not
         onClick={() => setOpen((v) => !v)}
         className="relative rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
       >
-        通知
+        {t("title")}
         {unreadCount > 0 && (
           <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-semibold text-white">
             {unreadCount}
@@ -51,21 +53,21 @@ export default function NotificationBell({ notifications }: { notifications: Not
       {open && (
         <div className="absolute right-0 z-10 mt-2 w-80 rounded-xl border border-slate-200 bg-white shadow-lg">
           <div className="flex items-center justify-between border-b border-slate-100 p-3">
-            <p className="text-sm font-semibold text-slate-900">通知</p>
+            <p className="text-sm font-semibold text-slate-900">{t("title")}</p>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
                 disabled={isPending}
                 className="text-xs text-teal-700 hover:underline disabled:opacity-50"
               >
-                すべて既読にする
+                {t("markAllRead")}
               </button>
             )}
           </div>
 
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 && (
-              <p className="p-4 text-center text-sm text-slate-400">通知はありません。</p>
+              <p className="p-4 text-center text-sm text-slate-400">{t("empty")}</p>
             )}
             {notifications.map((n) => (
               <div
@@ -82,7 +84,7 @@ export default function NotificationBell({ notifications }: { notifications: Not
                       disabled={isPending}
                       className="whitespace-nowrap text-xs text-slate-400 hover:text-teal-700 disabled:opacity-50"
                     >
-                      既読
+                      {t("markRead")}
                     </button>
                   )}
                 </div>

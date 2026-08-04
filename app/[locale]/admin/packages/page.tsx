@@ -1,25 +1,8 @@
 import { redirect, Link } from '@/i18n/navigation'
 import { createClient } from "@/lib/supabase/server"
-import { getLocale } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import AddPackageForm from "./add-package-form"
 import PackageRow from "./package-row"
-
-const STATUS_FILTERS = [
-  { value: "", label: "すべて" },
-  { value: "arrived", label: "到着済み" },
-  { value: "requested", label: "発送依頼済み" },
-  { value: "quoted", label: "見積済み" },
-  { value: "paid", label: "支払い済み" },
-  { value: "shipped", label: "発送完了" },
-]
-
-const STATUS_LABELS: Record<string, string> = {
-  arrived: "到着済み",
-  requested: "発送依頼済み",
-  quoted: "見積済み",
-  paid: "支払い済み",
-  shipped: "発送完了",
-}
 
 export default async function AdminPackagesPage({
   searchParams,
@@ -47,6 +30,17 @@ export default async function AdminPackagesPage({
   if (!profile?.is_admin) {
     redirect({ href: "/dashboard", locale })
   }
+
+  const t = await getTranslations('adminPackages')
+
+  const STATUS_FILTERS = [
+    { value: "", label: t("filterAll") },
+    { value: "arrived", label: t("filterArrived") },
+    { value: "requested", label: t("filterRequested") },
+    { value: "quoted", label: t("filterQuoted") },
+    { value: "paid", label: t("filterPaid") },
+    { value: "shipped", label: t("filterShipped") },
+  ]
 
   const { q = "", status = "" } = await searchParams
 
@@ -86,39 +80,39 @@ export default async function AdminPackagesPage({
     <main className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-4xl px-6 py-10">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-slate-900">管理者: 荷物到着登録</h1>
+          <h1 className="text-xl font-bold text-slate-900">{t("title")}</h1>
           <Link href="/admin/settings" className="text-sm text-teal-700 hover:underline">
-            メール通知設定
+            {t("settingsLink")}
           </Link>
         </div>
         <p className="mt-1 text-sm text-slate-500">
-          ユーザーのスイート番号を入力して、到着した荷物を登録してください。
+          {t("description")}
         </p>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
           <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
             <p className="text-2xl font-bold text-slate-900">{statCounts.total}</p>
-            <p className="mt-1 text-xs text-slate-500">全件</p>
+            <p className="mt-1 text-xs text-slate-500">{t("statTotal")}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
             <p className="text-2xl font-bold text-slate-900">{userCount ?? 0}</p>
-            <p className="mt-1 text-xs text-slate-500">ユーザー数</p>
+            <p className="mt-1 text-xs text-slate-500">{t("statUsers")}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
             <p className="text-2xl font-bold text-teal-700">{statCounts.arrived}</p>
-            <p className="mt-1 text-xs text-slate-500">到着済み</p>
+            <p className="mt-1 text-xs text-slate-500">{t("statArrived")}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
             <p className="text-2xl font-bold text-teal-700">{statCounts.requested}</p>
-            <p className="mt-1 text-xs text-slate-500">発送依頼済み</p>
+            <p className="mt-1 text-xs text-slate-500">{t("statRequested")}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
             <p className="text-2xl font-bold text-amber-700">{statCounts.quoted}</p>
-            <p className="mt-1 text-xs text-slate-500">見積済み</p>
+            <p className="mt-1 text-xs text-slate-500">{t("statQuoted")}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
             <p className="text-2xl font-bold text-slate-700">{statCounts.shipped}</p>
-            <p className="mt-1 text-xs text-slate-500">発送完了</p>
+            <p className="mt-1 text-xs text-slate-500">{t("statShipped")}</p>
           </div>
         </div>
 
@@ -129,7 +123,7 @@ export default async function AdminPackagesPage({
         <div className="mt-10">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-slate-900">
-              全ての荷物 ({filteredPackages.length})
+              {t("allPackages", { count: filteredPackages.length })}
             </h2>
 
             <form className="flex flex-wrap items-center gap-2" method="get">
@@ -137,7 +131,7 @@ export default async function AdminPackagesPage({
                 type="text"
                 name="q"
                 defaultValue={q}
-                placeholder="名前・スイート・追跡番号で検索"
+                placeholder={t("searchPlaceholder")}
                 className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
               />
               <select
@@ -155,14 +149,14 @@ export default async function AdminPackagesPage({
                 type="submit"
                 className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white hover:bg-slate-800"
               >
-                検索
+                {t("searchButton")}
               </button>
               {(q || status) && (
                 <Link
                   href="/admin/packages"
                   className="text-sm text-slate-500 underline hover:text-slate-700"
                 >
-                  クリア
+                  {t("clear")}
                 </Link>
               )}
             </form>
@@ -176,8 +170,8 @@ export default async function AdminPackagesPage({
             {filteredPackages.length === 0 && (
               <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
                 {packages.length === 0
-                  ? "登録された荷物はまだありません。"
-                  : "条件に一致する荷物がありません。"}
+                  ? t("emptyNone")
+                  : t("emptyFiltered")}
               </div>
             )}
           </div>

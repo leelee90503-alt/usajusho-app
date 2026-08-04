@@ -1,9 +1,11 @@
-"use client"
+'use client'
 
 import { useRef, useState, useTransition } from "react"
+import { useTranslations } from "next-intl"
 import { addPackage } from "./actions"
 
 export default function AddPackageForm() {
+  const t = useTranslations("addPackageForm")
   const formRef = useRef<HTMLFormElement>(null)
   const [isPending, startTransition] = useTransition()
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null)
@@ -15,7 +17,7 @@ export default function AddPackageForm() {
       if (result?.error) {
         setMessage({ type: "error", text: result.error })
       } else {
-        setMessage({ type: "success", text: "荷物を登録しました。" })
+        setMessage({ type: "success", text: t("success") })
         formRef.current?.reset()
       }
     })
@@ -27,12 +29,12 @@ export default function AddPackageForm() {
       action={handleSubmit}
       className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
     >
-      <h2 className="text-sm font-semibold text-slate-900">新しい荷物を登録</h2>
+      <h2 className="text-sm font-semibold text-slate-900">{t("heading")}</h2>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="block text-xs font-medium text-slate-600">
-            スイート番号 (例: USJ-001001)
+            {t("suiteLabel")}
           </label>
           <input
             name="suite_number"
@@ -42,7 +44,7 @@ export default function AddPackageForm() {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-600">品名</label>
+          <label className="block text-xs font-medium text-slate-600">{t("itemNameLabel")}</label>
           <input
             name="item_name"
             required
@@ -51,7 +53,7 @@ export default function AddPackageForm() {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-600">追跡番号</label>
+          <label className="block text-xs font-medium text-slate-600">{t("trackingNumberLabel")}</label>
           <input
             name="tracking_number"
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
@@ -59,7 +61,7 @@ export default function AddPackageForm() {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-600">重量 (lbs)</label>
+          <label className="block text-xs font-medium text-slate-600">{t("weightLabel")}</label>
           <input
             name="weight_lbs"
             type="number"
@@ -69,7 +71,7 @@ export default function AddPackageForm() {
         </div>
 
         <div className="sm:col-span-2">
-          <label className="block text-xs font-medium text-slate-600">メモ (任意)</label>
+          <label className="block text-xs font-medium text-slate-600">{t("adminNoteLabel")}</label>
           <textarea
             name="admin_note"
             rows={2}
@@ -95,7 +97,7 @@ export default function AddPackageForm() {
         disabled={isPending}
         className="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
       >
-        {isPending ? "登録中..." : "荷物を登録"}
+        {isPending ? t("submitting") : t("submit")}
       </button>
     </form>
   )

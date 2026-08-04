@@ -1,6 +1,7 @@
-"use client"
+'use client'
 
 import { useState, useTransition } from "react"
+import { useTranslations } from "next-intl"
 import { saveEmailSettings } from "./actions"
 
 type Settings = {
@@ -11,6 +12,7 @@ type Settings = {
 } | null
 
 export default function SettingsForm({ initialSettings }: { initialSettings: Settings }) {
+  const t = useTranslations("settingsForm")
   const [isPending, startTransition] = useTransition()
   const [message, setMessage] = useState<string | null>(null)
   const [configured, setConfigured] = useState(
@@ -26,11 +28,11 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Set
       if (result?.error) {
         setMessage(result.error)
       } else {
-        setMessage("保存しました。")
+        setMessage(t("saved"))
         setConfigured(
-          !!String(formData.get("emailjs_service_id") || "").trim() &&
-            !!String(formData.get("emailjs_template_id") || "").trim() &&
-            !!String(formData.get("emailjs_public_key") || "").trim()
+          !!(String(formData.get("emailjs_service_id") || "")).trim() &&
+            !!(String(formData.get("emailjs_template_id") || "")).trim() &&
+            !!(String(formData.get("emailjs_public_key") || "")).trim()
         )
       }
     })
@@ -45,12 +47,12 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Set
           }
         />
         <span className="text-sm text-slate-600">
-          {configured ? "メール送信は有効です" : "未設定（アプリ内通知のみ）"}
+          {configured ? t("statusConfigured") : t("statusUnconfigured")}
         </span>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Service ID</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1">{t("serviceIdLabel")}</label>
         <input
           type="text"
           name="emailjs_service_id"
@@ -60,7 +62,7 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Set
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Template ID</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1">{t("templateIdLabel")}</label>
         <input
           type="text"
           name="emailjs_template_id"
@@ -70,7 +72,7 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Set
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Public Key</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1">{t("publicKeyLabel")}</label>
         <input
           type="text"
           name="emailjs_public_key"
@@ -80,7 +82,7 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Set
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Private Key</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1">{t("privateKeyLabel")}</label>
         <input
           type="password"
           name="emailjs_private_key"
@@ -88,7 +90,7 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Set
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
         />
         <p className="text-xs text-slate-400 mt-1">
-          Private Key は EmailJS の Account → Security ページで確認できます。
+          {t("privateKeyHint")}
         </p>
       </div>
 
@@ -99,7 +101,7 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Set
         disabled={isPending}
         className="w-full bg-slate-900 text-white text-sm font-semibold rounded-md py-2.5 hover:bg-slate-800 disabled:opacity-50"
       >
-        {isPending ? "保存中..." : "保存する"}
+        {isPending ? t("saving") : t("save")}
       </button>
     </form>
   )

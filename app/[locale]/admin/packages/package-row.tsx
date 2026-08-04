@@ -1,17 +1,19 @@
-"use client"
+'use client'
 
 import { useState, useTransition } from "react"
+import { useTranslations } from "next-intl"
 import { updatePackageStatus, deletePackage, submitQuote } from "./actions"
 
-const STATUS_OPTIONS = [
-  { value: "arrived", label: "到着済み" },
-  { value: "requested", label: "発送依頼済み" },
-  { value: "quoted", label: "見積済み" },
-  { value: "paid", label: "支払い済み" },
-  { value: "shipped", label: "発送完了" },
-]
-
 export default function PackageRow({ pkg }: { pkg: any }) {
+  const t = useTranslations("packageRow")
+  const tStatus = useTranslations("packageStatus")
+  const STATUS_OPTIONS = [
+    { value: "arrived", label: tStatus("arrived") },
+    { value: "requested", label: tStatus("requested") },
+    { value: "quoted", label: tStatus("quoted") },
+    { value: "paid", label: tStatus("paid") },
+    { value: "shipped", label: tStatus("shipped") },
+  ]
   const [isPending, startTransition] = useTransition()
   const [quoteAmount, setQuoteAmount] = useState("")
   const [quoteNote, setQuoteNote] = useState("")
@@ -25,7 +27,7 @@ export default function PackageRow({ pkg }: { pkg: any }) {
   }
 
   function handleDelete() {
-    const ok = confirm(pkg.item_name + " を削除しますか？")
+    const ok = confirm(t("deleteConfirm", { name: pkg.item_name }))
     if (!ok) return
     startTransition(() => {
       deletePackage(pkg.id)
@@ -35,7 +37,7 @@ export default function PackageRow({ pkg }: { pkg: any }) {
   function handleSubmitQuote() {
     const amount = Number(quoteAmount)
     if (!amount || amount <= 0) {
-      setQuoteMessage("正しい金額を入力してください。")
+      setQuoteMessage(t("quoteInvalidAmount"))
       return
     }
     setQuoteMessage(null)
@@ -44,7 +46,7 @@ export default function PackageRow({ pkg }: { pkg: any }) {
       if (result?.error) {
         setQuoteMessage(result.error)
       } else {
-        setQuoteMessage("見積を送信しました。")
+        setQuoteMessage(t("quoteSentSuccess"))
       }
     })
   }
@@ -55,20 +57,20 @@ export default function PackageRow({ pkg }: { pkg: any }) {
         <div>
           <p className="font-semibold text-slate-900">{pkg.item_name}</p>
           <p className="mt-1 text-xs text-slate-500">
-            {pkg.profiles?.full_name} ・ {pkg.profiles?.suite_number}
+            {pkg.profiles?.full_name} {t("suiteSeparator")} {pkg.profiles?.suite_number}
           </p>
           {pkg.tracking_number && (
-            <p className="mt-1 text-xs text-slate-500">追跡番号: {pkg.tracking_number}</p>
+            <p className="mt-1 text-xs text-slate-500">{t("trackingNumber")}{pkg.tracking_number}</p>
           )}
           {pkg.weight_lbs && (
-            <p className="mt-1 text-xs text-slate-500">重量: {pkg.weight_lbs} lbs</p>
+            <p className="mt-1 text-xs text-slate-500">{t("weight")}{pkg.weight_lbs} {t("weightUnit")}</p>
           )}
           {pkg.admin_note && (
             <p className="mt-2 text-xs text-slate-600">{pkg.admin_note}</p>
           )}
           {pkg.quote_amount != null && (
             <p className="mt-2 text-xs font-semibold text-teal-700">
-              見積金額: ￥{Number(pkg.quote_amount).toLocaleString()}
+              {t("quoteAmountLabel")}{Number(pkg.quote_amount).toLocaleString()}
               {pkg.quote_note && (
                 <span className="ml-1 font-normal text-slate-500">({pkg.quote_note})</span>
               )}
@@ -95,7 +97,7 @@ export default function PackageRow({ pkg }: { pkg: any }) {
             disabled={isPending}
             className="rounded-lg border border-red-200 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
           >
-            削除
+            {t("delete")}
           </button>
         </div>
       </div>
@@ -103,17 +105,17 @@ export default function PackageRow({ pkg }: { pkg: any }) {
       {pkg.status === "requested" && (
         <div className="mt-3 flex flex-wrap items-end gap-2 rounded-lg border border-teal-200 bg-teal-50 p-3">
           <div>
-            <label className="block text-xs text-teal-800">見積金額 (円)</label>
+            <label className="block text-xs text-teal-800">{t("quoteAmountFieldLabel")}</label>
             <input
               type="number"
               value={quoteAmount}
               onChange={(e) => setQuoteAmount(e.target.value)}
               className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1 text-sm"
-              placeholder="3000"
+              placeholder={t("quoteAmountPlaceholder")}
             />
           </div>
           <div className="flex-1">
-            <label className="block text-xs text-teal-800">メモ (任意)</label>
+            <label className="block text-xs text-teal-800">{t("quoteNoteFieldLabel")}</label>
             <input
               type="text"
               value={quoteNote}
@@ -126,7 +128,7 @@ export default function PackageRow({ pkg }: { pkg: any }) {
             disabled={isPending}
             className="whitespace-nowrap rounded-lg bg-teal-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
           >
-            見積を送信
+            {t("submitQuote")}
           </button>
           {quoteMessage && <p className="w-full text-xs text-teal-800">{quoteMessage}</p>}
         </div>
