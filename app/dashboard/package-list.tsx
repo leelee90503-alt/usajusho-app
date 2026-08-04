@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { requestShipment } from "./actions"
+import { requestShipment, payForShipment } from "./actions"
 
 const STATUS_LABELS: Record<string, string> = {
   arrived: "到着済み",
   requested: "発送依頼済み",
+  quoted: "見積済み",
+  paid: "支払い済み",
   shipped: "発送完了",
 }
 
@@ -16,12 +18,16 @@ type Package = {
   weight_lbs: number | null
   admin_note: string | null
   status: string
+  quote_amount: number | null
+  quote_note: string | null
 }
 
 export default function PackageList({ packages }: { packages: Package[] }) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [isPending, startTransition] = useTransition()
   const [message, setMessage] = useState<string | null>(null)
+  const [payingId, setPayingId] = useState<string | null>(null)
+  const [payMessage, setPayMessage] = useState<string | null>(null)
 
   const arrivedPackages = packages.filter((p) => p.status === "arrived")
 
@@ -47,6 +53,20 @@ export default function PackageList({ packages }: { packages: Package[] }) {
         setMessage("発送を依頼しました。")
         setSelected(new Set())
       }
+    })
+  }
+
+  function handlePay(id: string) {
+    setPayMessage(null)
+    setPayingId(id)
+    startTransition(async () => {
+      const result = await payForShipment(id)
+      if (result?.error) {
+        setPayMessage(result.error)
+      } else {
+        setPayMessage("お支払いが完了しました。")
+      }
+      setPayingId(null)
     })
   }
 
@@ -78,6 +98,7 @@ export default function PackageList({ packages }: { packages: Package[] }) {
       )}
 
       {message && <p className="text-sm text-teal-700">{message}</p>}
+      {payMessage && <p className="text-sm text-teal-700">{payMessage}</p>}
 
       <ul className="space-y-3">
         {packages.map((pkg) => (
@@ -116,6 +137,26 @@ export default function PackageList({ packages }: { packages: Package[] }) {
                 {STATUS_LABELS[pkg.status] || pkg.status}
               </span>
             </div>
+
+            {pkg.status === "quoted" && pkg.quote_amount != null && (
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <div>
+                  <p className="text-sm font-semibold text-amber-900">
+                    送料の見積り: ￥{Number(pkg.quote_amount).toLocaleString()}
+                  </p>
+                  {pkg.quote_note && (
+                    <p className="mt-1 text-xs text-amber-700">{pkg.quote_note}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => handlePay(pkg.id)}
+                  disabled={isPending && payingId === pkg.id}
+                  className="whitespace-nowrap rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
+                >
+                  支払う
+                </button>
+              </div>
+            )}
           </li>
         ))}
       </ul>

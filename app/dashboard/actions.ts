@@ -34,3 +34,34 @@ export async function requestShipment(packageIds: string[]) {
 
   return { success: true }
 }
+
+export async function payForShipment(packageId: string) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: "ログインしてください。" }
+  }
+
+  // NOTE: Stripe is not yet connected. This marks the package as paid directly
+  // as a stand-in for a real checkout flow. Swap this for a Stripe Checkout
+  // session + webhook once payment credentials are available.
+  const { error } = await supabase
+    .from("packages")
+    .update({ status: "paid", updated_at: new Date().toISOString() })
+    .eq("id", packageId)
+    .eq("user_id", user.id)
+    .eq("status", "quoted")
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath("/dashboard")
+  revalidatePath("/admin/packages")
+
+  return { success: true }
+}

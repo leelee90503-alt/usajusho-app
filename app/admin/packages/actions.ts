@@ -95,3 +95,25 @@ export async function deletePackage(packageId: string) {
   revalidatePath("/admin/packages")
   return { success: true }
 }
+
+export async function submitQuote(packageId: string, quoteAmount: number, quoteNote: string) {
+  const supabase = await requireAdmin()
+
+  const { error } = await supabase
+    .from("packages")
+    .update({
+      quote_amount: quoteAmount,
+      quote_note: quoteNote || null,
+      status: "quoted",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", packageId)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath("/admin/packages")
+  revalidatePath("/dashboard")
+  return { success: true }
+}
