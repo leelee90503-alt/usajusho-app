@@ -102,7 +102,7 @@
       "resultLabel": "Estimated shipping cost",
       "unavailable": "Enter a weight to see an estimated cost.",
       "disclaimer": "* Actual shipping cost depends on package size, weight, and any add-on services selected. See your commercial invoice on the dashboard for the final amount.",
-      "currency": "¥",
+      "currency": "$",
       "overweightContact": "For packages over 50kg, please contact support for a custom quote."
     },
     "tracking": {
