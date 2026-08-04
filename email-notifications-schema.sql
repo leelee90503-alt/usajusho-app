@@ -30,9 +30,23 @@ begin
 end;
 $$;
 
+-- Admin read-all-profiles policy must NOT reference public.profiles from
+-- within its own using() clause directly, or Postgres raises
+-- "42P17: infinite recursion detected in policy for relation profiles".
+-- Instead, wrap the admin check in a SECURITY DEFINER function, which
+-- bypasses RLS internally and breaks the recursive evaluation.
+create or replace function public.is_admin(uid uuid)
+returns boolean
+language sql
+security definer set search_path = public
+stable
+as $$
+  select coalesce((select is_admin from public.profiles where id = uid), false);
+$$;
+
 create policy "Admins can view all profiles"
   on public.profiles for select
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin = true));
+  using (public.is_admin(auth.uid()));
 
 create table if not exists public.email_settings (
   id integer primary key default 1,
@@ -48,15 +62,15 @@ alter table public.email_settings enable row level security;
 
 create policy "Admins can view email settings"
   on public.email_settings for select
-  using (exists (select 1 from public.profiles where id = auth.uid() and is_admin = true));
+  using (public.is_admin(auth.uid()));
 
 create policy "Admins can update email settings"
   on public.email_settings for update
-  using (exists (select 1 from public.profiles where id = auth.uid() and is_admin = true))
-  with check (exists (select 1 from public.profiles where id = auth.uid() and is_admin = true));
+  using (public.is_admin(auth.uid()))
+  with check (public.is_admin(auth.uid()));
 
 create policy "Admins can insert email settings"
   on public.email_settings for insert
-  with check (exists (select 1 from public.profiles where id = auth.uid() and is_admin = true));
+  with check (public.is_admin(auth.uid()));
 
 insert into public.email_settings (id) values (1) on conflict (id) do nothing;
