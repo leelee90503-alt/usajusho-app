@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PrintButton from './print-button'
+import InvoiceForm from './invoice-form'
+import { createOrGetDraftInvoice } from './invoice-actions'
 
 export default async function InvoiceDetailPage({
   params,
@@ -35,6 +37,52 @@ export default async function InvoiceDetailPage({
   if (!pkg) {
     notFound()
   }
+
+
+  const it = await getTranslations("invoiceForm")
+  const invoiceFormLabels = {
+    title: it("title"),
+    statusDraft: it("statusDraft"),
+    statusSubmitted: it("statusSubmitted"),
+    statusCorrectionRequired: it("statusCorrectionRequired"),
+    statusAdminReview: it("statusAdminReview"),
+    statusComplete: it("statusComplete"),
+    correctionBannerTitle: it("correctionBannerTitle"),
+    noticeWhyNeeded: it("noticeWhyNeeded"),
+    noticeEnglishRequired: it("noticeEnglishRequired"),
+    noticeAccurateValue: it("noticeAccurateValue"),
+    noticeCustomsDuties: it("noticeCustomsDuties"),
+    noticeProhibitedItems: it("noticeProhibitedItems"),
+    noticeCorrections: it("noticeCorrections"),
+    shipperName: it("shipperName"),
+    shipperAddress: it("shipperAddress"),
+    consigneeName: it("consigneeName"),
+    consigneeAddress: it("consigneeAddress"),
+    reasonForExport: it("reasonForExport"),
+    shippingTerms: it("shippingTerms"),
+    lineItemsTitle: it("lineItemsTitle"),
+    productName: it("productName"),
+    quantity: it("quantity"),
+    unitPrice: it("unitPrice"),
+    itemTotal: it("itemTotal"),
+    countryOfOrigin: it("countryOfOrigin"),
+    hsCode: it("hsCode"),
+    currencySymbol: it("currencySymbol"),
+    duplicate: it("duplicate"),
+    delete: it("delete"),
+    noItems: it("noItems"),
+    addItem: it("addItem"),
+    totalDeclaredValue: it("totalDeclaredValue"),
+    submit: it("submit"),
+    submitConfirmTitle: it("submitConfirmTitle"),
+    submitConfirmBody: it("submitConfirmBody"),
+    certificationStatement: it("certificationStatement"),
+    customerSignature: it("customerSignature"),
+    cancel: it("cancel"),
+    confirmSubmit: it("confirmSubmit"),
+  }
+
+  const invoiceResult = await createOrGetDraftInvoice(pkg.id)
 
   return (
     <main className="min-h-screen bg-slate-50 print:bg-white">
@@ -118,6 +166,10 @@ export default async function InvoiceDetailPage({
           {pkg.quote_note && (
             <p className="mt-4 text-xs text-slate-500">{pkg.quote_note}</p>
           )}
+
+      {invoiceResult.invoice && (
+        <InvoiceForm invoice={invoiceResult.invoice} labels={invoiceFormLabels} />
+      )}
         </div>
       </div>
     </main>
