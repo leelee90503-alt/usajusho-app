@@ -94,10 +94,16 @@
       "description": "Enter your package weight to see an estimated shipping cost to Japan right away.",
       "weightLabel": "Package weight",
       "weightPlaceholder": "e.g. 2.5",
+      "dimensionsLabel": "Box dimensions (optional)",
+      "lengthPlaceholder": "Length",
+      "widthPlaceholder": "Width",
+      "heightPlaceholder": "Height",
+      "dimensionsHint": "Adding dimensions gives a more accurate estimate using dimensional weight (L x W x H / 6000). Max 50kg per box, max 260cm (L+W+H combined), max length 200cm.",
       "resultLabel": "Estimated shipping cost",
       "unavailable": "Enter a weight to see an estimated cost.",
       "disclaimer": "* Actual shipping cost depends on package size, weight, and any add-on services selected. See your commercial invoice on the dashboard for the final amount.",
-      "currency": "¥"
+      "currency": "¥",
+      "overweightContact": "For packages over 50kg, please contact support for a custom quote."
     },
     "tracking": {
       "title": "Track it from shipment to delivery",

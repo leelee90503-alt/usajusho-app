@@ -94,10 +94,16 @@
       "description": "荷物の重さを入力するだけで、日本までの概算送料をすぐに確認できます。",
       "weightLabel": "荷物の重さ",
       "weightPlaceholder": "例：2.5",
+      "dimensionsLabel": "箱のサイズ（任意）",
+      "lengthPlaceholder": "奧行",
+      "widthPlaceholder": "幅",
+      "heightPlaceholder": "高さ",
+      "dimensionsHint": "サイズを入力すると、容積重量（縦×横×高 cm ÷ 6000）を考慮したより正確な見積もりになります。箱あたり最大50kg、サイズは縦×横×高の合計で260cm以内、最長200cmまで。",
       "resultLabel": "概算送料",
       "unavailable": "重さを入力すると概算送料が表示されます。",
       "disclaimer": "※ 実際の送料は荷物のサイズ・重量や選択した付加サービスにより異なります。最終金額はマイページの商業送り状でご確認ください。",
-      "currency": "¥"
+      "currency": "¥",
+      "overweightContact": "50kgを超える場合は、お問い合わせいただければ個別にお見積もりします。"
     },
     "tracking": {
       "title": "発送から到着まで追跡できます",

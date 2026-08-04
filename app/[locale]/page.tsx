@@ -238,13 +238,19 @@ export default async function Home() {
           <FeeCalculator
             rates={shippingRates}
             labels={{
-              weightLabel: t("calculator.weightLabel"),
-              weightPlaceholder: t("calculator.weightPlaceholder"),
-              resultLabel: t("calculator.resultLabel"),
-              unavailable: t("calculator.unavailable"),
-              disclaimer: t("calculator.disclaimer"),
-              currency: t("calculator.currency"),
-            }}
+                weightLabel: t("calculator.weightLabel"),
+                weightPlaceholder: t("calculator.weightPlaceholder"),
+                dimensionsLabel: t("calculator.dimensionsLabel"),
+                lengthPlaceholder: t("calculator.lengthPlaceholder"),
+                widthPlaceholder: t("calculator.widthPlaceholder"),
+                heightPlaceholder: t("calculator.heightPlaceholder"),
+                dimensionsHint: t("calculator.dimensionsHint"),
+                resultLabel: t("calculator.resultLabel"),
+                unavailable: t("calculator.unavailable"),
+                disclaimer: t("calculator.disclaimer"),
+                currency: t("calculator.currency"),
+                overweightContact: t("calculator.overweightContact"),
+              }}
           />
         </div>
       </section>

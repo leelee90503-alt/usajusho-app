@@ -34,7 +34,7 @@ export type ChargeableWeightResult = {
   chargeableWeightKg: number
 }
 
-const VOLUMETRIC_DIVISOR = 5000
+const VOLUMETRIC_DIVISOR = 6000
 
 export function calculateVolumetricWeightKg(
   lengthCm: number | null | undefined,
@@ -73,12 +73,17 @@ export function findRateForWeight(
     .sort((a, b) => a.min_weight_kg - b.min_weight_kg)
 
   for (const rate of active) {
-    const withinMin = chargeableWeightKg >= rate.min_weight_kg
-    const withinMax = rate.max_weight_kg === null || chargeableWeightKg < rate.max_weight_kg
-    if (withinMin && withinMax) {
-      return rate
+      // Tiers are (min, max] so a weight exactly on an integer boundary (e.g. 3.0kg)
+      // bills at that tier's rate (ceiling billing), not the next tier up. The very
+      // first tier (min_weight_kg === 0) stays inclusive of 0 itself.
+      const withinMin = rate.min_weight_kg === 0
+        ? chargeableWeightKg >= rate.min_weight_kg
+        : chargeableWeightKg > rate.min_weight_kg
+      const withinMax = rate.max_weight_kg === null || chargeableWeightKg <= rate.max_weight_kg
+      if (withinMin && withinMax) {
+        return rate
+      }
     }
-  }
 
   return null
 }
