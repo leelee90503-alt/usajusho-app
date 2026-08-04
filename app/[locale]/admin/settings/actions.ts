@@ -1,16 +1,19 @@
 "use server"
 
-import { redirect } from "next/navigation"
+import { redirect } from '@/i18n/navigation'
+import { getLocale } from 'next-intl/server'
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 
-async function requireAdmin() {
+async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>> {
+  const locale = await getLocale()
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) {
-    redirect("/login")
+    redirect({ href: "/login", locale })
+    return undefined as never
   }
   const { data: profile } = await supabase
     .from("profiles")
@@ -18,7 +21,8 @@ async function requireAdmin() {
     .eq("id", user.id)
     .single()
   if (!profile?.is_admin) {
-    redirect("/dashboard")
+    redirect({ href: "/dashboard", locale })
+    return undefined as never
   }
   return supabase
 }

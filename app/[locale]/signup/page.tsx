@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { useRouter, Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function SignupPage() {
+  const t = useTranslations('signup')
   const router = useRouter()
   const supabase = createClient()
   const [fullName, setFullName] = useState('')
@@ -38,15 +39,15 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    <main className="min-h-screen flex items-center justify-center bg-[var(--usj-surface)] px-4">
       <div className="w-full max-w-sm bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-        <h1 className="text-xl font-bold text-slate-900 mb-1">USAJUSHO 会員登録</h1>
+        <h1 className="text-xl font-bold text-[var(--usj-primary)] mb-1">{t('title')}</h1>
         <p className="text-sm text-slate-500 mb-6">Create your account</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              お名前
+              {t('fullName')}
             </label>
             <input
               type="text"
@@ -56,9 +57,10 @@ export default function SignupPage() {
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              メールアドレス
+              {t('email')}
             </label>
             <input
               type="email"
@@ -68,14 +70,14 @@ export default function SignupPage() {
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              パスワード
+              {t('password')}
             </label>
             <input
               type="password"
               required
-              minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -87,16 +89,16 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-slate-900 text-white text-sm font-semibold rounded-md py-2.5 hover:bg-slate-800 disabled:opacity-50"
+            className="w-full bg-[var(--usj-primary)] text-white text-sm font-semibold rounded-md py-2.5 hover:opacity-90 disabled:opacity-50"
           >
-            {loading ? '登録中...' : 'アカウントを作成'}
+            {loading ? t('submitting') : t('submit')}
           </button>
         </form>
 
         <p className="text-sm text-slate-500 mt-6 text-center">
-          すでにアカウントをお持ちですか？{' '}
+          {t('hasAccount')}{' '}
           <Link href="/login" className="text-teal-700 font-medium">
-            ログイン
+            {t('loginLink')}
           </Link>
         </p>
       </div>

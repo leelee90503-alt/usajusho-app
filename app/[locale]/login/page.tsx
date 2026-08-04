@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { useRouter, Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
+  const t = useTranslations('login')
   const router = useRouter()
   const supabase = createClient()
   const [email, setEmail] = useState('')
@@ -31,15 +32,15 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    <main className="min-h-screen flex items-center justify-center bg-[var(--usj-surface)] px-4">
       <div className="w-full max-w-sm bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-        <h1 className="text-xl font-bold text-slate-900 mb-1">ログイン</h1>
+        <h1 className="text-xl font-bold text-[var(--usj-primary)] mb-1">{t('title')}</h1>
         <p className="text-sm text-slate-500 mb-6">Sign in to USAJUSHO</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              メールアドレス
+              {t('email')}
             </label>
             <input
               type="email"
@@ -49,9 +50,10 @@ export default function LoginPage() {
               className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              パスワード
+              {t('password')}
             </label>
             <input
               type="password"
@@ -67,16 +69,16 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-slate-900 text-white text-sm font-semibold rounded-md py-2.5 hover:bg-slate-800 disabled:opacity-50"
+            className="w-full bg-[var(--usj-primary)] text-white text-sm font-semibold rounded-md py-2.5 hover:opacity-90 disabled:opacity-50"
           >
-            {loading ? 'ログイン中...' : 'ログイン'}
+            {loading ? t('submitting') : t('submit')}
           </button>
         </form>
 
         <p className="text-sm text-slate-500 mt-6 text-center">
-          アカウントをお持ちでないですか？{' '}
+          {t('noAccount')}{' '}
           <Link href="/signup" className="text-teal-700 font-medium">
-            会員登録
+            {t('signupLink')}
           </Link>
         </p>
       </div>

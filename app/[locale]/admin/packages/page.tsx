@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation"
+import { redirect, Link } from '@/i18n/navigation'
 import { createClient } from "@/lib/supabase/server"
+import { getLocale } from 'next-intl/server'
 import AddPackageForm from "./add-package-form"
 import PackageRow from "./package-row"
 
@@ -25,6 +26,7 @@ export default async function AdminPackagesPage({
 }: {
   searchParams: Promise<{ q?: string; status?: string }>
 }) {
+  const locale = await getLocale()
   const supabase = await createClient()
 
   const {
@@ -32,7 +34,8 @@ export default async function AdminPackagesPage({
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect("/login")
+    redirect({ href: "/login", locale })
+    return
   }
 
   const { data: profile } = await supabase
@@ -42,7 +45,7 @@ export default async function AdminPackagesPage({
     .single()
 
   if (!profile?.is_admin) {
-    redirect("/dashboard")
+    redirect({ href: "/dashboard", locale })
   }
 
   const { q = "", status = "" } = await searchParams
@@ -84,9 +87,9 @@ export default async function AdminPackagesPage({
       <div className="mx-auto max-w-4xl px-6 py-10">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-slate-900">管理者: 荷物到着登録</h1>
-          <a href="/admin/settings" className="text-sm text-teal-700 hover:underline">
+          <Link href="/admin/settings" className="text-sm text-teal-700 hover:underline">
             メール通知設定
-          </a>
+          </Link>
         </div>
         <p className="mt-1 text-sm text-slate-500">
           ユーザーのスイート番号を入力して、到着した荷物を登録してください。
@@ -155,12 +158,12 @@ export default async function AdminPackagesPage({
                 検索
               </button>
               {(q || status) && (
-                <a
+                <Link
                   href="/admin/packages"
                   className="text-sm text-slate-500 underline hover:text-slate-700"
                 >
                   クリア
-                </a>
+                </Link>
               )}
             </form>
           </div>

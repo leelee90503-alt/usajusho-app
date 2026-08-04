@@ -1,8 +1,10 @@
-import { redirect } from "next/navigation"
+import { redirect, Link } from '@/i18n/navigation'
 import { createClient } from "@/lib/supabase/server"
+import { getLocale } from 'next-intl/server'
 import SettingsForm from "./settings-form"
 
 export default async function AdminSettingsPage() {
+  const locale = await getLocale()
   const supabase = await createClient()
 
   const {
@@ -10,7 +12,8 @@ export default async function AdminSettingsPage() {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect("/login")
+    redirect({ href: "/login", locale })
+    return
   }
 
   const { data: profile } = await supabase
@@ -20,7 +23,7 @@ export default async function AdminSettingsPage() {
     .single()
 
   if (!profile?.is_admin) {
-    redirect("/dashboard")
+    redirect({ href: "/dashboard", locale })
   }
 
   const { data: settings } = await supabase
@@ -34,9 +37,9 @@ export default async function AdminSettingsPage() {
       <div className="mx-auto max-w-2xl px-6 py-10">
         <div className="flex items-center justify-between mb-1">
           <h1 className="text-xl font-bold text-slate-900">メール通知設定</h1>
-          <a href="/admin/packages" className="text-sm text-teal-700 hover:underline">
+          <Link href="/admin/packages" className="text-sm text-teal-700 hover:underline">
             荷物管理に戻る
-          </a>
+          </Link>
         </div>
         <p className="text-sm text-slate-500 mb-6">
           EmailJS のアカウント情報を入力すると、荷物の到着・見積り・発送完了時にユーザーへ自動でメールが送信されます。
