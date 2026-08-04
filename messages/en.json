@@ -1,0 +1,43 @@
+{
+  "common": {
+    "appName": "USAJUSHO",
+    "language": "Language",
+    "japanese": "日本語",
+    "english": "English"
+  },
+  "home": {
+    "title": "USAJUSHO",
+    "description": "A US-to-Japan package forwarding service. Get your own US address and shop US online stores from Japan.",
+    "signup": "Sign Up",
+    "login": "Log In"
+  },
+  "login": {
+    "title": "Log In",
+    "email": "Email address",
+    "password": "Password",
+    "submit": "Log In",
+    "submitting": "Logging in...",
+    "noAccount": "Don't have an account?",
+    "signupLink": "Sign Up"
+  },
+  "signup": {
+    "title": "Sign Up",
+    "fullName": "Full name",
+    "email": "Email address",
+    "password": "Password",
+    "submit": "Sign Up",
+    "submitting": "Signing up...",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Log In"
+  },
+  "dashboard": {
+    "myAddress": "My US Address",
+    "signOut": "Sign Out",
+    "notifications": "Notifications"
+  },
+  "nav": {
+    "adminPackages": "Admin: Package Intake",
+    "adminSettings": "Email Notification Settings",
+    "backToPackages": "Back to Package Management"
+  }
+}

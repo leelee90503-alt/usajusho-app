@@ -1,0 +1,43 @@
+{
+  "common": {
+    "appName": "USAJUSHO",
+    "language": "言語",
+    "japanese": "日本語",
+    "english": "English"
+  },
+  "home": {
+    "title": "USAJUSHO",
+    "description": "米国から日本への転送サービス。専用の米国住所で、米国のオンラインショップを日本からご利用いただけます。",
+    "signup": "会員登録",
+    "login": "ログイン"
+  },
+  "login": {
+    "title": "ログイン",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "submit": "ログイン",
+    "submitting": "ログイン中...",
+    "noAccount": "アカウントをお持ちでないですか？",
+    "signupLink": "会員登録"
+  },
+  "signup": {
+    "title": "会員登録",
+    "fullName": "お名前",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "submit": "会員登録",
+    "submitting": "登録中...",
+    "hasAccount": "すでにアカウントをお持ちですか？",
+    "loginLink": "ログイン"
+  },
+  "dashboard": {
+    "myAddress": "私の米国住所",
+    "signOut": "ログアウト",
+    "notifications": "通知"
+  },
+  "nav": {
+    "adminPackages": "管理者: 荷物到着登録",
+    "adminSettings": "メール通知設定",
+    "backToPackages": "荷物管理に戻る"
+  }
+}
