@@ -82,7 +82,12 @@ export default async function AdminPackagesPage({
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-4xl px-6 py-10">
-        <h1 className="text-xl font-bold text-slate-900">管理者: 荷物到着登録</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-slate-900">管理者: 荷物到着登録</h1>
+          <a href="/admin/settings" className="text-sm text-teal-700 hover:underline">
+            メール通知設定
+          </a>
+        </div>
         <p className="mt-1 text-sm text-slate-500">
           ユーザーのスイート番号を入力して、到着した荷物を登録してください。
         </p>

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
+import emailjs from "@emailjs/nodejs"
 
 type NotifyParams = {
   userId: string
@@ -7,17 +8,12 @@ type NotifyParams = {
   body: string
 }
 
-// Creates an in-app notification row for the user, and stubs out an email send.
-//
-// TODO: Wire up a real email provider (e.g. Resend, SendGrid, Postmark) once
-// credentials are available. Email delivery needs the user's email address,
-// which lives in Supabase auth.users rather than public.profiles - fetching
-// it requires a service-role client (SUPABASE_SERVICE_ROLE_KEY), which is not
-// currently configured in this project's environment. Once that key is added:
-//   1. Create a service-role client in this file.
-//   2. Look up the user's email via supabaseAdmin.auth.admin.getUserById(userId).
-//   3. Send the email via the provider's SDK using `title` as subject and
-//      `body` as the message.
+// Creates an in-app notification row for the user, and sends a real email
+// through EmailJS if an administrator has configured EmailJS credentials on
+// the /admin/settings page (stored in public.email_settings). Until those
+// credentials are entered, this silently falls back to in-app notifications
+// only - no code changes or redeploys are needed once the admin fills in
+// the settings form.
 export async function notifyUser(supabase: SupabaseClient, params: NotifyParams) {
   const { userId, packageId, title, body } = params
 
@@ -27,11 +23,58 @@ export async function notifyUser(supabase: SupabaseClient, params: NotifyParams)
     title,
     body,
   })
-
   if (error) {
     console.error("Failed to create notification:", error.message)
   }
 
-  // Stub: log what would be emailed once a provider is connected.
-  console.log(`[email stub] to user ${userId}: ${title} - ${body}`)
+  await sendEmailNotification(supabase, userId, title, body)
+}
+
+async function sendEmailNotification(
+  supabase: SupabaseClient,
+  userId: string,
+  title: string,
+  body: string
+) {
+  try {
+    const { data: settings } = await supabase
+      .from("email_settings")
+      .select("emailjs_service_id, emailjs_template_id, emailjs_public_key, emailjs_private_key")
+      .eq("id", 1)
+      .maybeSingle()
+
+    if (!settings?.emailjs_service_id || !settings?.emailjs_template_id || !settings?.emailjs_public_key) {
+      console.log(`[email not configured] would notify user ${userId}: ${title} - ${body}`)
+      return
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", userId)
+      .single()
+
+    if (!profile?.email) {
+      console.log(`[no email on file] could not email user ${userId}: ${title} - ${body}`)
+      return
+    }
+
+    await emailjs.send(
+      settings.emailjs_service_id,
+      settings.emailjs_template_id,
+      {
+        to_email: profile.email,
+        to_name: profile.full_name || "",
+        subject: title,
+        message: body,
+      },
+      {
+        publicKey: settings.emailjs_public_key,
+        privateKey: settings.emailjs_private_key || undefined,
+      }
+    )
+    console.log(`[email sent] to ${profile.email}: ${title}`)
+  } catch (err) {
+    console.error("Failed to send email notification:", err)
+  }
 }
