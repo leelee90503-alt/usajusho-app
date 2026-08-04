@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import SignOutButton from './sign-out-button'
 import PackageList from './package-list'
+import NotificationBell from './notification-bell'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -26,12 +27,22 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
+  const { data: notifications } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(20)
+
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-slate-900">USAJUSHO</h1>
-          <SignOutButton />
+          <div className="flex items-center gap-3">
+            <NotificationBell notifications={notifications ?? []} />
+            <SignOutButton />
+          </div>
         </div>
 
         <div className="mt-8">

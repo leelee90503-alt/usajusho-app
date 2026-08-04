@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { notifyUser } from "@/lib/notifications"
 
 async function requireAdmin() {
   const supabase = await createClient()
@@ -63,6 +64,12 @@ export async function addPackage(formData: FormData) {
     return { error: insertError.message }
   }
 
+  await notifyUser(supabase, {
+    userId: profile.id,
+    title: "荷物が届きました",
+    body: `${itemName} が届きました。ダッシュボードからご確認ください。`,
+  })
+
   revalidatePath("/admin/packages")
   return { success: true }
 }
@@ -70,13 +77,24 @@ export async function addPackage(formData: FormData) {
 export async function updatePackageStatus(packageId: string, status: string) {
   const supabase = await requireAdmin()
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("packages")
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", packageId)
+    .select("user_id, item_name")
+    .single()
 
   if (error) {
     return { error: error.message }
+  }
+
+  if (status === "shipped" && updated) {
+    await notifyUser(supabase, {
+      userId: updated.user_id,
+      packageId,
+      title: "発送が完了しました",
+      body: `${updated.item_name} の発送が完了しました。`,
+    })
   }
 
   revalidatePath("/admin/packages")
@@ -99,7 +117,7 @@ export async function deletePackage(packageId: string) {
 export async function submitQuote(packageId: string, quoteAmount: number, quoteNote: string) {
   const supabase = await requireAdmin()
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("packages")
     .update({
       quote_amount: quoteAmount,
@@ -108,9 +126,20 @@ export async function submitQuote(packageId: string, quoteAmount: number, quoteN
       updated_at: new Date().toISOString(),
     })
     .eq("id", packageId)
+    .select("user_id, item_name")
+    .single()
 
   if (error) {
     return { error: error.message }
+  }
+
+  if (updated) {
+    await notifyUser(supabase, {
+      userId: updated.user_id,
+      packageId,
+      title: "送料の見積りが届きました",
+      body: `${updated.item_name} の送料見積り ￥${quoteAmount.toLocaleString()} が届きました。ダッシュボードからお支払いください。`,
+    })
   }
 
   revalidatePath("/admin/packages")
