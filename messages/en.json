@@ -172,7 +172,8 @@
     "backToPackages": "Back to Package Management",
     "purchaseAgency": "Purchase Proxy",
     "login": "Log In",
-    "signup": "Sign Up"
+    "signup": "Sign Up",
+    "howItWorks": "How It Works"
   },
   "packageList": {
     "empty": "No packages have arrived yet.",
@@ -565,5 +566,33 @@
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "copyright": "© 2026 USAJUSHO. All rights reserved."
+  },
+  "howItWorks": {
+    "eyebrow": "Getting Started",
+    "title": "How USAJUSHO Works",
+    "description": "From your first sign-up to a package on your doorstep in Japan — here's exactly what happens at each step, and what's on you versus what we take care of.",
+    "youDoLabel": "What you do",
+    "weHandleLabel": "What we handle",
+    "step1Title": "Create your free account",
+    "step1YouDo": "Sign up with your email in under a minute — no fees to join.",
+    "step1WeHandle": "We instantly issue your own dedicated USAJUSHO warehouse address in the US.",
+    "step2Title": "Shop at any US store",
+    "step2YouDo": "Check out at Amazon, Nike, Best Buy, or any other US retailer using your new USAJUSHO address as the shipping address.",
+    "step2WeHandle": "Can't ship to a freight forwarder, or want us to buy it for you instead? Use Purchase Proxy and we'll purchase the item on your behalf.",
+    "step3Title": "We receive, inspect & photograph it",
+    "step3YouDo": "Just relax — there's nothing to do at this step.",
+    "step3WeHandle": "When your package arrives, we check it in, verify the contents, and photograph it. Photos post to your dashboard as soon as they are ready.",
+    "step4Title": "Review, consolidate & choose add-ons",
+    "step4YouDo": "Log in to your dashboard, review your arrived packages, and decide whether to combine multiple boxes into one shipment to save on shipping. Add any extra services you need.",
+    "step4WeHandle": "We prepare your commercial invoice with the final price, based on the options you chose.",
+    "step5Title": "Pay & we ship to Japan",
+    "step5YouDo": "Review and pay the shipping invoice from your dashboard.",
+    "step5WeHandle": "We hand your package to our international carrier and issue a tracking number right away.",
+    "step6Title": "Delivered to your door in Japan",
+    "step6YouDo": "Track your shipment anytime from your dashboard.",
+    "step6WeHandle": "Your package arrives at the Japan address you specified — typically a few days to about a week after shipping.",
+    "ctaTitle": "Ready to get your own US address?",
+    "ctaDescription": "Sign up is free — you're only charged when you actually ship.",
+    "ctaButton": "Start for Free"
   }
 }
