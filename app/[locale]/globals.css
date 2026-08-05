@@ -19,7 +19,7 @@
   --color-primary: var(--usj-primary);
   --color-accent: var(--usj-accent);
   --color-surface: var(--usj-surface);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-latin), var(--font-jp), Arial, Helvetica, sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -59,7 +59,7 @@
 }
 
 body {
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
 
 @layer base {

@@ -42,36 +42,44 @@ export default async function Home() {
   return (
     <main className="flex flex-col">
       {/* 2. Hero */}
-      <section className="bg-surface border-b border-slate-200">
-        <div className="mx-auto max-w-6xl px-4 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
+      <section className="relative isolate overflow-hidden border-b border-slate-200">
+        <div className="absolute inset-0 -z-10">
+          <img
+            src="/images/hero-bg.webp"
+            alt=""
+            className="h-full w-full object-cover object-right-top"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--usj-primary)] via-[var(--usj-primary)]/85 to-[var(--usj-primary)]/20" />
+        </div>
+        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <p className="text-accent font-semibold text-sm mb-3 tracking-wide">
+            <p className="text-emerald-300 font-semibold text-sm mb-3 tracking-wide">
               {t("hero.eyebrow")}
             </p>
-            <h1 className="text-3xl md:text-5xl font-bold text-primary leading-tight mb-5">
+            <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-5">
               {t("hero.headline")}
             </h1>
-            <p className="text-slate-600 text-base md:text-lg mb-8 max-w-md leading-relaxed">
+            <p className="text-slate-200 text-base md:text-lg mb-8 max-w-md leading-relaxed">
               {t("hero.description")}
             </p>
             <div className="flex flex-wrap gap-3 mb-8">
-              <Button asChild size="lg" className="h-auto px-6 py-3 text-sm font-semibold">
+              <Button asChild size="lg" className="h-auto px-6 py-3 text-sm font-semibold bg-white text-primary hover:bg-slate-100">
                 <Link href="/signup">{t("hero.ctaPrimary")}</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 size="lg"
-                className="h-auto px-6 py-3 text-sm font-semibold border-slate-300 text-primary hover:bg-slate-50"
+                className="h-auto px-6 py-3 text-sm font-semibold border-white/40 text-white hover:bg-white/10"
               >
                 <a href="#calculator">{t("hero.ctaSecondary")}</a>
               </Button>
             </div>
-            <p className="text-xs text-slate-500">{t("hero.trustNote")}</p>
+            <p className="text-xs text-slate-300">{t("hero.trustNote")}</p>
           </div>
 
           {/* Realistic package-status preview panel, not an abstract graphic */}
-          <Card className="shadow-sm">
+          <Card className="shadow-xl">
             <CardContent>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-semibold text-slate-400 tracking-wide">
