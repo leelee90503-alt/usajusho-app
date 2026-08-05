@@ -3,6 +3,12 @@
 import { useRef, useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { addPackage } from "./actions"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Loader2 } from "lucide-react"
 
 export default function AddPackageForm() {
   const t = useTranslations("addPackageForm")
@@ -24,109 +30,66 @@ export default function AddPackageForm() {
   }
 
   return (
-    <form
-      ref={formRef}
-      action={handleSubmit}
-      className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-    >
-      <h2 className="text-sm font-semibold text-slate-900">{t("heading")}</h2>
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("heading")}</CardTitle>
+      </CardHeader>
+      <form ref={formRef} action={handleSubmit}>
+        <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="pkg-suite">{t("suiteLabel")}</Label>
+            <Input id="pkg-suite" name="suite_number" required />
+          </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <label className="block text-xs font-medium text-slate-600">
-            {t("suiteLabel")}
-          </label>
-          <input
-            name="suite_number"
-            required
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="pkg-item-name">{t("itemNameLabel")}</Label>
+            <Input id="pkg-item-name" name="item_name" required />
+          </div>
 
-        <div>
-          <label className="block text-xs font-medium text-slate-600">{t("itemNameLabel")}</label>
-          <input
-            name="item_name"
-            required
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="pkg-tracking">{t("trackingNumberLabel")}</Label>
+            <Input id="pkg-tracking" name="tracking_number" />
+          </div>
 
-        <div>
-          <label className="block text-xs font-medium text-slate-600">{t("trackingNumberLabel")}</label>
-          <input
-            name="tracking_number"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="pkg-weight">{t("weightLabel")}</Label>
+            <Input id="pkg-weight" name="weight_kg" type="number" step="0.01" />
+          </div>
 
-        <div>
-          <label className="block text-xs font-medium text-slate-600">{t("weightLabel")}</label>
-          <input
-            name="weight_kg"
-            type="number"
-            step="0.01"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="pkg-length">{t("lengthLabel")}</Label>
+            <Input id="pkg-length" name="length_cm" type="number" step="0.1" />
+          </div>
 
-        <div>
-          <label className="block text-xs font-medium text-slate-600">{t("lengthLabel")}</label>
-          <input
-            name="length_cm"
-            type="number"
-            step="0.1"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="pkg-width">{t("widthLabel")}</Label>
+            <Input id="pkg-width" name="width_cm" type="number" step="0.1" />
+          </div>
 
-        <div>
-          <label className="block text-xs font-medium text-slate-600">{t("widthLabel")}</label>
-          <input
-            name="width_cm"
-            type="number"
-            step="0.1"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="pkg-height">{t("heightLabel")}</Label>
+            <Input id="pkg-height" name="height_cm" type="number" step="0.1" />
+          </div>
 
-        <div>
-          <label className="block text-xs font-medium text-slate-600">{t("heightLabel")}</label>
-          <input
-            name="height_cm"
-            type="number"
-            step="0.1"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="pkg-note">{t("adminNoteLabel")}</Label>
+            <Textarea id="pkg-note" name="admin_note" rows={2} />
+          </div>
+        </CardContent>
 
-        <div className="sm:col-span-2">
-          <label className="block text-xs font-medium text-slate-600">{t("adminNoteLabel")}</label>
-          <textarea
-            name="admin_note"
-            rows={2}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
-      </div>
+        <CardContent className="pt-0">
+          {message && (
+            <p className={message.type === "error" ? "text-sm text-destructive" : "text-sm text-accent"}>
+              {message.text}
+            </p>
+          )}
 
-      {message && (
-        <p
-          className={
-            message.type === "error" ? "mt-3 text-sm text-red-600" : "mt-3 text-sm text-teal-700"
-          }
-        >
-          {message.text}
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={isPending}
-        className="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-      >
-        {isPending ? t("submitting") : t("submit")}
-      </button>
-    </form>
+          <Button type="submit" disabled={isPending} className="mt-4">
+            {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isPending ? t("submitting") : t("submit")}
+          </Button>
+        </CardContent>
+      </form>
+    </Card>
   )
 }

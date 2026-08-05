@@ -6,6 +6,7 @@ import FeeSettingsForm from "./fee-settings-form"
 import WhitelistForm from "./whitelist-form"
 import { getPurchaseAgencyFeeSettings } from "@/lib/purchase-agency-settings"
 import { getWhitelistDomains } from "@/lib/purchase-agency-whitelist"
+import { Button } from "@/components/ui/button"
 
 export default async function AdminPurchaseRequestsPage({
   searchParams,
@@ -64,18 +65,17 @@ export default async function AdminPurchaseRequestsPage({
   ]
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-4xl px-6 py-10">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-slate-900">{t("title")}</h1>
-          <Link
-            href="/admin/packages"
-            className="text-sm text-teal-700 hover:underline"
-          >
-            {t("packagesLink")}
-          </Link>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold text-primary">{t("title")}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{t("description")}</p>
+          </div>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/admin/packages">{t("packagesLink")}</Link>
+          </Button>
         </div>
-        <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
 
         <FeeSettingsForm
           initialSettings={{
@@ -90,7 +90,7 @@ export default async function AdminPurchaseRequestsPage({
           <select
             name="status"
             defaultValue={status}
-            className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+            className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             {STATUS_FILTERS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -98,12 +98,9 @@ export default async function AdminPurchaseRequestsPage({
               </option>
             ))}
           </select>
-          <button
-            type="submit"
-            className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white hover:bg-slate-800"
-          >
+          <Button type="submit" size="sm">
             {t("filterButton")}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-6 space-y-3">
@@ -112,7 +109,7 @@ export default async function AdminPurchaseRequestsPage({
           ))}
 
           {filtered.length === 0 && (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+            <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
               {requests.length === 0 ? t("emptyNone") : t("emptyFiltered")}
             </div>
           )}

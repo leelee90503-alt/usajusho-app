@@ -1,10 +1,11 @@
-
 import { redirect, Link } from "@/i18n/navigation"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from "next-intl/server"
 import { adminCreateOrGetInvoice } from "../actions"
 import AdminInvoiceForm from "./admin-invoice-form"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 export default async function AdminInvoiceDetailPage({
   params,
@@ -100,33 +101,32 @@ export default async function AdminInvoiceDetailPage({
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <Link href="/admin/invoices" className="text-xs font-semibold text-teal-700 hover:underline">
+      <Link href="/admin/invoices" className="text-xs font-semibold text-accent hover:underline">
         {t("backToList")}
       </Link>
 
-      <div className="mt-4 rounded-xl border border-slate-200 bg-white p-6">
-        <h1 className="text-xl font-bold text-slate-900">{pkg.item_name}</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          {pkg.profiles?.full_name ?? "—"}
-          {pkg.profiles?.suite_number ? ` · ${pkg.profiles.suite_number}` : ""}
-        </p>
-        <p className="mt-1 text-xs text-slate-400">{pkg.tracking_number ?? ""}</p>
-      </div>
+      <Card className="mt-4">
+        <CardContent className="py-6">
+          <h1 className="text-xl font-bold text-foreground">{pkg.item_name}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {pkg.profiles?.full_name ?? "—"}
+            {pkg.profiles?.suite_number ? ` · ${pkg.profiles.suite_number}` : ""}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">{pkg.tracking_number ?? ""}</p>
+        </CardContent>
+      </Card>
 
       {existingInvoice ? (
         <AdminInvoiceForm invoice={existingInvoice} labels={formLabels} />
       ) : (
-        <div className="mt-8 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
-          <p className="text-sm text-slate-600">{t("noInvoiceYet")}</p>
-          <form action={createInvoiceAction.bind(null, packageId)} className="mt-4 inline-block">
-            <button
-              type="submit"
-              className="rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
-            >
-              {t("createInvoiceButton")}
-            </button>
-          </form>
-        </div>
+        <Card className="mt-8 border-dashed">
+          <CardContent className="py-8 text-center">
+            <p className="text-sm text-muted-foreground">{t("noInvoiceYet")}</p>
+            <form action={createInvoiceAction.bind(null, packageId)} className="mt-4 inline-block">
+              <Button type="submit">{t("createInvoiceButton")}</Button>
+            </form>
+          </CardContent>
+        </Card>
       )}
     </main>
   )

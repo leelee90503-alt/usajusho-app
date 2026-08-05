@@ -3,6 +3,10 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { deleteRate, toggleRateActive, updateRate } from "./actions"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent } from "@/components/ui/card"
 
 type Rate = {
   id: string
@@ -48,136 +52,102 @@ export default function RateRow({ rate }: { rate: Rate }) {
 
   if (isEditing) {
     return (
-      <div className="rounded-xl border border-teal-200 bg-teal-50 p-4">
-        <form action={handleUpdate} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <label className="block text-xs text-teal-800">{t("labelField")}</label>
-            <input
-              name="label"
-              defaultValue={rate.label}
-              required
-              className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-teal-800">{t("minWeightField")}</label>
-            <input
-              type="number"
-              name="min_weight_kg"
-              step="0.01"
-              min="0"
-              defaultValue={rate.min_weight_kg}
-              required
-              className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-teal-800">{t("maxWeightField")}</label>
-            <input
-              type="number"
-              name="max_weight_kg"
-              step="0.01"
-              min="0"
-              defaultValue={rate.max_weight_kg ?? ""}
-              placeholder={t("maxWeightPlaceholder")}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-teal-800">{t("pricePerKgField")}</label>
-            <input
-              type="number"
-              name="price_per_kg"
-              step="1"
-              min="0"
-              defaultValue={rate.price_per_kg}
-              required
-              className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-teal-800">{t("minChargeField")}</label>
-            <input
-              type="number"
-              name="min_charge"
-              step="1"
-              min="0"
-              defaultValue={rate.min_charge}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
-            />
-          </div>
+      <Card className="border-teal-200 bg-teal-50">
+        <CardContent className="py-4">
+          <form action={handleUpdate} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1 sm:col-span-2">
+              <Label className="text-xs font-normal text-teal-800">{t("labelField")}</Label>
+              <Input name="label" defaultValue={rate.label} required />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs font-normal text-teal-800">{t("minWeightField")}</Label>
+              <Input
+                type="number"
+                name="min_weight_kg"
+                step="0.01"
+                min="0"
+                defaultValue={rate.min_weight_kg}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs font-normal text-teal-800">{t("maxWeightField")}</Label>
+              <Input
+                type="number"
+                name="max_weight_kg"
+                step="0.01"
+                min="0"
+                defaultValue={rate.max_weight_kg ?? ""}
+                placeholder={t("maxWeightPlaceholder")}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs font-normal text-teal-800">{t("pricePerKgField")}</Label>
+              <Input
+                type="number"
+                name="price_per_kg"
+                step="1"
+                min="0"
+                defaultValue={rate.price_per_kg}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs font-normal text-teal-800">{t("minChargeField")}</Label>
+              <Input type="number" name="min_charge" step="1" min="0" defaultValue={rate.min_charge} />
+            </div>
 
-          {message && <p className="sm:col-span-2 text-xs text-red-600">{message}</p>}
+            {message && <p className="text-xs text-destructive sm:col-span-2">{message}</p>}
 
-          <div className="sm:col-span-2 flex gap-2">
-            <button
-              type="submit"
-              disabled={isPending}
-              className="rounded-lg bg-teal-700 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-            >
-              {t("save")}
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700"
-            >
-              {t("cancel")}
-            </button>
-          </div>
-        </form>
-      </div>
+            <div className="flex gap-2 sm:col-span-2">
+              <Button type="submit" size="sm" disabled={isPending}>
+                {t("save")}
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => setIsEditing(false)}>
+                {t("cancel")}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     )
   }
 
   const maxLabel = rate.max_weight_kg === null ? t("andAbove") : String(rate.max_weight_kg)
 
   return (
-    <div
-      className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4 ${
-        rate.is_active ? "border-slate-200 bg-white" : "border-slate-200 bg-slate-100 opacity-60"
-      }`}
-    >
-      <div>
-        <p className="text-sm font-semibold text-slate-900">{rate.label}</p>
-        <p className="mt-1 text-xs text-slate-500">
-          {t("rangeLabel", {
-            min: rate.min_weight_kg,
-            max: maxLabel,
-          })}
-          {" - "}
-          {t("priceLabel", { price: rate.price_per_kg })}
-          {rate.min_charge > 0 && (
-            <>
-              {" - "}
-              {t("minChargeLabel", { amount: rate.min_charge })}
-            </>
-          )}
-        </p>
-      </div>
+    <Card className={rate.is_active ? undefined : "bg-muted/60 opacity-60"}>
+      <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
+        <div>
+          <p className="text-sm font-semibold text-foreground">{rate.label}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t("rangeLabel", {
+              min: rate.min_weight_kg,
+              max: maxLabel,
+            })}
+            {" - "}
+            {t("priceLabel", { price: rate.price_per_kg })}
+            {rate.min_charge > 0 && (
+              <>
+                {" - "}
+                {t("minChargeLabel", { amount: rate.min_charge })}
+              </>
+            )}
+          </p>
+        </div>
 
-      <div className="flex items-center gap-2">
-        <button
-          onClick={handleToggle}
-          disabled={isPending}
-          className="whitespace-nowrap rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 disabled:opacity-50"
-        >
-          {rate.is_active ? t("deactivate") : t("activate")}
-        </button>
-        <button
-          onClick={() => setIsEditing(true)}
-          className="whitespace-nowrap rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700"
-        >
-          {t("edit")}
-        </button>
-        <button
-          onClick={handleDelete}
-          disabled={isPending}
-          className="whitespace-nowrap rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-700 disabled:opacity-50"
-        >
-          {t("delete")}
-        </button>
-      </div>
-    </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleToggle} disabled={isPending}>
+            {rate.is_active ? t("deactivate") : t("activate")}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+            {t("edit")}
+          </Button>
+          <Button variant="destructive" size="sm" onClick={handleDelete} disabled={isPending}>
+            {t("delete")}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

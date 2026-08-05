@@ -3,6 +3,18 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { saveFeeSettings } from "./actions"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Loader2 } from "lucide-react"
 
 type FeeSettings = {
   flatFeeCents: number
@@ -40,70 +52,68 @@ export default function FeeSettingsForm({
   }
 
   return (
-    <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-sm font-semibold text-slate-900">
-        {t("feeSettingsHeading")}
-      </h2>
-      <p className="mt-1 text-sm text-slate-500">
-        {t("feeSettingsDescription")}
-      </p>
+    <Card className="mt-6">
+      <CardHeader>
+        <CardTitle>{t("feeSettingsHeading")}</CardTitle>
+        <CardDescription>{t("feeSettingsDescription")}</CardDescription>
+      </CardHeader>
 
-      <form action={handleSubmit} className="mt-4 flex flex-wrap items-end gap-4">
-        <div>
-          <label className="block text-xs font-medium text-slate-600">
-            {t("flatFeeField")}
-          </label>
-          <input
-            type="number"
-            name="flat_fee_dollars"
-            step="0.01"
-            min="0"
-            required
-            defaultValue={(current.flatFeeCents / 100).toFixed(2)}
-            className="mt-1 w-36 rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
+      <form action={handleSubmit}>
+        <CardContent className="flex flex-wrap items-end gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="flat_fee_dollars">{t("flatFeeField")}</Label>
+            <Input
+              id="flat_fee_dollars"
+              type="number"
+              name="flat_fee_dollars"
+              step="0.01"
+              min="0"
+              required
+              defaultValue={(current.flatFeeCents / 100).toFixed(2)}
+              className="w-36"
+            />
+          </div>
 
-        <div>
-          <label className="block text-xs font-medium text-slate-600">
-            {t("feePercentField")}
-          </label>
-          <input
-            type="number"
-            name="fee_percent"
-            step="0.01"
-            min="0"
-            required
-            defaultValue={current.feePercent}
-            className="mt-1 w-36 rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="fee_percent">{t("feePercentField")}</Label>
+            <Input
+              id="fee_percent"
+              type="number"
+              name="fee_percent"
+              step="0.01"
+              min="0"
+              required
+              defaultValue={current.feePercent}
+              className="w-36"
+            />
+          </div>
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
-        >
-          {isPending ? t("feeSettingsSaving") : t("feeSettingsSave")}
-        </button>
+          <Button type="submit" disabled={isPending}>
+            {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isPending ? t("feeSettingsSaving") : t("feeSettingsSave")}
+          </Button>
+        </CardContent>
       </form>
 
-      {message && (
-        <p
-          className={
-            message.type === "error" ? "mt-3 text-sm text-red-600" : "mt-3 text-sm text-teal-700"
-          }
-        >
-          {message.text}
+      <CardFooter className="flex-col items-start gap-2">
+        {message && (
+          <p
+            className={
+              message.type === "error"
+                ? "text-sm text-destructive"
+                : "text-sm text-accent"
+            }
+          >
+            {message.text}
+          </p>
+        )}
+        <p className="text-xs text-muted-foreground">
+          {t("feeSettingsCurrent", {
+            flatFee: (current.flatFeeCents / 100).toFixed(2),
+            feePercent: current.feePercent,
+          })}
         </p>
-      )}
-
-      <p className="mt-4 text-xs text-slate-400">
-        {t("feeSettingsCurrent", {
-          flatFee: (current.flatFeeCents / 100).toFixed(2),
-          feePercent: current.feePercent,
-        })}
-      </p>
-    </div>
+      </CardFooter>
+    </Card>
   )
 }

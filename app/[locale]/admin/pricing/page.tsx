@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import RateRow from "./rate-row"
 import AddRateForm from "./add-rate-form"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 export default async function AdminPricingPage() {
   const locale = await getLocale()
@@ -39,23 +41,27 @@ export default async function AdminPricingPage() {
   const rateList = rates ?? []
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-3xl px-6 py-10">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-slate-900">{t("title")}</h1>
-          <Link href="/admin/packages" className="text-sm text-teal-700 hover:underline">
-            {t("backToPackages")}
-          </Link>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-xl font-bold text-primary">{t("title")}</h1>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/admin/packages">{t("backToPackages")}</Link>
+          </Button>
         </div>
-        <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("description")}</p>
 
-        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-900">{t("addHeading")}</h2>
-          <AddRateForm />
-        </div>
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>{t("addHeading")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AddRateForm />
+          </CardContent>
+        </Card>
 
         <div className="mt-8">
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-lg font-semibold text-foreground">
             {t("listHeading", { count: rateList.length })}
           </h2>
 
@@ -65,9 +71,11 @@ export default async function AdminPricingPage() {
             ))}
 
             {rateList.length === 0 && (
-              <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-                {t("empty")}
-              </div>
+              <Card className="border-dashed">
+                <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                  {t("empty")}
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>

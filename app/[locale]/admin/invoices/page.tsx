@@ -1,7 +1,16 @@
-
 import { redirect, Link } from "@/i18n/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from "next-intl/server"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 type ProfileJoin = { full_name: string | null; suite_number: string | null } | { full_name: string | null; suite_number: string | null }[] | null
 
@@ -16,6 +25,14 @@ const STATUS_LABEL_KEY: Record<string, string> = {
   correction_required: "statusCorrectionRequired",
   admin_review: "statusAdminReview",
   complete: "statusComplete",
+}
+
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  draft: "bg-slate-100 text-slate-700",
+  customer_submitted: "bg-slate-100 text-slate-700",
+  correction_required: "bg-amber-100 text-amber-800",
+  admin_review: "bg-slate-100 text-slate-700",
+  complete: "bg-teal-100 text-teal-800",
 }
 
 export default async function AdminInvoicesPage() {
@@ -72,8 +89,8 @@ export default async function AdminInvoicesPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
-      <p className="mt-1 text-sm text-slate-500">{t("subtitle")}</p>
+      <h1 className="text-2xl font-bold text-primary">{t("title")}</h1>
+      <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard label={t("statTotal")} value={statCounts.total} />
@@ -84,70 +101,72 @@ export default async function AdminInvoicesPage() {
         <StatCard label={t("statComplete")} value={statCounts.complete} />
       </div>
 
-      <div className="mt-8 overflow-x-auto rounded-xl border border-slate-200 bg-white">
-        <table className="w-full min-w-[720px] text-sm">
-          <thead>
-            <tr className="border-b border-slate-100 text-left text-xs text-slate-500">
-              <th className="px-4 py-3">{t("colCustomer")}</th>
-              <th className="px-4 py-3">{t("colPackage")}</th>
-              <th className="px-4 py-3">{t("colTracking")}</th>
-              <th className="px-4 py-3">{t("colInvoiceStatus")}</th>
-              <th className="px-4 py-3">{t("colDeclaredValue")}</th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody>
+      <Card className="mt-8">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t("colCustomer")}</TableHead>
+              <TableHead>{t("colPackage")}</TableHead>
+              <TableHead>{t("colTracking")}</TableHead>
+              <TableHead>{t("colInvoiceStatus")}</TableHead>
+              <TableHead>{t("colDeclaredValue")}</TableHead>
+              <TableHead className="text-right" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map(({ pkg, invoice }) => (
-              <tr key={pkg.id} className="border-b border-slate-50 last:border-0">
-                <td className="px-4 py-3">
-                  <p className="font-medium text-slate-800">{pkg.profiles?.full_name ?? "—"}</p>
-                  <p className="text-xs text-slate-400">{pkg.profiles?.suite_number ?? ""}</p>
-                </td>
-                <td className="px-4 py-3 text-slate-700">{pkg.item_name}</td>
-                <td className="px-4 py-3 text-slate-500">{pkg.tracking_number ?? "—"}</td>
-                <td className="px-4 py-3">
+              <TableRow key={pkg.id}>
+                <TableCell>
+                  <p className="font-medium text-foreground">{pkg.profiles?.full_name ?? "—"}</p>
+                  <p className="text-xs text-muted-foreground">{pkg.profiles?.suite_number ?? ""}</p>
+                </TableCell>
+                <TableCell className="text-foreground">{pkg.item_name}</TableCell>
+                <TableCell className="text-muted-foreground">{pkg.tracking_number ?? "—"}</TableCell>
+                <TableCell>
                   {invoice ? (
-                    <span className="whitespace-nowrap rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                    <Badge className={STATUS_BADGE_CLASS[invoice.status] ?? "bg-slate-100 text-slate-700"}>
                       {t(STATUS_LABEL_KEY[invoice.status] ?? "statusDraft")}
-                    </span>
+                    </Badge>
                   ) : (
-                    <span className="whitespace-nowrap rounded-full bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-400">
+                    <Badge variant="outline" className="text-muted-foreground">
                       {t("statusNotStarted")}
-                    </span>
+                    </Badge>
                   )}
-                </td>
-                <td className="px-4 py-3 text-slate-700">
+                </TableCell>
+                <TableCell className="text-foreground">
                   {invoice ? `$${Number(invoice.total_declared_value).toLocaleString()}` : "—"}
-                </td>
-                <td className="px-4 py-3 text-right">
+                </TableCell>
+                <TableCell className="text-right">
                   <Link
                     href={`/admin/invoices/${pkg.id}`}
-                    className="text-xs font-semibold text-teal-700 hover:underline"
+                    className="text-xs font-semibold text-accent hover:underline"
                   >
                     {invoice ? t("viewLink") : t("createLink")}
                   </Link>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
             {rows.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-sm text-slate-400">
+              <TableRow>
+                <TableCell colSpan={6} className="py-8 text-center text-sm text-muted-foreground">
                   {t("noPackages")}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </Card>
     </main>
   )
 }
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-3">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 text-xl font-bold text-slate-900">{value}</p>
-    </div>
+    <Card>
+      <CardContent className="py-3">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="mt-1 text-xl font-bold text-foreground">{value}</p>
+      </CardContent>
+    </Card>
   )
 }

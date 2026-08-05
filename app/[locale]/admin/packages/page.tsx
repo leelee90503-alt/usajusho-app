@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from 'next-intl/server'
 import AddPackageForm from "./add-package-form"
 import PackageRow from "./package-row"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export default async function AdminPackagesPage({
   searchParams,
@@ -84,49 +87,63 @@ export default async function AdminPackagesPage({
   })
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-4xl px-6 py-10">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-slate-900">{t("title")}</h1>
-            <Link href="/admin/pricing" className="text-sm text-teal-700 hover:underline">
-              {t("pricingLink")}
-            </Link>
-          <Link href="/admin/settings" className="text-sm text-teal-700 hover:underline">
-            {t("settingsLink")}
-          </Link>
-            <Link href="/admin/purchase-requests" className="text-sm text-teal-700 hover:underline">
-              {t("purchaseRequestsLink")}
-            </Link>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-xl font-bold text-primary">{t("title")}</h1>
+          <nav className="flex items-center gap-1">
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/pricing">{t("pricingLink")}</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/settings">{t("settingsLink")}</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/purchase-requests">{t("purchaseRequestsLink")}</Link>
+            </Button>
+          </nav>
         </div>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-muted-foreground">
           {t("description")}
         </p>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
-          <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
-            <p className="text-2xl font-bold text-slate-900">{statCounts.total}</p>
-            <p className="mt-1 text-xs text-slate-500">{t("statTotal")}</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
-            <p className="text-2xl font-bold text-slate-900">{userCount ?? 0}</p>
-            <p className="mt-1 text-xs text-slate-500">{t("statUsers")}</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
-            <p className="text-2xl font-bold text-teal-700">{statCounts.arrived}</p>
-            <p className="mt-1 text-xs text-slate-500">{t("statArrived")}</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
-            <p className="text-2xl font-bold text-teal-700">{statCounts.requested}</p>
-            <p className="mt-1 text-xs text-slate-500">{t("statRequested")}</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
-            <p className="text-2xl font-bold text-amber-700">{statCounts.quoted}</p>
-            <p className="mt-1 text-xs text-slate-500">{t("statQuoted")}</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-3 text-center shadow-sm">
-            <p className="text-2xl font-bold text-slate-700">{statCounts.shipped}</p>
-            <p className="mt-1 text-xs text-slate-500">{t("statShipped")}</p>
-          </div>
+          <Card>
+            <CardContent className="py-3 text-center">
+              <p className="text-2xl font-bold text-foreground">{statCounts.total}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("statTotal")}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-3 text-center">
+              <p className="text-2xl font-bold text-foreground">{userCount ?? 0}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("statUsers")}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-3 text-center">
+              <p className="text-2xl font-bold text-accent">{statCounts.arrived}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("statArrived")}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-3 text-center">
+              <p className="text-2xl font-bold text-accent">{statCounts.requested}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("statRequested")}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-3 text-center">
+              <p className="text-2xl font-bold text-amber-700">{statCounts.quoted}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("statQuoted")}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-3 text-center">
+              <p className="text-2xl font-bold text-foreground">{statCounts.shipped}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("statShipped")}</p>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="mt-6">
@@ -135,22 +152,22 @@ export default async function AdminPackagesPage({
 
         <div className="mt-10">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-slate-900">
+            <h2 className="text-lg font-semibold text-foreground">
               {t("allPackages", { count: filteredPackages.length })}
             </h2>
 
             <form className="flex flex-wrap items-center gap-2" method="get">
-              <input
+              <Input
                 type="text"
                 name="q"
                 defaultValue={q}
                 placeholder={t("searchPlaceholder")}
-                className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
+                className="w-48"
               />
               <select
                 name="status"
                 defaultValue={status}
-                className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+                className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 {STATUS_FILTERS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -158,19 +175,13 @@ export default async function AdminPackagesPage({
                   </option>
                 ))}
               </select>
-              <button
-                type="submit"
-                className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white hover:bg-slate-800"
-              >
+              <Button type="submit" size="sm">
                 {t("searchButton")}
-              </button>
+              </Button>
               {(q || status) && (
-                <Link
-                  href="/admin/packages"
-                  className="text-sm text-slate-500 underline hover:text-slate-700"
-                >
-                  {t("clear")}
-                </Link>
+                <Button asChild variant="link" size="sm" className="text-muted-foreground">
+                  <Link href="/admin/packages">{t("clear")}</Link>
+                </Button>
               )}
             </form>
           </div>
@@ -181,11 +192,11 @@ export default async function AdminPackagesPage({
             ))}
 
             {filteredPackages.length === 0 && (
-              <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-                {packages.length === 0
-                  ? t("emptyNone")
-                  : t("emptyFiltered")}
-              </div>
+              <Card className="border-dashed">
+                <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                  {packages.length === 0 ? t("emptyNone") : t("emptyFiltered")}
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>
