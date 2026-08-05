@@ -4,6 +4,18 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter, Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 
 export default function SignupPage() {
   const t = useTranslations('signup')
@@ -39,69 +51,70 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[var(--usj-surface)] px-4">
-      <div className="w-full max-w-sm bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-        <h1 className="text-xl font-bold text-[var(--usj-primary)] mb-1">{t('title')}</h1>
-        <p className="text-sm text-slate-500 mb-6">Create your account</p>
+    <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-[var(--usj-surface)] px-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-primary">{t('title')}</CardTitle>
+          <CardDescription>Create your account</CardDescription>
+        </CardHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              {t('fullName')}
-            </label>
-            <input
-              type="text"
-              required
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="signup-fullname">{t('fullName')}</Label>
+              <Input
+                id="signup-fullname"
+                type="text"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              {t('email')}
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="signup-email">{t('email')}</Label>
+              <Input
+                id="signup-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              {t('password')}
-            </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="signup-password">{t('password')}</Label>
+              <Input
+                id="signup-password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && (
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </p>
+            )}
+          </CardContent>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[var(--usj-primary)] text-white text-sm font-semibold rounded-md py-2.5 hover:opacity-90 disabled:opacity-50"
-          >
-            {loading ? t('submitting') : t('submit')}
-          </button>
+          <CardFooter className="flex flex-col gap-4">
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading ? t('submitting') : t('submit')}
+            </Button>
+
+            <p className="text-sm text-muted-foreground text-center">
+              {t('hasAccount')}{' '}
+              <Link href="/login" className="font-medium text-primary hover:underline">
+                {t('loginLink')}
+              </Link>
+            </p>
+          </CardFooter>
         </form>
-
-        <p className="text-sm text-slate-500 mt-6 text-center">
-          {t('hasAccount')}{' '}
-          <Link href="/login" className="text-teal-700 font-medium">
-            {t('loginLink')}
-          </Link>
-        </p>
-      </div>
+      </Card>
     </main>
   )
 }
