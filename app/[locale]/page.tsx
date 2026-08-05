@@ -5,7 +5,6 @@ import FeeCalculator from "@/components/home/fee-calculator"
 import DeliveryJourney from "@/components/home/delivery-journey"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
   Search,
   PackageCheck,
@@ -51,8 +50,8 @@ export default async function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[var(--usj-primary)] via-[var(--usj-primary)]/85 to-[var(--usj-primary)]/20" />
         </div>
-        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
-          <div>
+        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-28">
+          <div className="max-w-xl">
             <p className="text-emerald-300 font-semibold text-sm mb-3 tracking-wide">
               {t("hero.eyebrow")}
             </p>
@@ -77,40 +76,6 @@ export default async function Home() {
             </div>
             <p className="text-xs text-slate-300">{t("hero.trustNote")}</p>
           </div>
-
-          {/* Realistic package-status preview panel, not an abstract graphic */}
-          <Card className="shadow-xl">
-            <CardContent>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-semibold text-slate-400 tracking-wide">
-                  {t("hero.previewLabel")}
-                </span>
-                <Badge variant="secondary" className="bg-accent/10 text-accent">
-                  {t("hero.previewStatus")}
-                </Badge>
-              </div>
-              <div className="space-y-3">
-                <div className="flex gap-3 items-center border-b border-slate-100 pb-3">
-                  <img src="/images/store-amazon.svg" alt={t("hero.previewItem1LogoAlt")} className="w-12 h-12 rounded shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-[var(--usj-text)] truncate">
-                      {t("hero.previewItem1")}
-                    </p>
-                    <p className="text-xs text-slate-500">{t("hero.previewMeta1")}</p>
-                  </div>
-                </div>
-                <div className="flex gap-3 items-center">
-                  <img src="/images/store-nike.png" alt={t("hero.previewItem2LogoAlt")} className="w-12 h-12 rounded shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-[var(--usj-text)] truncate">
-                      {t("hero.previewItem2")}
-                    </p>
-                    <p className="text-xs text-slate-500">{t("hero.previewMeta2")}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </section>
 
