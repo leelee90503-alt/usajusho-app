@@ -72,7 +72,8 @@
       "title": "Consolidate to save on shipping",
       "description": "Combine multiple orders into a single shipment to cut shipping costs well below sending each one separately. Repackaging is also available to remove unneeded boxes and paperwork.",
       "exampleLabel": "3 packages → consolidated into 1 shipment",
-      "exampleNote": "Savings vary depending on box size and weight."
+      "exampleNote": "Savings vary depending on box size and weight.",
+      "flowAlt": "Three separate packages combined into a single consolidated shipment"
     },
     "addons": {
       "title": "Add only the services you need",

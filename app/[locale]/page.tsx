@@ -199,11 +199,11 @@ export default async function Home() {
           </div>
           <div className="bg-white border border-slate-200 rounded-lg p-6">
             <div className="flex items-center gap-3 text-sm text-slate-500 mb-3">
-              <div className="w-8 h-8 rounded bg-slate-100" aria-hidden="true" />
-              <div className="w-8 h-8 rounded bg-slate-100" aria-hidden="true" />
-              <div className="w-8 h-8 rounded bg-slate-100" aria-hidden="true" />
-              <span aria-hidden="true">→</span>
-              <div className="w-10 h-10 rounded bg-[var(--usj-accent)]/15 border border-[var(--usj-accent)]/30" aria-hidden="true" />
+              <img
+                src="/images/consolidation-flow.svg"
+                alt={t("consolidation.flowAlt")}
+                className="h-16 w-auto"
+              />
             </div>
             <p className="text-sm text-[var(--usj-text)] font-medium">{t("consolidation.exampleLabel")}</p>
             <p className="text-xs text-slate-500 mt-1">{t("consolidation.exampleNote")}</p>
