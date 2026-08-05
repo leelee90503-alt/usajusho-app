@@ -2,9 +2,9 @@ import type { LegalDoc } from "./types"
 
 export const privacyEn: LegalDoc = {
   title: `Privacy Policy`,
-  effectiveDateLabel: `Effective Date: [EFFECTIVE_DATE]`,
+  effectiveDateLabel: `Effective Date: January 1, 2026`,
   intro: [
-    `This Privacy Policy explains how [LEGAL_ENTITY_NAME] ("USAJUSHO," "we," "us," or "our") collects, uses, discloses, and protects personal information when you use our website and Service, and describes the privacy rights available to California residents under the California Consumer Privacy Act, as amended by the California Privacy Rights Act (collectively, "CCPA").`,
+    `This Privacy Policy explains how Victoria Tech Innovation ("USAJUSHO," "we," "us," or "our") collects, uses, discloses, and protects personal information when you use our website and Service, and describes the privacy rights available to California residents under the California Consumer Privacy Act, as amended by the California Privacy Rights Act (collectively, "CCPA").`,
   ],
   sections: [
     {
@@ -51,7 +51,7 @@ export const privacyEn: LegalDoc = {
     {
       heading: `5. Data Retention`,
       blocks: [
-        { kind: "p", text: `We retain personal information for as long as your account is active and as necessary to provide the Service, comply with our legal obligations (e.g., tax and accounting records), resolve disputes, and enforce our agreements. Purchase-proxy transaction records are generally retained for [RETENTION_YEARS] years after order completion for accounting and dispute-resolution purposes.` },
+        { kind: "p", text: `We retain personal information for as long as your account is active and as necessary to provide the Service, comply with our legal obligations (e.g., tax and accounting records), resolve disputes, and enforce our agreements. Purchase-proxy transaction records are generally retained for 7 years after order completion for accounting and dispute-resolution purposes.` },
       ],
     },
     {
@@ -66,7 +66,7 @@ export const privacyEn: LegalDoc = {
           `Limit Use of Sensitive Personal Information: we do not use sensitive personal information beyond what is necessary to provide the Service.`,
           `Non-Discrimination: we will not discriminate against you for exercising any of these rights.`,
         ] },
-        { kind: "p", text: `To exercise these rights, contact us at [CONTACT_EMAIL]. We may need to verify your identity before completing your request. We will respond within 45 days, as required by the CCPA (extendable by an additional 45 days when reasonably necessary, with notice to you).` },
+        { kind: "p", text: `To exercise these rights, contact us at info@usajusho.com. We may need to verify your identity before completing your request. We will respond within 45 days, as required by the CCPA (extendable by an additional 45 days when reasonably necessary, with notice to you).` },
         { kind: "p", text: `You may also designate an authorized agent to submit a request on your behalf, subject to our ability to verify the agent's authority.` },
       ],
     },
@@ -103,7 +103,7 @@ export const privacyEn: LegalDoc = {
     {
       heading: `12. Contact Us`,
       blocks: [
-        { kind: "p", text: `For questions about this Privacy Policy or to exercise your privacy rights, contact us at [CONTACT_EMAIL].` },
+        { kind: "p", text: `For questions about this Privacy Policy or to exercise your privacy rights, contact us at info@usajusho.com.` },
       ],
     },
   ],

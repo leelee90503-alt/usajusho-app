@@ -2,9 +2,9 @@ import type { LegalDoc } from "./types"
 
 export const termsEn: LegalDoc = {
   title: `Terms of Service`,
-  effectiveDateLabel: `Effective Date: [EFFECTIVE_DATE]`,
+  effectiveDateLabel: `Effective Date: January 1, 2026`,
   intro: [
-    `Welcome to USAJUSHO ("USAJUSHO," "we," "us," or "our"). These Terms of Service ("Terms") govern your access to and use of the USAJUSHO website, package-forwarding service, and Purchase Proxy (購入代行) service (collectively, the "Service"), operated by [LEGAL_ENTITY_NAME], a California [LLC/corporation] with its principal place of business at [BUSINESS_ADDRESS] ("Company"). By creating an account or using the Service, you agree to be bound by these Terms. If you do not agree, do not use the Service.`,
+    `Welcome to USAJUSHO ("USAJUSHO," "we," "us," or "our"). These Terms of Service ("Terms") govern your access to and use of the USAJUSHO website, package-forwarding service, and Purchase Proxy (購入代行) service (collectively, the "Service"), operated by Victoria Tech Innovation, a California corporation with its principal place of business at 18533 S. Western Ave., Gardena, CA 90248 ("Company"). By creating an account or using the Service, you agree to be bound by these Terms. If you do not agree, do not use the Service.`,
   ],
   sections: [
     {
@@ -74,7 +74,7 @@ export const termsEn: LegalDoc = {
     {
       heading: `10. Governing Law and Dispute Resolution`,
       blocks: [
-        { kind: "p", text: `These Terms are governed by the laws of the State of California, without regard to conflict-of-laws principles. Subject to applicable consumer-protection law in your jurisdiction, you and the Company agree that any dispute arising from these Terms or the Service will be resolved in the state or federal courts located in [COUNTY], California, and you consent to the personal jurisdiction of those courts.` },
+        { kind: "p", text: `These Terms are governed by the laws of the State of California, without regard to conflict-of-laws principles. Subject to applicable consumer-protection law in your jurisdiction, you and the Company agree that any dispute arising from these Terms or the Service will be resolved in the state or federal courts located in Los Angeles County, California, and you consent to the personal jurisdiction of those courts.` },
       ],
     },
     {
@@ -92,7 +92,7 @@ export const termsEn: LegalDoc = {
     {
       heading: `13. Contact Us`,
       blocks: [
-        { kind: "p", text: `Questions about these Terms may be directed to [CONTACT_EMAIL].` },
+        { kind: "p", text: `Questions about these Terms may be directed to info@usajusho.com.` },
       ],
     },
   ],
