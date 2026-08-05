@@ -94,6 +94,9 @@ export default async function AdminPackagesPage({
           <Link href="/admin/settings" className="text-sm text-teal-700 hover:underline">
             {t("settingsLink")}
           </Link>
+            <Link href="/admin/purchase-requests" className="text-sm text-teal-700 hover:underline">
+              {t("purchaseRequestsLink")}
+            </Link>
         </div>
         <p className="mt-1 text-sm text-slate-500">
           {t("description")}
