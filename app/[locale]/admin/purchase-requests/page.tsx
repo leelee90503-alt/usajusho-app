@@ -74,7 +74,12 @@ export default async function AdminPurchaseRequestsPage({
         </div>
         <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
 
-        <FeeSettingsForm initialSettings={feeSettings} />
+        <FeeSettingsForm
+          initialSettings={{
+            flatFeeCents: feeSettings.flatFeeCents,
+            feePercent: feeSettings.feePercent * 100,
+          }}
+        />
 
         <form className="mt-6 flex flex-wrap items-center gap-2" method="get">
           <select
