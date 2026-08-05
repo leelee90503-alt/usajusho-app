@@ -30,7 +30,7 @@ export default async function AdminSettingsPage() {
 
   const { data: settings } = await supabase
     .from("email_settings")
-    .select("emailjs_service_id, emailjs_template_id, emailjs_public_key, emailjs_private_key")
+    .select("resend_api_key")
     .eq("id", 1)
     .maybeSingle()
 
@@ -54,17 +54,8 @@ export default async function AdminSettingsPage() {
             <h2 className="mb-3 text-sm font-semibold text-foreground">{t("setupHeading")}</h2>
             <ol className="list-inside list-decimal space-y-2 text-sm text-muted-foreground">
               <li>{t("step1")}</li>
-              <li>
-                {t("step2Pre")}{" "}
-                <code className="rounded bg-muted px-1">to_email</code>,{" "}
-                <code className="rounded bg-muted px-1">to_name</code>,{" "}
-                <code className="rounded bg-muted px-1">subject</code>,{" "}
-                <code className="rounded bg-muted px-1">message</code> {t("step2Post")}
-              </li>
-              <li>
-                {t("step3Pre")} {t("step3Post")}
-              </li>
-              <li>{t("step4")}</li>
+              <li>{t("step2")}</li>
+              <li>{t("step3")}</li>
             </ol>
           </CardContent>
         </Card>

@@ -267,11 +267,8 @@
   "settingsForm": {
     "statusConfigured": "メール送信は有効です",
     "statusUnconfigured": "未設定（アプリ内通知のみ）",
-    "serviceIdLabel": "Service ID",
-    "templateIdLabel": "Template ID",
-    "publicKeyLabel": "Public Key",
-    "privateKeyLabel": "Private Key",
-    "privateKeyHint": "Private Key は EmailJS の Account → Security ページで確認できます。",
+    "apiKeyLabel": "Resend APIキー",
+    "apiKeyHint": "Resendダッシュボードの API Keys ページで確認できます。usajusho.comドメインへの送信権限が必要です。",
     "saved": "保存しました。",
     "saving": "保存中...",
     "save": "保存する"
@@ -279,14 +276,11 @@
   "adminSettings": {
     "title": "メール通知設定",
     "backLink": "荷物管理に戻る",
-    "description": "EmailJSのアカウント情報を入力すると、荷物の到着・見積り・発送完了時にユーザーへ自動でメールが送信されます。未設定の間はアプリ内通知のみが送られます。",
+    "description": "Resend の API キーを入力すると、荷物の到着・見積り・発送完了時にユーザーへ自動でメールが送信されます。未設定の間はアプリ内通知のみが送られます。",
     "setupHeading": "設定手順",
-    "step1": "emailjs.com でアカウントを作成し、Email Service を追加してください。",
-    "step2Pre": "Email Template を作成し、本文に",
-    "step2Post": "の変数を使ってください。",
-    "step3Pre": "EmailJS の Account → Security で「API calls are disabled for non-browser applications」を",
-    "step3Post": "無効にしてください（サーバーから送信するため必須です）。",
-    "step4": "Service ID・Template ID・Public Key・Private Key を下のフォームに入力して保存してください。"
+    "step1": "resend.com で無料アカウントを作成し、usajusho.com ドメインを認証してください。",
+    "step2": "送信権限のあるAPIキーを作成してください。",
+    "step3": "作成したAPIキーを下のフォームに入力して保存してください。"
   },
   "adminPricing": {
     "title": "配送料金の管理",

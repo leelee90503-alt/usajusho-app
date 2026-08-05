@@ -30,18 +30,12 @@ async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>>
 export async function saveEmailSettings(formData: FormData) {
   const supabase = await requireAdmin()
 
-  const emailjsServiceId = String(formData.get("emailjs_service_id") || "").trim()
-  const emailjsTemplateId = String(formData.get("emailjs_template_id") || "").trim()
-  const emailjsPublicKey = String(formData.get("emailjs_public_key") || "").trim()
-  const emailjsPrivateKey = String(formData.get("emailjs_private_key") || "").trim()
+  const resendApiKey = String(formData.get("resend_api_key") || "").trim()
 
   const { error } = await supabase
     .from("email_settings")
     .update({
-      emailjs_service_id: emailjsServiceId || null,
-      emailjs_template_id: emailjsTemplateId || null,
-      emailjs_public_key: emailjsPublicKey || null,
-      emailjs_private_key: emailjsPrivateKey || null,
+      resend_api_key: resendApiKey || null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", 1)

@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
-import emailjs from "@emailjs/nodejs"
 
 type NotifyParams = {
   userId: string
@@ -9,11 +8,10 @@ type NotifyParams = {
 }
 
 // Creates an in-app notification row for the user, and sends a real email
-// through EmailJS if an administrator has configured EmailJS credentials on
-// the /admin/settings page (stored in public.email_settings). Until those
-// credentials are entered, this silently falls back to in-app notifications
-// only - no code changes or redeploys are needed once the admin fills in
-// the settings form.
+// through Resend if an administrator has entered a Resend API key on the
+// /admin/settings page (stored in public.email_settings). Until that key is
+// entered, this silently falls back to in-app notifications only - no code
+// changes or redeploys are needed once the admin fills in the settings form.
 export async function notifyUser(supabase: SupabaseClient, params: NotifyParams) {
   const { userId, packageId, title, body } = params
 
@@ -39,11 +37,11 @@ async function sendEmailNotification(
   try {
     const { data: settings } = await supabase
       .from("email_settings")
-      .select("emailjs_service_id, emailjs_template_id, emailjs_public_key, emailjs_private_key")
+      .select("resend_api_key")
       .eq("id", 1)
       .maybeSingle()
 
-    if (!settings?.emailjs_service_id || !settings?.emailjs_template_id || !settings?.emailjs_public_key) {
+    if (!settings?.resend_api_key) {
       console.log(`[email not configured] would notify user ${userId}: ${title} - ${body}`)
       return
     }
@@ -59,20 +57,28 @@ async function sendEmailNotification(
       return
     }
 
-    await emailjs.send(
-      settings.emailjs_service_id,
-      settings.emailjs_template_id,
-      {
-        to_email: profile.email,
-        to_name: profile.full_name || "",
-        subject: title,
-        message: body,
+    const greeting = profile.full_name ? `${profile.full_name} 様,<br/><br/>` : ""
+
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${settings.resend_api_key}`,
+        "Content-Type": "application/json",
       },
-      {
-        publicKey: settings.emailjs_public_key,
-        privateKey: settings.emailjs_private_key || undefined,
-      }
-    )
+      body: JSON.stringify({
+        from: "USAJUSHO <info@usajusho.com>",
+        to: profile.email,
+        subject: title,
+        html: `<p>${greeting}${body}</p>`,
+      }),
+    })
+
+    if (!res.ok) {
+      const errText = await res.text()
+      console.error("Failed to send email notification via Resend:", res.status, errText)
+      return
+    }
+
     console.log(`[email sent] to ${profile.email}: ${title}`)
   } catch (err) {
     console.error("Failed to send email notification:", err)

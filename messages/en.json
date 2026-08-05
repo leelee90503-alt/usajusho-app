@@ -267,11 +267,8 @@
   "settingsForm": {
     "statusConfigured": "Email sending is enabled",
     "statusUnconfigured": "Not configured (in-app notifications only)",
-    "serviceIdLabel": "Service ID",
-    "templateIdLabel": "Template ID",
-    "publicKeyLabel": "Public Key",
-    "privateKeyLabel": "Private Key",
-    "privateKeyHint": "You can find your Private Key on the EmailJS Account → Security page.",
+    "apiKeyLabel": "Resend API Key",
+    "apiKeyHint": "Find this under API Keys in your Resend dashboard. It needs sending access for the usajusho.com domain.",
     "saved": "Saved.",
     "saving": "Saving...",
     "save": "Save"
@@ -279,14 +276,11 @@
   "adminSettings": {
     "title": "Email Notification Settings",
     "backLink": "Back to Package Management",
-    "description": "Enter your EmailJS account details to automatically email users when a package arrives, is quoted, or ships. Until configured, only in-app notifications are sent.",
+    "description": "Enter your Resend API key to automatically email users when a package arrives, is quoted, or ships. Until configured, only in-app notifications are sent.",
     "setupHeading": "Setup Steps",
-    "step1": "Create an account at emailjs.com and add an Email Service.",
-    "step2Pre": "Create an Email Template and use the",
-    "step2Post": "variables in the body.",
-    "step3Pre": "On the EmailJS Account → Security page,",
-    "step3Post": "turn off \"API calls are disabled for non-browser applications\" (required for sending from the server).",
-    "step4": "Enter the Service ID, Template ID, Public Key, and Private Key into the form below and save."
+    "step1": "Create a free account at resend.com and verify the usajusho.com domain there.",
+    "step2": "Create an API Key with sending access.",
+    "step3": "Enter the API Key into the form below and save."
   },
   "adminPricing": {
     "title": "Shipping Rate Management",

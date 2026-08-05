@@ -10,21 +10,14 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
 
 type Settings = {
-  emailjs_service_id: string | null
-  emailjs_template_id: string | null
-  emailjs_public_key: string | null
-  emailjs_private_key: string | null
+  resend_api_key: string | null
 } | null
 
 export default function SettingsForm({ initialSettings }: { initialSettings: Settings }) {
   const t = useTranslations("settingsForm")
   const [isPending, startTransition] = useTransition()
   const [message, setMessage] = useState<string | null>(null)
-  const [configured, setConfigured] = useState(
-    !!initialSettings?.emailjs_service_id &&
-      !!initialSettings?.emailjs_template_id &&
-      !!initialSettings?.emailjs_public_key
-  )
+  const [configured, setConfigured] = useState(!!initialSettings?.resend_api_key)
 
   function handleSubmit(formData: FormData) {
     setMessage(null)
@@ -34,11 +27,7 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Set
         setMessage(result.error)
       } else {
         setMessage(t("saved"))
-        setConfigured(
-          !!(String(formData.get("emailjs_service_id") || "")).trim() &&
-            !!(String(formData.get("emailjs_template_id") || "")).trim() &&
-            !!(String(formData.get("emailjs_public_key") || "")).trim()
-        )
+        setConfigured(!!String(formData.get("resend_api_key") || "").trim())
       }
     })
   }
@@ -59,45 +48,15 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Set
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="emailjs_service_id">{t("serviceIdLabel")}</Label>
+            <Label htmlFor="resend_api_key">{t("apiKeyLabel")}</Label>
             <Input
-              id="emailjs_service_id"
-              type="text"
-              name="emailjs_service_id"
-              defaultValue={initialSettings?.emailjs_service_id ?? ""}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="emailjs_template_id">{t("templateIdLabel")}</Label>
-            <Input
-              id="emailjs_template_id"
-              type="text"
-              name="emailjs_template_id"
-              defaultValue={initialSettings?.emailjs_template_id ?? ""}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="emailjs_public_key">{t("publicKeyLabel")}</Label>
-            <Input
-              id="emailjs_public_key"
-              type="text"
-              name="emailjs_public_key"
-              defaultValue={initialSettings?.emailjs_public_key ?? ""}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="emailjs_private_key">{t("privateKeyLabel")}</Label>
-            <Input
-              id="emailjs_private_key"
+              id="resend_api_key"
               type="password"
-              name="emailjs_private_key"
-              defaultValue={initialSettings?.emailjs_private_key ?? ""}
+              name="resend_api_key"
+              defaultValue={initialSettings?.resend_api_key ?? ""}
             />
             <p className="text-xs text-muted-foreground">
-              {t("privateKeyHint")}
+              {t("apiKeyHint")}
             </p>
           </div>
 
