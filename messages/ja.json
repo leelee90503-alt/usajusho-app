@@ -173,7 +173,8 @@
     "purchaseAgency": "購入代行",
     "login": "ログイン",
     "signup": "会員登録",
-    "howItWorks": "ご利用の流れ"
+    "howItWorks": "ご利用の流れ",
+    "customs": "関税ガイド"
   },
   "packageList": {
     "empty": "まだ届いた荷物はありません。",

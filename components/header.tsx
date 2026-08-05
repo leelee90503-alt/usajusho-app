@@ -31,6 +31,14 @@ export default async function Header() {
             size="sm"
             className="text-sm font-medium text-slate-600 hover:text-primary hover:bg-primary/5"
           >
+            <Link href="/customs">{t("customs")}</Link>
+          </Button>
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-sm font-medium text-slate-600 hover:text-primary hover:bg-primary/5"
+          >
             <Link href="/purchase-agency">{t("purchaseAgency")}</Link>
           </Button>
           <Button

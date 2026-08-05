@@ -173,7 +173,8 @@
     "purchaseAgency": "Purchase Proxy",
     "login": "Log In",
     "signup": "Sign Up",
-    "howItWorks": "How It Works"
+    "howItWorks": "How It Works",
+    "customs": "Customs Guide"
   },
   "packageList": {
     "empty": "No packages have arrived yet.",
