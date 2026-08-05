@@ -22,7 +22,9 @@
       "previewItem1": "Amazon.com — ワイヤレスイヤホン",
       "previewMeta1": "2.4kg・写真確認済み",
       "previewItem2": "Nike.com — スニーカー 2足",
-      "previewMeta2": "1.8kg・統合配送を選択中"
+      "previewMeta2": "1.8kg・統合配送を選択中",
+      "previewItem1LogoAlt": "Amazon.comのストアアイコン",
+      "previewItem2LogoAlt": "Nike.comのストアアイコン"
     },
     "trust": {
       "stat1Value": "100%",

@@ -63,7 +63,7 @@ export default async function Home() {
             </div>
             <div className="space-y-3">
               <div className="flex gap-3 items-center border-b border-slate-100 pb-3">
-                <div className="w-12 h-12 rounded bg-slate-100 shrink-0" aria-hidden="true" />
+                    <img src="/images/store-amazon.svg" alt={t("hero.previewItem1LogoAlt")} className="w-12 h-12 rounded shrink-0" />
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[var(--usj-text)] truncate">
                     {t("hero.previewItem1")}
@@ -72,7 +72,7 @@ export default async function Home() {
                 </div>
               </div>
               <div className="flex gap-3 items-center">
-                <div className="w-12 h-12 rounded bg-slate-100 shrink-0" aria-hidden="true" />
+                    <img src="/images/store-nike.svg" alt={t("hero.previewItem2LogoAlt")} className="w-12 h-12 rounded shrink-0" />
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[var(--usj-text)] truncate">
                     {t("hero.previewItem2")}
