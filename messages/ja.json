@@ -170,7 +170,9 @@
     "adminPackages": "管理者: 荷物到着登録",
     "adminSettings": "メール通知設定",
     "backToPackages": "荷物管理に戻る",
-    "purchaseAgency": "購入代行"
+    "purchaseAgency": "購入代行",
+    "login": "ログイン",
+    "signup": "会員登録"
   },
   "packageList": {
     "empty": "まだ届いた荷物はありません。",

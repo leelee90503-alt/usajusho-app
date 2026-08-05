@@ -25,6 +25,22 @@ export default async function Header() {
           >
             <Link href="/purchase-agency">{t("purchaseAgency")}</Link>
           </Button>
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-sm font-medium text-slate-600 hover:text-primary hover:bg-primary/5"
+          >
+            <Link href="/login">{t("login")}</Link>
+          </Button>
+          <Button
+            asChild
+            variant="default"
+            size="sm"
+            className="text-sm font-medium"
+          >
+            <Link href="/signup">{t("signup")}</Link>
+          </Button>
           <LanguageSwitcher />
         </nav>
       </div>

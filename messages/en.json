@@ -170,7 +170,9 @@
     "adminPackages": "Admin: Package Intake",
     "adminSettings": "Email Notification Settings",
     "backToPackages": "Back to Package Management",
-    "purchaseAgency": "Purchase Proxy"
+    "purchaseAgency": "Purchase Proxy",
+    "login": "Log In",
+    "signup": "Sign Up"
   },
   "packageList": {
     "empty": "No packages have arrived yet.",
