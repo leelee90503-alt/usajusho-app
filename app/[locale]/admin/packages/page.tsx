@@ -99,6 +99,9 @@ export default async function AdminPackagesPage({
               <Link href="/admin/settings">{t("settingsLink")}</Link>
             </Button>
             <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/shipping">{t("shippingLink")}</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
               <Link href="/admin/purchase-requests">{t("purchaseRequestsLink")}</Link>
             </Button>
           </nav>

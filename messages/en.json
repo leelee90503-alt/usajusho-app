@@ -222,7 +222,8 @@
     "allPackages": "All Packages ({count})",
     "emptyNone": "No packages have been registered yet.",
     "emptyFiltered": "No packages match your filters.",
-    "purchaseRequestsLink": "Purchase Requests"
+    "purchaseRequestsLink": "Purchase Requests",
+    "shippingLink": "Shipping Address"
   },
   "packageStatus": {
     "arrived": "Arrived",
@@ -589,5 +590,24 @@
     "ctaTitle": "Ready to get your own US address?",
     "ctaDescription": "Sign up is free — you're only charged when you actually ship.",
     "ctaButton": "Start for Free"
+  },
+  "adminShipping": {
+    "title": "Shipping Address Settings",
+    "backLink": "Back to Package Management",
+    "description": "Set the warehouse base address assigned to every customer, and control whether their individual Suite number is shown on their dashboard."
+  },
+  "shippingForm": {
+    "addressLine1Label": "Street Address",
+    "cityLabel": "City",
+    "stateLabel": "State",
+    "zipLabel": "ZIP Code",
+    "suiteToggleLabel": "Show Suite number to customers",
+    "suiteToggleHint": "When off, customers only see the base warehouse address on their dashboard (the Suite number is still generated and stored for internal use).",
+    "applyExistingLabel": "Also update already-registered customers",
+    "applyExistingHint": "By default, changes only apply to new signups. Turn this on to immediately overwrite the address on file for every existing customer.",
+    "saved": "Saved.",
+    "savedWithCount": "Saved. Updated {count} existing customer(s).",
+    "saving": "Saving...",
+    "save": "Save"
   }
 }

@@ -222,7 +222,8 @@
     "allPackages": "全ての荷物（{count}）",
     "emptyNone": "登録された荷物はまだありません。",
     "emptyFiltered": "条件に一致する荷物がありません。",
-    "purchaseRequestsLink": "購入代行リクエスト"
+    "purchaseRequestsLink": "購入代行リクエスト",
+    "shippingLink": "配送先住所"
   },
   "packageStatus": {
     "arrived": "到着済み",
@@ -589,5 +590,24 @@
     "ctaTitle": "ご自身の米国住所を手に入れませんか?",
     "ctaDescription": "登録は無料 - 実際に発送するときだけ料金が発生します。",
     "ctaButton": "無料で始める"
+  },
+  "adminShipping": {
+    "title": "配送先住所の設定",
+    "backLink": "パッケージ管理に戻る",
+    "description": "すべてのお客様に割り当てられる倉庫の基本住所を設定し、各お客様のSuite番号をダッシュボードに表示するかどうかを管理します。"
+  },
+  "shippingForm": {
+    "addressLine1Label": "住所",
+    "cityLabel": "市区町村",
+    "stateLabel": "州",
+    "zipLabel": "郵便番号",
+    "suiteToggleLabel": "お客様にSuite番号を表示する",
+    "suiteToggleHint": "オフにすると、お客様のダッシュボードには倉庫の基本住所のみが表示されます(Suite番号は内部利用のため引き続き生成・保存されます)。",
+    "applyExistingLabel": "既存のお客様の住所も更新する",
+    "applyExistingHint": "通常、変更は新規登録者にのみ適用されます。オンにすると、既存のすべてのお客様の登録住所を今すぐ上書きします。",
+    "saved": "保存しました。",
+    "savedWithCount": "保存しました。既存のお客様{count}件を更新しました。",
+    "saving": "保存中...",
+    "save": "保存"
   }
 }
