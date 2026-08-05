@@ -1,14 +1,34 @@
-import { useTranslations } from "next-intl"
 import { getTranslations } from "next-intl/server"
 import { Link } from "@/i18n/navigation"
 import { createClient } from "@/lib/supabase/server"
 import FeeCalculator from "@/components/home/fee-calculator"
 import DeliveryJourney from "@/components/home/delivery-journey"
-import LanguageSwitcher from "@/components/language-switcher"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import {
+  Search,
+  PackageCheck,
+  Receipt,
+  Archive,
+  ShieldCheck,
+  Settings2,
+  type LucideIcon,
+} from "lucide-react"
 import type { ShippingRate } from "@/lib/pricing"
+
+const addonIcons: Record<string, LucideIcon> = {
+  item1: Search,
+  item2: PackageCheck,
+  item3: Receipt,
+  item4: Archive,
+  item5: ShieldCheck,
+  item6: Settings2,
+}
 
 export default async function Home() {
   const t = await getTranslations("home")
+  const tc = await getTranslations("common")
 
   const supabase = await createClient()
   const { data: rates } = await supabase
@@ -22,66 +42,67 @@ export default async function Home() {
   return (
     <main className="flex flex-col">
       {/* 2. Hero */}
-      <section className="bg-[var(--usj-surface)] border-b border-slate-200">
+      <section className="bg-surface border-b border-slate-200">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <p className="text-[var(--usj-accent)] font-semibold text-sm mb-3 tracking-wide">
+            <p className="text-accent font-semibold text-sm mb-3 tracking-wide">
               {t("hero.eyebrow")}
             </p>
-            <h1 className="text-3xl md:text-5xl font-bold text-[var(--usj-primary)] leading-tight mb-5">
+            <h1 className="text-3xl md:text-5xl font-bold text-primary leading-tight mb-5">
               {t("hero.headline")}
             </h1>
             <p className="text-slate-600 text-base md:text-lg mb-8 max-w-md leading-relaxed">
               {t("hero.description")}
             </p>
             <div className="flex flex-wrap gap-3 mb-8">
-              <Link
-                href="/signup"
-                className="bg-[var(--usj-primary)] text-white text-sm font-semibold rounded-md px-6 py-3 hover:opacity-90 transition-opacity"
+              <Button asChild size="lg" className="h-auto px-6 py-3 text-sm font-semibold">
+                <Link href="/signup">{t("hero.ctaPrimary")}</Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="h-auto px-6 py-3 text-sm font-semibold border-slate-300 text-primary hover:bg-slate-50"
               >
-                {t("hero.ctaPrimary")}
-              </Link>
-              <a
-                href="#calculator"
-                className="bg-white text-[var(--usj-primary)] text-sm font-semibold rounded-md px-6 py-3 border border-slate-300 hover:bg-slate-50 transition-colors"
-              >
-                {t("hero.ctaSecondary")}
-              </a>
+                <a href="#calculator">{t("hero.ctaSecondary")}</a>
+              </Button>
             </div>
             <p className="text-xs text-slate-500">{t("hero.trustNote")}</p>
           </div>
 
           {/* Realistic package-status preview panel, not an abstract graphic */}
-          <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-5">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-slate-400 tracking-wide">
-                {t("hero.previewLabel")}
-              </span>
-              <span className="text-xs font-medium text-[var(--usj-accent)] bg-[var(--usj-accent)]/10 rounded px-2 py-1">
-                {t("hero.previewStatus")}
-              </span>
-            </div>
-            <div className="space-y-3">
-              <div className="flex gap-3 items-center border-b border-slate-100 pb-3">
-                    <img src="/images/store-amazon.svg" alt={t("hero.previewItem1LogoAlt")} className="w-12 h-12 rounded shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-[var(--usj-text)] truncate">
-                    {t("hero.previewItem1")}
-                  </p>
-                  <p className="text-xs text-slate-500">{t("hero.previewMeta1")}</p>
+          <Card className="shadow-sm">
+            <CardContent>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-semibold text-slate-400 tracking-wide">
+                  {t("hero.previewLabel")}
+                </span>
+                <Badge variant="secondary" className="bg-accent/10 text-accent">
+                  {t("hero.previewStatus")}
+                </Badge>
+              </div>
+              <div className="space-y-3">
+                <div className="flex gap-3 items-center border-b border-slate-100 pb-3">
+                  <img src="/images/store-amazon.svg" alt={t("hero.previewItem1LogoAlt")} className="w-12 h-12 rounded shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-[var(--usj-text)] truncate">
+                      {t("hero.previewItem1")}
+                    </p>
+                    <p className="text-xs text-slate-500">{t("hero.previewMeta1")}</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <img src="/images/store-nike.png" alt={t("hero.previewItem2LogoAlt")} className="w-12 h-12 rounded shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-[var(--usj-text)] truncate">
+                      {t("hero.previewItem2")}
+                    </p>
+                    <p className="text-xs text-slate-500">{t("hero.previewMeta2")}</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex gap-3 items-center">
-                    <img src="/images/store-nike.png" alt={t("hero.previewItem2LogoAlt")} className="w-12 h-12 rounded shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-[var(--usj-text)] truncate">
-                    {t("hero.previewItem2")}
-                  </p>
-                  <p className="text-xs text-slate-500">{t("hero.previewMeta2")}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
@@ -89,19 +110,19 @@ export default async function Home() {
       <section className="border-b border-slate-200">
         <div className="mx-auto max-w-6xl px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div>
-            <p className="text-2xl font-bold text-[var(--usj-primary)]">{t("trust.stat1Value")}</p>
+            <p className="text-2xl font-bold text-primary">{t("trust.stat1Value")}</p>
             <p className="text-xs text-slate-500 mt-1">{t("trust.stat1Label")}</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-[var(--usj-primary)]">{t("trust.stat2Value")}</p>
+            <p className="text-2xl font-bold text-primary">{t("trust.stat2Value")}</p>
             <p className="text-xs text-slate-500 mt-1">{t("trust.stat2Label")}</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-[var(--usj-primary)]">{t("trust.stat3Value")}</p>
+            <p className="text-2xl font-bold text-primary">{t("trust.stat3Value")}</p>
             <p className="text-xs text-slate-500 mt-1">{t("trust.stat3Label")}</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-[var(--usj-primary)]">{t("trust.stat4Value")}</p>
+            <p className="text-2xl font-bold text-primary">{t("trust.stat4Value")}</p>
             <p className="text-xs text-slate-500 mt-1">{t("trust.stat4Label")}</p>
           </div>
         </div>
@@ -111,7 +132,7 @@ export default async function Home() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
           <div className="max-w-2xl mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)] mb-3">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-3">
               {t("journey.title")}
             </h2>
             <p className="text-slate-600 leading-relaxed">{t("journey.description")}</p>
@@ -130,24 +151,24 @@ export default async function Home() {
       </section>
 
       {/* 5. US warehouse address explanation */}
-      <section className="bg-[var(--usj-surface)] border-y border-slate-200">
+      <section className="bg-surface border-y border-slate-200">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-center">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)] mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
               {t("address.title")}
             </h2>
             <p className="text-slate-600 leading-relaxed mb-6">{t("address.description")}</p>
             <ul className="space-y-3">
               <li className="flex gap-3 text-sm text-slate-700">
-                <span className="text-[var(--usj-accent)] font-bold">01</span>
+                <span className="text-accent font-bold">01</span>
                 {t("address.point1")}
               </li>
               <li className="flex gap-3 text-sm text-slate-700">
-                <span className="text-[var(--usj-accent)] font-bold">02</span>
+                <span className="text-accent font-bold">02</span>
                 {t("address.point2")}
               </li>
               <li className="flex gap-3 text-sm text-slate-700">
-                <span className="text-[var(--usj-accent)] font-bold">03</span>
+                <span className="text-accent font-bold">03</span>
                 {t("address.point3")}
               </li>
             </ul>
@@ -171,16 +192,16 @@ export default async function Home() {
             <img
               src="/images/inspection-exterior.svg"
               alt={t("inspection.exteriorAlt")}
-              className="aspect-square rounded-lg bg-[var(--usj-surface)] border border-slate-200 object-cover w-full"
+              className="aspect-square rounded-lg bg-surface border border-slate-200 object-cover w-full"
             />
             <img
               src="/images/inspection-interior.svg"
               alt={t("inspection.interiorAlt")}
-              className="aspect-square rounded-lg bg-[var(--usj-surface)] border border-slate-200 object-cover w-full mt-6"
+              className="aspect-square rounded-lg bg-surface border border-slate-200 object-cover w-full mt-6"
             />
           </div>
           <div className="order-1 md:order-2">
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)] mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
               {t("inspection.title")}
             </h2>
             <p className="text-slate-600 leading-relaxed">{t("inspection.description")}</p>
@@ -189,10 +210,10 @@ export default async function Home() {
       </section>
 
       {/* 7. Consolidation / repackaging guide */}
-      <section className="bg-[var(--usj-surface)] border-y border-slate-200">
+      <section className="bg-surface border-y border-slate-200">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-center">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)] mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
               {t("consolidation.title")}
             </h2>
             <p className="text-slate-600 leading-relaxed">{t("consolidation.description")}</p>
@@ -215,30 +236,38 @@ export default async function Home() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
           <div className="max-w-2xl mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)] mb-3">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-3">
               {t("addons.title")}
             </h2>
             <p className="text-slate-600 leading-relaxed">{t("addons.description")}</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {["item1", "item2", "item3", "item4", "item5", "item6"].map((key) => (
-              <div key={key} className="border border-slate-200 rounded-lg p-5">
-                <p className="text-sm font-semibold text-[var(--usj-text)] mb-1">
-                  {t(`addons.${key}Title`)}
-                </p>
-                <p className="text-xs text-slate-500 leading-relaxed">{t(`addons.${key}Description`)}</p>
-              </div>
-            ))}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {["item1", "item2", "item3", "item4", "item5", "item6"].map((key) => {
+              const Icon = addonIcons[key]
+              return (
+                <Card key={key} className="hover:shadow-md transition-shadow">
+                  <CardContent>
+                    <div className="mb-3 flex size-9 items-center justify-center rounded-md bg-accent/10 text-accent">
+                      <Icon className="size-5" aria-hidden="true" />
+                    </div>
+                    <p className="text-sm font-semibold text-[var(--usj-text)] mb-1">
+                      {t(`addons.${key}Title`)}
+                    </p>
+                    <p className="text-xs text-slate-500 leading-relaxed">{t(`addons.${key}Description`)}</p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
           <p className="text-xs text-slate-500 mt-6">{t("addons.footnote")}</p>
         </div>
       </section>
 
       {/* 9. Shipping fee calculator */}
-      <section id="calculator" className="bg-[var(--usj-surface)] border-y border-slate-200 scroll-mt-16">
+      <section id="calculator" className="bg-surface border-y border-slate-200 scroll-mt-16">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-start">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)] mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
               {t("calculator.title")}
             </h2>
             <p className="text-slate-600 leading-relaxed">{t("calculator.description")}</p>
@@ -246,19 +275,19 @@ export default async function Home() {
           <FeeCalculator
             rates={shippingRates}
             labels={{
-                weightLabel: t("calculator.weightLabel"),
-                weightPlaceholder: t("calculator.weightPlaceholder"),
-                dimensionsLabel: t("calculator.dimensionsLabel"),
-                lengthPlaceholder: t("calculator.lengthPlaceholder"),
-                widthPlaceholder: t("calculator.widthPlaceholder"),
-                heightPlaceholder: t("calculator.heightPlaceholder"),
-                dimensionsHint: t("calculator.dimensionsHint"),
-                resultLabel: t("calculator.resultLabel"),
-                unavailable: t("calculator.unavailable"),
-                disclaimer: t("calculator.disclaimer"),
-                currency: t("calculator.currency"),
-                overweightContact: t("calculator.overweightContact"),
-              }}
+              weightLabel: t("calculator.weightLabel"),
+              weightPlaceholder: t("calculator.weightPlaceholder"),
+              dimensionsLabel: t("calculator.dimensionsLabel"),
+              lengthPlaceholder: t("calculator.lengthPlaceholder"),
+              widthPlaceholder: t("calculator.widthPlaceholder"),
+              heightPlaceholder: t("calculator.heightPlaceholder"),
+              dimensionsHint: t("calculator.dimensionsHint"),
+              resultLabel: t("calculator.resultLabel"),
+              unavailable: t("calculator.unavailable"),
+              disclaimer: t("calculator.disclaimer"),
+              currency: t("calculator.currency"),
+              overweightContact: t("calculator.overweightContact"),
+            }}
           />
         </div>
       </section>
@@ -267,21 +296,21 @@ export default async function Home() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-center">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)] mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
               {t("tracking.title")}
             </h2>
             <p className="text-slate-600 leading-relaxed">{t("tracking.description")}</p>
           </div>
-          <div className="bg-[var(--usj-surface)] border border-slate-200 rounded-lg p-6">
+          <div className="bg-surface border border-slate-200 rounded-lg p-6">
             <div className="flex items-center gap-2 mb-4">
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center flex-1 last:flex-none">
                   <div
-                    className={`w-3 h-3 rounded-full ${i <= 2 ? "bg-[var(--usj-accent)]" : "bg-slate-300"}`}
+                    className={`w-3 h-3 rounded-full ${i <= 2 ? "bg-accent" : "bg-slate-300"}`}
                     aria-hidden="true"
                   />
                   {i < 3 && (
-                    <div className={`h-0.5 flex-1 ${i < 2 ? "bg-[var(--usj-accent)]" : "bg-slate-300"}`} aria-hidden="true" />
+                    <div className={`h-0.5 flex-1 ${i < 2 ? "bg-accent" : "bg-slate-300"}`} aria-hidden="true" />
                   )}
                 </div>
               ))}
@@ -293,9 +322,9 @@ export default async function Home() {
       </section>
 
       {/* 11. FAQ */}
-      <section className="bg-[var(--usj-surface)] border-y border-slate-200">
+      <section className="bg-surface border-y border-slate-200">
         <div className="mx-auto max-w-3xl px-4 py-16 md:py-20">
-          <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)] mb-10 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-primary mb-10 text-center">
             {t("faq.title")}
           </h2>
           <div className="space-y-4">
@@ -315,54 +344,41 @@ export default async function Home() {
       </section>
 
       {/* 12. Signup CTA */}
-      <section className="bg-[var(--usj-primary)]">
+      <section className="bg-primary">
         <div className="mx-auto max-w-4xl px-4 py-16 md:py-20 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">{t("cta.title")}</h2>
           <p className="text-slate-300 mb-8 max-w-xl mx-auto leading-relaxed">{t("cta.description")}</p>
-          <Link
-            href="/signup"
-            className="inline-block bg-white text-[var(--usj-primary)] text-sm font-semibold rounded-md px-8 py-3.5 hover:bg-slate-100 transition-colors"
+          <Button
+            asChild
+            size="lg"
+            variant="secondary"
+            className="h-auto px-8 py-3.5 text-sm font-semibold bg-white text-primary hover:bg-slate-100"
           >
-            {t("cta.button")}
-          </Link>
+            <Link href="/signup">{t("cta.button")}</Link>
+          </Button>
         </div>
       </section>
 
-      {/* 13. Footer */}
-      <FooterSection />
+      {/* 13. Homepage-specific account links (distinct from the shared site footer rendered in the layout) */}
+      <section className="bg-white border-t border-slate-200">
+        <div className="mx-auto max-w-6xl px-4 py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <p className="font-bold text-primary mb-2">{tc("appName")}</p>
+            <p className="text-xs text-slate-500 max-w-sm leading-relaxed">{t("footer.tagline")}</p>
+          </div>
+          <div className="flex flex-col gap-2 text-xs text-slate-500">
+            <p className="font-semibold text-slate-700 mb-1">{t("footer.linksTitle")}</p>
+            <div className="flex gap-4">
+              <Link href="/login" className="hover:text-primary">
+                {t("login")}
+              </Link>
+              <Link href="/signup" className="hover:text-primary">
+                {t("signup")}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
-  )
-}
-
-function FooterSection() {
-  const t = useTranslations("home")
-  const tc = useTranslations("common")
-
-  return (
-    <footer className="bg-white border-t border-slate-200">
-      <div className="mx-auto max-w-6xl px-4 py-10 flex flex-col md:flex-row justify-between gap-6">
-        <div>
-          <p className="font-bold text-[var(--usj-primary)] mb-2">{tc("appName")}</p>
-          <p className="text-xs text-slate-500 max-w-sm leading-relaxed">{t("footer.tagline")}</p>
-        </div>
-        <div className="flex flex-col gap-2 text-xs text-slate-500">
-          <p className="font-semibold text-slate-700 mb-1">{t("footer.linksTitle")}</p>
-          <Link href="/login" className="hover:text-[var(--usj-primary)]">
-            {t("login")}
-          </Link>
-          <Link href="/signup" className="hover:text-[var(--usj-primary)]">
-            {t("signup")}
-          </Link>
-        </div>
-        <div className="text-xs" aria-label={tc("language")}>
-          <LanguageSwitcher />
-        </div>
-      </div>
-      <div className="border-t border-slate-200">
-        <div className="mx-auto max-w-6xl px-4 py-4 text-xs text-slate-400">
-          {t("footer.copyright")}
-        </div>
-      </div>
-    </footer>
   )
 }
