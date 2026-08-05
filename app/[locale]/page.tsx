@@ -72,7 +72,7 @@ export default async function Home() {
                 </div>
               </div>
               <div className="flex gap-3 items-center">
-                    <img src="/images/store-nike.svg" alt={t("hero.previewItem2LogoAlt")} className="w-12 h-12 rounded shrink-0" />
+                    <img src="/images/store-nike.png" alt={t("hero.previewItem2LogoAlt")} className="w-12 h-12 rounded shrink-0" />
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[var(--usj-text)] truncate">
                     {t("hero.previewItem2")}
