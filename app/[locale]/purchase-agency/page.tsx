@@ -1,119 +1,147 @@
 import { Link } from "@/i18n/navigation"
 import { getTranslations } from "next-intl/server"
+import {
+  FileText,
+  FileCheck,
+  CreditCard,
+  ShoppingCart,
+  PackageCheck,
+  Truck,
+  Globe,
+  Languages,
+  Star,
+  Receipt,
+  type LucideIcon,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card"
 
 export default async function PurchaseAgencyPage() {
   const t = await getTranslations("purchaseAgency")
 
-  const steps = [
-    { title: t("step1Title"), description: t("step1Description") },
-    { title: t("step2Title"), description: t("step2Description") },
-    { title: t("step3Title"), description: t("step3Description") },
-    { title: t("step4Title"), description: t("step4Description") },
-    { title: t("step5Title"), description: t("step5Description") },
-    { title: t("step6Title"), description: t("step6Description") },
+  const steps: { title: string; description: string; icon: LucideIcon }[] = [
+    { title: t("step1Title"), description: t("step1Description"), icon: FileText },
+    { title: t("step2Title"), description: t("step2Description"), icon: FileCheck },
+    { title: t("step3Title"), description: t("step3Description"), icon: CreditCard },
+    { title: t("step4Title"), description: t("step4Description"), icon: ShoppingCart },
+    { title: t("step5Title"), description: t("step5Description"), icon: PackageCheck },
+    { title: t("step6Title"), description: t("step6Description"), icon: Truck },
   ]
 
-  const benefits = [
-    { title: t("benefit1Title"), description: t("benefit1Description") },
-    { title: t("benefit2Title"), description: t("benefit2Description") },
-    { title: t("benefit3Title"), description: t("benefit3Description") },
-    { title: t("benefit4Title"), description: t("benefit4Description") },
+  const benefits: { title: string; description: string; icon: LucideIcon }[] = [
+    { title: t("benefit1Title"), description: t("benefit1Description"), icon: Globe },
+    { title: t("benefit2Title"), description: t("benefit2Description"), icon: Languages },
+    { title: t("benefit3Title"), description: t("benefit3Description"), icon: Star },
+    { title: t("benefit4Title"), description: t("benefit4Description"), icon: Receipt },
   ]
 
   return (
     <main className="flex flex-col">
+      {/* Hero */}
       <section className="bg-[var(--usj-surface)] border-b border-slate-200">
         <div className="mx-auto max-w-4xl px-4 py-16 md:py-24 text-center">
           <p className="text-[var(--usj-accent)] font-semibold text-sm mb-3 tracking-wide">
             {t("eyebrow")}
           </p>
-          <h1 className="text-3xl md:text-5xl font-bold text-[var(--usj-primary)] leading-tight mb-5">
+          <h1 className="text-3xl md:text-5xl font-bold text-primary leading-tight mb-5">
             {t("headline")}
           </h1>
           <p className="text-slate-600 text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
             {t("description")}
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Link
-              href="/dashboard/purchase-requests"
-              className="bg-[var(--usj-primary)] text-white text-sm font-semibold rounded-md px-6 py-3 hover:opacity-90 transition-opacity"
-            >
-              {t("ctaPrimary")}
-            </Link>
-            <Link
-              href="/signup"
-              className="bg-white text-[var(--usj-primary)] text-sm font-semibold rounded-md px-6 py-3 border border-slate-300 hover:bg-slate-50 transition-colors"
-            >
-              {t("ctaSecondary")}
-            </Link>
+            <Button asChild size="lg">
+              <Link href="/dashboard/purchase-requests">{t("ctaPrimary")}</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="text-primary">
+              <Link href="/signup">{t("ctaSecondary")}</Link>
+            </Button>
           </div>
         </div>
       </section>
 
+      {/* Process steps */}
       <section className="mx-auto max-w-5xl px-4 py-16 md:py-20 w-full">
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)]">
+          <h2 className="text-2xl md:text-3xl font-bold text-primary">
             {t("stepsTitle")}
           </h2>
           <p className="text-slate-600 mt-2">{t("stepsDescription")}</p>
         </div>
         <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {steps.map((step, index) => (
-            <li
-              key={step.title}
-              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--usj-primary)] text-sm font-bold text-white">
-                {index + 1}
-              </div>
-              <h3 className="mt-3 font-semibold text-slate-900">
-                {step.title}
-              </h3>
-              <p className="mt-1 text-sm text-slate-600 leading-relaxed">
-                {step.description}
-              </p>
-            </li>
-          ))}
+          {steps.map((step, index) => {
+            const Icon = step.icon
+            return (
+              <li key={step.title}>
+                <Card className="h-full">
+                  <CardHeader>
+                    <div className="flex items-center gap-3 mb-1">
+                      <Badge className="h-7 w-7 shrink-0 justify-center rounded-full p-0 text-sm">
+                        {index + 1}
+                      </Badge>
+                      <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
+                    </div>
+                    <CardTitle className="text-base">{step.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      {step.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </li>
+            )
+          })}
         </ol>
       </section>
 
+      {/* Benefits */}
       <section className="bg-[var(--usj-surface)] border-y border-slate-200">
         <div className="mx-auto max-w-5xl px-4 py-16 md:py-20">
           <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)]">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary">
               {t("benefitsTitle")}
             </h2>
             <p className="text-slate-600 mt-2">{t("benefitsDescription")}</p>
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
-            {benefits.map((benefit) => (
-              <div
-                key={benefit.title}
-                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-              >
-                <h3 className="font-semibold text-slate-900">
-                  {benefit.title}
-                </h3>
-                <p className="mt-1 text-sm text-slate-600 leading-relaxed">
-                  {benefit.description}
-                </p>
-              </div>
-            ))}
+            {benefits.map((benefit) => {
+              const Icon = benefit.icon
+              return (
+                <Card key={benefit.title} className="bg-white">
+                  <CardHeader>
+                    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
+                    </div>
+                    <CardTitle className="text-base">{benefit.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      {benefit.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </div>
       </section>
 
+      {/* Final CTA */}
       <section className="mx-auto max-w-3xl px-4 py-16 md:py-20 text-center w-full">
-        <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)] mb-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
           {t("finalCtaTitle")}
         </h2>
         <p className="text-slate-600 mb-8">{t("finalCtaDescription")}</p>
-        <Link
-          href="/dashboard/purchase-requests"
-          className="inline-block bg-[var(--usj-primary)] text-white text-sm font-semibold rounded-md px-6 py-3 hover:opacity-90 transition-opacity"
-        >
-          {t("ctaPrimary")}
-        </Link>
+        <Button asChild size="lg">
+          <Link href="/dashboard/purchase-requests">{t("ctaPrimary")}</Link>
+        </Button>
       </section>
     </main>
   )
