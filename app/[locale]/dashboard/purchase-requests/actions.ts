@@ -1,11 +1,10 @@
 "use server"
 
 import { redirect } from "@/i18n/navigation"
-import { getLocale, getTranslations } from "next-intl/server"
+import { getLocale } from "next-intl/server"
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { getStripe } from "@/lib/stripe"
-import { getWhitelistDomains, isUrlWhitelisted } from "@/lib/purchase-agency-whitelist"
 
 export async function submitPurchaseRequest(formData: FormData) {
   const locale = await getLocale()
@@ -28,16 +27,6 @@ export async function submitPurchaseRequest(formData: FormData) {
 
   if (!productDescription) {
     return { error: "商品の説明は必須です。" }
-  }
-
-  if (productUrl) {
-    const whitelistDomains = await getWhitelistDomains()
-    const enabledDomains = whitelistDomains.filter((d) => d.enabled)
-    if (!isUrlWhitelisted(productUrl, enabledDomains)) {
-      const t = await getTranslations({ locale, namespace: "purchaseRequests" })
-      const stores = enabledDomains.map((d) => d.label).join(", ")
-      return { error: t("productUrlNotWhitelisted", { stores }) }
-    }
   }
 
   const budgetCapDollars = budgetCapRaw ? Number(budgetCapRaw) : null
