@@ -257,3 +257,81 @@ export async function saveFeeSettings(formData: FormData) {
   revalidatePath("/admin/purchase-requests")
   return { success: true }
 }
+
+// Normalizes a raw domain/URL typed by an admin into a bare lowercase
+// hostname (no protocol, no "www.", no path/query), e.g. turns
+// "https://www.Amazon.com/some/path?x=1" into "amazon.com". Duplicated
+// (rather than shared) with the client-side normalization in
+// ./whitelist-form.tsx as defense in depth against a bypassed client.
+function normalizeDomain(input: string): string {
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split("/")[0]
+    .split("?")[0]
+}
+
+export async function addWhitelistDomain(formData: FormData) {
+  const supabase = await requireAdmin()
+
+  const label = String(formData.get("label") || "").trim()
+  const domain = normalizeDomain(String(formData.get("domain") || ""))
+
+  if (!label) {
+    return { error: "表示名を入力してください。" }
+  }
+  if (!domain) {
+    return { error: "正しいドメインを入力してください。" }
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const { data, error } = await supabase
+    .from("purchase_agency_whitelist_domains")
+    .insert({ domain, label, created_by: user?.id ?? null })
+    .select("id, domain, label, enabled")
+    .single()
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath("/admin/purchase-requests")
+  return { success: true, domain: data }
+}
+
+export async function toggleWhitelistDomain(id: string, enabled: boolean) {
+  const supabase = await requireAdmin()
+
+  const { error } = await supabase
+    .from("purchase_agency_whitelist_domains")
+    .update({ enabled })
+    .eq("id", id)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath("/admin/purchase-requests")
+  return { success: true }
+}
+
+export async function deleteWhitelistDomain(id: string) {
+  const supabase = await requireAdmin()
+
+  const { error } = await supabase
+    .from("purchase_agency_whitelist_domains")
+    .delete()
+    .eq("id", id)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath("/admin/purchase-requests")
+  return { success: true }
+}

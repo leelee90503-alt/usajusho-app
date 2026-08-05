@@ -489,7 +489,8 @@
       "purchased": "Purchased",
       "cancelled": "Cancelled",
       "refunded": "Refunded"
-    }
+    },
+    "productUrlNotWhitelisted": "We currently only support purchases from: {stores}. Please use a link from one of these stores, or leave the URL blank and describe the item in Product Description."
   },
   "adminPurchaseRequests": {
     "title": "Admin: Purchase Requests",
@@ -544,6 +545,18 @@
       "purchased": "Purchased",
       "cancelled": "Cancelled",
       "refunded": "Refunded"
-    }
+    },
+    "whitelistHeading": "Whitelisted Shopping Sites",
+    "whitelistDescription": "Customers may only submit a Product URL from a store listed here. Manage the list without a code deploy.",
+    "whitelistLabelField": "Store name",
+    "whitelistDomainField": "Domain",
+    "whitelistAddButton": "Add",
+    "whitelistAdding": "Adding...",
+    "whitelistAddSuccess": "Store added.",
+    "whitelistEnabled": "Enabled",
+    "whitelistDisabled": "Disabled",
+    "whitelistRemove": "Remove",
+    "whitelistRemoveConfirm": "Remove {label} ({domain})?",
+    "whitelistEmpty": "No stores whitelisted yet. Add one below."
   }
 }

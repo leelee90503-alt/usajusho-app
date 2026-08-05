@@ -3,7 +3,9 @@ import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from "next-intl/server"
 import RequestRow from "./request-row"
 import FeeSettingsForm from "./fee-settings-form"
+import WhitelistForm from "./whitelist-form"
 import { getPurchaseAgencyFeeSettings } from "@/lib/purchase-agency-settings"
+import { getWhitelistDomains } from "@/lib/purchase-agency-whitelist"
 
 export default async function AdminPurchaseRequestsPage({
   searchParams,
@@ -44,6 +46,7 @@ export default async function AdminPurchaseRequestsPage({
 
   const requests = allRequests ?? []
   const feeSettings = await getPurchaseAgencyFeeSettings()
+  const whitelistDomains = await getWhitelistDomains()
   const filtered = status
     ? requests.filter((r) => r.status === status)
     : requests
@@ -80,6 +83,8 @@ export default async function AdminPurchaseRequestsPage({
             feePercent: Math.round(feeSettings.feePercent * 10000) / 100,
           }}
         />
+
+        <WhitelistForm initialDomains={whitelistDomains} />
 
         <form className="mt-6 flex flex-wrap items-center gap-2" method="get">
           <select

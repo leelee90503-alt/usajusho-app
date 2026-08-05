@@ -489,7 +489,8 @@
       "purchased": "購入完了",
       "cancelled": "キャンセル済み",
       "refunded": "返金済み"
-    }
+    },
+    "productUrlNotWhitelisted": "現在、商品URLとしてご利用いただけるのは次のストアのみです：{stores}。これらのストアのリンクをご利用いただくか、URLを空欄にして商品の説明欄に詳細をご記入ください。"
   },
   "adminPurchaseRequests": {
     "title": "管理者：購入代行リクエスト",
@@ -544,6 +545,18 @@
       "purchased": "購入完了",
       "cancelled": "キャンセル済み",
       "refunded": "返金済み"
-    }
+    },
+    "whitelistHeading": "利用可能なショッピングサイト",
+    "whitelistDescription": "お客様が商品URLとして送信できるのは、ここに登録されたストアのみです。コードのデプロイなしにリストを管理できます。",
+    "whitelistLabelField": "ストア名",
+    "whitelistDomainField": "ドメイン",
+    "whitelistAddButton": "追加",
+    "whitelistAdding": "追加中...",
+    "whitelistAddSuccess": "ストアを追加しました。",
+    "whitelistEnabled": "有効",
+    "whitelistDisabled": "無効",
+    "whitelistRemove": "削除",
+    "whitelistRemoveConfirm": "{label}（{domain}）を削除しますか？",
+    "whitelistEmpty": "まだ登録されたストアがありません。下のフォームから追加してください。"
   }
 }
