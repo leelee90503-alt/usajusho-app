@@ -75,7 +75,7 @@ export default function FeeCalculator({
           value={weightInput}
           onChange={(e) => setWeightInput(e.target.value)}
           placeholder={labels.weightPlaceholder}
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--usj-accent)] focus:border-transparent"
+          className="flex-1 min-w-0 rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--usj-accent)] focus:border-transparent"
         />
         <span className="flex items-center text-sm text-slate-500 px-1">kg</span>
       </div>
@@ -94,7 +94,7 @@ export default function FeeCalculator({
           onChange={(e) => setLengthInput(e.target.value)}
           placeholder={labels.lengthPlaceholder}
           aria-label={labels.lengthPlaceholder}
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--usj-accent)] focus:border-transparent"
+          className="flex-1 min-w-0 rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--usj-accent)] focus:border-transparent"
         />
         <span className="text-slate-400 text-sm">x</span>
         <input
@@ -106,7 +106,7 @@ export default function FeeCalculator({
           onChange={(e) => setWidthInput(e.target.value)}
           placeholder={labels.widthPlaceholder}
           aria-label={labels.widthPlaceholder}
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--usj-accent)] focus:border-transparent"
+          className="flex-1 min-w-0 rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--usj-accent)] focus:border-transparent"
         />
         <span className="text-slate-400 text-sm">x</span>
         <input
@@ -118,7 +118,7 @@ export default function FeeCalculator({
           onChange={(e) => setHeightInput(e.target.value)}
           placeholder={labels.heightPlaceholder}
           aria-label={labels.heightPlaceholder}
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--usj-accent)] focus:border-transparent"
+          className="flex-1 min-w-0 rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--usj-accent)] focus:border-transparent"
         />
         <span className="flex items-center text-sm text-slate-500 px-1">cm</span>
       </div>
