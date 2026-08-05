@@ -70,7 +70,7 @@ export default async function Home() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="h-auto px-6 py-3 text-sm font-semibold border-white/40 text-white hover:bg-white/10"
+                className="h-auto px-6 py-3 text-sm font-semibold bg-transparent border-white/40 text-white hover:bg-white/10"
               >
                 <a href="#calculator">{t("hero.ctaSecondary")}</a>
               </Button>
