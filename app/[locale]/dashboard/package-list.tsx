@@ -3,6 +3,10 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { requestShipment, payForShipment } from "./actions"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Package as PackageIcon } from "lucide-react"
 
 type Package = {
   id: string
@@ -13,6 +17,14 @@ type Package = {
   status: string
   quote_amount: number | null
   quote_note: string | null
+}
+
+const STATUS_BADGE_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+  arrived: "outline",
+  requested: "secondary",
+  quoted: "default",
+  paid: "secondary",
+  shipped: "secondary",
 }
 
 export default function PackageList({ packages }: { packages: Package[] }) {
@@ -73,94 +85,99 @@ export default function PackageList({ packages }: { packages: Package[] }) {
 
   if (!packages || packages.length === 0) {
     return (
-      <div className="mt-3 rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-        {t("empty")}
-        <br />
-        {t("emptyHint")}
-      </div>
+      <Card className="mt-3 border-dashed">
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
+          {t("empty")}
+          <br />
+          {t("emptyHint")}
+        </CardContent>
+      </Card>
     )
   }
 
   return (
     <div className="mt-3 space-y-3">
       {arrivedPackages.length > 0 && (
-        <div className="flex items-center justify-between rounded-xl border border-teal-200 bg-teal-50 p-4">
-          <p className="text-sm text-teal-800">
-            {t("selectPrompt")}
-          </p>
-          <button
-            onClick={handleRequestShipment}
-            disabled={isPending || selected.size === 0}
-            className="whitespace-nowrap rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
-          >
-            {t("requestShipment", { count: selected.size })}
-          </button>
-        </div>
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="flex items-center justify-between gap-4 py-4">
+            <p className="text-sm text-primary">{t("selectPrompt")}</p>
+            <Button
+              type="button"
+              onClick={handleRequestShipment}
+              disabled={isPending || selected.size === 0}
+              size="sm"
+            >
+              {t("requestShipment", { count: selected.size })}
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
-      {message && <p className="text-sm text-teal-700">{message}</p>}
+      {message && <p className="text-sm text-primary">{message}</p>}
 
-      <ul className="space-y-3">
+      <div className="space-y-3">
         {packages.map((pkg) => (
-          <li
-            key={pkg.id}
-            className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-3">
-                {pkg.status === "arrived" && (
-                  <input
-                    type="checkbox"
-                    checked={selected.has(pkg.id)}
-                    onChange={() => toggleSelected(pkg.id)}
-                    className="mt-1 h-4 w-4"
-                  />
-                )}
-                <div>
-                  <p className="font-semibold text-slate-900">{pkg.item_name}</p>
-                  {pkg.tracking_number && (
-                    <p className="mt-1 text-xs text-slate-500">
-                      {t("trackingNumber")}{pkg.tracking_number}
-                    </p>
+          <Card key={pkg.id}>
+            <CardContent className="py-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  {pkg.status === "arrived" && (
+                    <input
+                      type="checkbox"
+                      checked={selected.has(pkg.id)}
+                      onChange={() => toggleSelected(pkg.id)}
+                      className="mt-1 h-4 w-4"
+                    />
                   )}
-                  {pkg.weight_lbs && (
-                    <p className="mt-1 text-xs text-slate-500">
-                      {t("weight")}{pkg.weight_lbs} {t("weightUnit")}
-                    </p>
+                  <PackageIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                  <div>
+                    <p className="font-semibold text-slate-900">{pkg.item_name}</p>
+                    {pkg.tracking_number && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {t("trackingNumber")}{pkg.tracking_number}
+                      </p>
+                    )}
+                    {pkg.weight_lbs && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {t("weight")}{pkg.weight_lbs} {t("weightUnit")}
+                      </p>
+                    )}
+                    {pkg.admin_note && (
+                      <p className="mt-2 text-xs text-slate-600">{pkg.admin_note}</p>
+                    )}
+                  </div>
+                </div>
+                <Badge variant={STATUS_BADGE_VARIANT[pkg.status] ?? "outline"} className="whitespace-nowrap">
+                  {STATUS_LABELS[pkg.status] || pkg.status}
+                </Badge>
+              </div>
+
+              {pkg.status === "quoted" && pkg.quote_amount && (
+                <div className="mt-3 rounded-lg bg-slate-50 p-3">
+                  <p className="text-sm text-slate-700">
+                    {t("quoteLabel")}¥{Number(pkg.quote_amount).toLocaleString()}
+                  </p>
+                  {pkg.quote_note && (
+                    <p className="mt-1 text-xs text-muted-foreground">{pkg.quote_note}</p>
                   )}
-                  {pkg.admin_note && (
-                    <p className="mt-2 text-xs text-slate-600">{pkg.admin_note}</p>
+                  <Button
+                    type="button"
+                    onClick={() => handlePay(pkg.id)}
+                    disabled={isPending && payingId === pkg.id}
+                    size="sm"
+                    className="mt-2"
+                  >
+                    {t("pay")}
+                  </Button>
+                  {payMessage && payingId === null && (
+                    <p className="mt-2 text-sm text-primary">{payMessage}</p>
                   )}
                 </div>
-              </div>
-              <span className="whitespace-nowrap rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
-                {STATUS_LABELS[pkg.status] || pkg.status}
-              </span>
-            </div>
-
-            {pkg.status === "quoted" && pkg.quote_amount && (
-              <div className="mt-3 rounded-lg bg-slate-50 p-3">
-                <p className="text-sm text-slate-700">
-                  {t("quoteLabel")}¥{Number(pkg.quote_amount).toLocaleString()}
-                </p>
-                {pkg.quote_note && (
-                  <p className="mt-1 text-xs text-slate-500">{pkg.quote_note}</p>
-                )}
-                <button
-                  onClick={() => handlePay(pkg.id)}
-                  disabled={isPending && payingId === pkg.id}
-                  className="mt-2 whitespace-nowrap rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
-                >
-                  {t("pay")}
-                </button>
-                {payMessage && payingId === null && (
-                  <p className="mt-2 text-sm text-teal-700">{payMessage}</p>
-                )}
-              </div>
-            )}
-          </li>
+              )}
+            </CardContent>
+          </Card>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

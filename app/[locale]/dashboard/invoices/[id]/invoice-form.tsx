@@ -9,6 +9,29 @@ import {
   duplicateInvoiceItem,
   submitInvoice,
 } from "./invoice-actions"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { AlertTriangle, Copy, Trash2 } from "lucide-react"
 
 type InvoiceItem = {
   id: string
@@ -50,6 +73,14 @@ const STATUS_LABEL_KEY: Record<string, string> = {
   correction_required: "statusCorrectionRequired",
   admin_review: "statusAdminReview",
   complete: "statusComplete",
+}
+
+const STATUS_BADGE_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+  draft: "outline",
+  customer_submitted: "secondary",
+  correction_required: "destructive",
+  admin_review: "secondary",
+  complete: "default",
 }
 
 export default function InvoiceForm({
@@ -165,298 +196,295 @@ export default function InvoiceForm({
   }
 
   return (
-    <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+    <Card className="mt-8">
+      <CardHeader className="flex flex-row items-center justify-between gap-3 border-b">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">{labels.title}</h2>
+          <CardTitle>{labels.title}</CardTitle>
           {invoice.invoice_number && (
-            <p className="mt-1 text-xs text-slate-500">{invoice.invoice_number}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{invoice.invoice_number}</p>
           )}
         </div>
-        <span className="whitespace-nowrap rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+        <Badge variant={STATUS_BADGE_VARIANT[invoice.status] ?? "outline"}>
           {labels[STATUS_LABEL_KEY[invoice.status]] || invoice.status}
-        </span>
-      </div>
+        </Badge>
+      </CardHeader>
 
-      {invoice.status === "correction_required" && invoice.correction_note && (
-        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <p className="text-xs font-semibold text-amber-800">{labels.correctionBannerTitle}</p>
-          <p className="mt-1 text-sm text-amber-700">{invoice.correction_note}</p>
-        </div>
-      )}
-
-      <div className="mt-4 rounded-lg bg-slate-50 p-4 text-xs text-slate-500 space-y-1">
-        <p>{labels.noticeWhyNeeded}</p>
-        <p>{labels.noticeEnglishRequired}</p>
-        <p>{labels.noticeAccurateValue}</p>
-        <p>{labels.noticeCustomsDuties}</p>
-        <p>{labels.noticeProhibitedItems}</p>
-        <p>{labels.noticeCorrections}</p>
-      </div>
-
-      {error && (
-        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
-      )}
-
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <HeaderField
-          label={labels.shipperName}
-          value={invoice.shipper_name || ""}
-          disabled={!isMutable}
-          onChange={(v) => refreshField("shipper_name", v)}
-          onBlur={(v) => handleHeaderBlur("shipper_name", v)}
-        />
-        <HeaderField
-          label={labels.shipperAddress}
-          value={invoice.shipper_address || ""}
-          disabled={!isMutable}
-          onChange={(v) => refreshField("shipper_address", v)}
-          onBlur={(v) => handleHeaderBlur("shipper_address", v)}
-        />
-
-        <HeaderField
-          label={labels.consigneeName}
-          value={invoice.consignee_name || ""}
-          disabled={!isMutable}
-          onChange={(v) => refreshField("consignee_name", v)}
-          onBlur={(v) => handleHeaderBlur("consignee_name", v)}
-        />
-        <HeaderField
-          label={labels.consigneeAddress}
-          value={invoice.consignee_address || ""}
-          disabled={!isMutable}
-          onChange={(v) => refreshField("consignee_address", v)}
-          onBlur={(v) => handleHeaderBlur("consignee_address", v)}
-        />
-        <HeaderField
-          label={labels.reasonForExport}
-          value={invoice.reason_for_export || ""}
-          disabled={!isMutable}
-          onChange={(v) => refreshField("reason_for_export", v)}
-          onBlur={(v) => handleHeaderBlur("reason_for_export", v)}
-        />
-        <HeaderField
-          label={labels.shippingTerms}
-          value={invoice.shipping_terms || ""}
-          disabled={!isMutable}
-          onChange={(v) => refreshField("shipping_terms", v)}
-          onBlur={(v) => handleHeaderBlur("shipping_terms", v)}
-        />
-      </div>
-
-      <div className="mt-8">
-        <h3 className="text-sm font-semibold text-slate-900">{labels.lineItemsTitle}</h3>
-        <div className="mt-3 overflow-x-auto">
-          <table className="w-full min-w-[640px] text-sm">
-            <thead>
-              <tr className="text-left text-xs text-slate-500">
-                <th className="pb-2">{labels.productName}</th>
-                <th className="pb-2">{labels.quantity}</th>
-                <th className="pb-2">{labels.unitPrice}</th>
-                <th className="pb-2">{labels.itemTotal}</th>
-                <th className="pb-2">{labels.countryOfOrigin}</th>
-                <th className="pb-2">{labels.hsCode}</th>
-                <th className="pb-2" />
-              </tr>
-            </thead>
-            <tbody>
-
-              {items.map((item) => (
-                <tr key={item.id} className="border-t border-slate-100">
-                  <td className="py-2 pr-2">
-                    <input
-                      className="w-full rounded border border-slate-200 px-2 py-1 text-sm disabled:bg-slate-50"
-                      value={item.product_name}
-                      disabled={!isMutable}
-                      onChange={(e) => handleItemFieldChange(item.id, "product_name", e.target.value)}
-                      onBlur={(e) => handleItemBlur(item.id, "product_name", e.target.value)}
-                    />
-                  </td>
-                  <td className="py-2 pr-2">
-                    <input
-                      type="number"
-                      className="w-20 rounded border border-slate-200 px-2 py-1 text-sm disabled:bg-slate-50"
-                      value={item.quantity}
-                      disabled={!isMutable}
-                      onChange={(e) => handleItemFieldChange(item.id, "quantity", e.target.value)}
-                      onBlur={(e) => handleItemBlur(item.id, "quantity", e.target.value)}
-                    />
-                  </td>
-                  <td className="py-2 pr-2">
-                    <input
-                      type="number"
-                      className="w-24 rounded border border-slate-200 px-2 py-1 text-sm disabled:bg-slate-50"
-                      value={item.unit_price}
-                      disabled={!isMutable}
-                      onChange={(e) => handleItemFieldChange(item.id, "unit_price", e.target.value)}
-                      onBlur={(e) => handleItemBlur(item.id, "unit_price", e.target.value)}
-                    />
-                  </td>
-                  <td className="py-2 pr-2 font-medium text-slate-700">
-                    {labels.currencySymbol}
-                    {Number(item.item_total_amount).toLocaleString()}
-                  </td>
-
-                  <td className="py-2 pr-2">
-                    <input
-                      className="w-24 rounded border border-slate-200 px-2 py-1 text-sm disabled:bg-slate-50"
-                      value={item.country_of_origin || ""}
-                      disabled={!isMutable}
-                      onChange={(e) => handleItemFieldChange(item.id, "country_of_origin", e.target.value)}
-                      onBlur={(e) => handleItemBlur(item.id, "country_of_origin", e.target.value)}
-                    />
-                  </td>
-                  <td className="py-2 pr-2">
-                    <input
-                      className="w-24 rounded border border-slate-200 px-2 py-1 text-sm disabled:bg-slate-50"
-                      value={item.hs_code || ""}
-                      disabled={!isMutable}
-                      onChange={(e) => handleItemFieldChange(item.id, "hs_code", e.target.value)}
-                      onBlur={(e) => handleItemBlur(item.id, "hs_code", e.target.value)}
-                    />
-                  </td>
-                  <td className="py-2 whitespace-nowrap">
-                    {isMutable && (
-                      <>
-                        <button
-                          type="button"
-                          className="mr-2 text-xs text-teal-700 hover:underline"
-                          onClick={() => handleDuplicateItem(item.id)}
-                        >
-                          {labels.duplicate}
-                        </button>
-                        <button
-                          type="button"
-                          className="text-xs text-red-600 hover:underline"
-                          onClick={() => handleDeleteItem(item.id)}
-                        >
-                          {labels.delete}
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
-              {items.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="py-4 text-center text-xs text-slate-400">
-                    {labels.noItems}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {isMutable && (
-          <div className="mt-4 flex flex-wrap items-end gap-2 rounded-lg bg-slate-50 p-3">
-            <input
-              className="w-40 rounded border border-slate-200 px-2 py-1.5 text-sm"
-              placeholder={labels.productName}
-              value={newItem.product_name}
-              onChange={(e) => setNewItem((s) => ({ ...s, product_name: e.target.value }))}
-            />
-            <input
-              type="number"
-              className="w-20 rounded border border-slate-200 px-2 py-1.5 text-sm"
-              placeholder={labels.quantity}
-              value={newItem.quantity}
-              onChange={(e) => setNewItem((s) => ({ ...s, quantity: e.target.value }))}
-            />
-            <input
-              type="number"
-              className="w-24 rounded border border-slate-200 px-2 py-1.5 text-sm"
-              placeholder={labels.unitPrice}
-              value={newItem.unit_price}
-              onChange={(e) => setNewItem((s) => ({ ...s, unit_price: e.target.value }))}
-            />
-            <input
-              className="w-24 rounded border border-slate-200 px-2 py-1.5 text-sm"
-              placeholder={labels.countryOfOrigin}
-              value={newItem.country_of_origin}
-              onChange={(e) => setNewItem((s) => ({ ...s, country_of_origin: e.target.value }))}
-            />
-            <input
-              className="w-24 rounded border border-slate-200 px-2 py-1.5 text-sm"
-              placeholder={labels.hsCode}
-              value={newItem.hs_code}
-              onChange={(e) => setNewItem((s) => ({ ...s, hs_code: e.target.value }))}
-            />
-            <button
-              type="button"
-              disabled={isPending || !newItem.product_name.trim()}
-              onClick={handleAddItem}
-              className="rounded-md bg-teal-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
-            >
-              {labels.addItem}
-            </button>
-          </div>
+      <CardContent className="space-y-6">
+        {invoice.status === "correction_required" && invoice.correction_note && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>{labels.correctionBannerTitle}</AlertTitle>
+            <AlertDescription>{invoice.correction_note}</AlertDescription>
+          </Alert>
         )}
-      </div>
 
-      <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
-        <p className="text-sm font-semibold text-slate-900">{labels.totalDeclaredValue}</p>
-        <p className="text-lg font-bold text-teal-700">
-          {labels.currencySymbol}
-          {Number(invoice.total_declared_value).toLocaleString()}
-        </p>
-      </div>
+        <div className="rounded-lg bg-slate-50 p-4 text-xs text-muted-foreground space-y-1">
+          <p>{labels.noticeWhyNeeded}</p>
+          <p>{labels.noticeEnglishRequired}</p>
+          <p>{labels.noticeAccurateValue}</p>
+          <p>{labels.noticeCustomsDuties}</p>
+          <p>{labels.noticeProhibitedItems}</p>
+          <p>{labels.noticeCorrections}</p>
+        </div>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <HeaderField
+            label={labels.shipperName}
+            value={invoice.shipper_name || ""}
+            disabled={!isMutable}
+            onChange={(v) => refreshField("shipper_name", v)}
+            onBlur={(v) => handleHeaderBlur("shipper_name", v)}
+          />
+          <HeaderField
+            label={labels.shipperAddress}
+            value={invoice.shipper_address || ""}
+            disabled={!isMutable}
+            onChange={(v) => refreshField("shipper_address", v)}
+            onBlur={(v) => handleHeaderBlur("shipper_address", v)}
+          />
+
+          <HeaderField
+            label={labels.consigneeName}
+            value={invoice.consignee_name || ""}
+            disabled={!isMutable}
+            onChange={(v) => refreshField("consignee_name", v)}
+            onBlur={(v) => handleHeaderBlur("consignee_name", v)}
+          />
+          <HeaderField
+            label={labels.consigneeAddress}
+            value={invoice.consignee_address || ""}
+            disabled={!isMutable}
+            onChange={(v) => refreshField("consignee_address", v)}
+            onBlur={(v) => handleHeaderBlur("consignee_address", v)}
+          />
+          <HeaderField
+            label={labels.reasonForExport}
+            value={invoice.reason_for_export || ""}
+            disabled={!isMutable}
+            onChange={(v) => refreshField("reason_for_export", v)}
+            onBlur={(v) => handleHeaderBlur("reason_for_export", v)}
+          />
+          <HeaderField
+            label={labels.shippingTerms}
+            value={invoice.shipping_terms || ""}
+            disabled={!isMutable}
+            onChange={(v) => refreshField("shipping_terms", v)}
+            onBlur={(v) => handleHeaderBlur("shipping_terms", v)}
+          />
+        </div>
+
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900">{labels.lineItemsTitle}</h3>
+          <div className="mt-3 rounded-lg border border-slate-200">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{labels.productName}</TableHead>
+                  <TableHead>{labels.quantity}</TableHead>
+                  <TableHead>{labels.unitPrice}</TableHead>
+                  <TableHead>{labels.itemTotal}</TableHead>
+                  <TableHead>{labels.countryOfOrigin}</TableHead>
+                  <TableHead>{labels.hsCode}</TableHead>
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <Input
+                        value={item.product_name}
+                        disabled={!isMutable}
+                        onChange={(e) => handleItemFieldChange(item.id, "product_name", e.target.value)}
+                        onBlur={(e) => handleItemBlur(item.id, "product_name", e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        className="w-20"
+                        value={item.quantity}
+                        disabled={!isMutable}
+                        onChange={(e) => handleItemFieldChange(item.id, "quantity", e.target.value)}
+                        onBlur={(e) => handleItemBlur(item.id, "quantity", e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        className="w-24"
+                        value={item.unit_price}
+                        disabled={!isMutable}
+                        onChange={(e) => handleItemFieldChange(item.id, "unit_price", e.target.value)}
+                        onBlur={(e) => handleItemBlur(item.id, "unit_price", e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium text-slate-700">
+                      {labels.currencySymbol}
+                      {Number(item.item_total_amount).toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        className="w-24"
+                        value={item.country_of_origin || ""}
+                        disabled={!isMutable}
+                        onChange={(e) => handleItemFieldChange(item.id, "country_of_origin", e.target.value)}
+                        onBlur={(e) => handleItemBlur(item.id, "country_of_origin", e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        className="w-24"
+                        value={item.hs_code || ""}
+                        disabled={!isMutable}
+                        onChange={(e) => handleItemFieldChange(item.id, "hs_code", e.target.value)}
+                        onBlur={(e) => handleItemBlur(item.id, "hs_code", e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {isMutable && (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleDuplicateItem(item.id)}
+                            aria-label={labels.duplicate}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => handleDeleteItem(item.id)}
+                            aria-label={labels.delete}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {items.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-xs text-muted-foreground">
+                      {labels.noItems}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {isMutable && (
+            <div className="mt-4 flex flex-wrap items-end gap-2 rounded-lg bg-slate-50 p-3">
+              <Input
+                className="w-40"
+                placeholder={labels.productName}
+                value={newItem.product_name}
+                onChange={(e) => setNewItem((s) => ({ ...s, product_name: e.target.value }))}
+              />
+              <Input
+                type="number"
+                className="w-20"
+                placeholder={labels.quantity}
+                value={newItem.quantity}
+                onChange={(e) => setNewItem((s) => ({ ...s, quantity: e.target.value }))}
+              />
+              <Input
+                type="number"
+                className="w-24"
+                placeholder={labels.unitPrice}
+                value={newItem.unit_price}
+                onChange={(e) => setNewItem((s) => ({ ...s, unit_price: e.target.value }))}
+              />
+              <Input
+                className="w-24"
+                placeholder={labels.countryOfOrigin}
+                value={newItem.country_of_origin}
+                onChange={(e) => setNewItem((s) => ({ ...s, country_of_origin: e.target.value }))}
+              />
+              <Input
+                className="w-24"
+                placeholder={labels.hsCode}
+                value={newItem.hs_code}
+                onChange={(e) => setNewItem((s) => ({ ...s, hs_code: e.target.value }))}
+              />
+              <Button
+                type="button"
+                disabled={isPending || !newItem.product_name.trim()}
+                onClick={handleAddItem}
+              >
+                {labels.addItem}
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between border-t border-slate-200 pt-4">
+          <p className="text-sm font-semibold text-slate-900">{labels.totalDeclaredValue}</p>
+          <p className="text-lg font-bold text-primary">
+            {labels.currencySymbol}
+            {Number(invoice.total_declared_value).toLocaleString()}
+          </p>
+        </div>
+      </CardContent>
 
       {isMutable && (
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={() => setConfirmOpen(true)}
-            className="rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
-          >
+        <CardFooter className="justify-end gap-3">
+          <Button type="button" disabled={isPending} onClick={() => setConfirmOpen(true)}>
             {labels.submit}
-          </button>
-        </div>
+          </Button>
+        </CardFooter>
       )}
 
-      {confirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
-            <h3 className="text-base font-semibold text-slate-900">{labels.submitConfirmTitle}</h3>
-            <p className="mt-2 text-sm text-slate-600">{labels.submitConfirmBody}</p>
-            <label className="mt-4 flex items-start gap-2 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                checked={certAccepted}
-                onChange={(e) => setCertAccepted(e.target.checked)}
-                className="mt-1"
-              />
-              {labels.certificationStatement}
-            </label>
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{labels.submitConfirmTitle}</DialogTitle>
+            <DialogDescription>{labels.submitConfirmBody}</DialogDescription>
+          </DialogHeader>
 
+          <Label className="flex items-start gap-2 text-sm font-normal text-slate-700">
             <input
-              className="mt-3 w-full rounded border border-slate-200 px-3 py-2 text-sm"
-              placeholder={labels.customerSignature}
-              value={signature}
-              onChange={(e) => setSignature(e.target.value)}
+              type="checkbox"
+              checked={certAccepted}
+              onChange={(e) => setCertAccepted(e.target.checked)}
+              className="mt-1"
             />
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
-                className="rounded-md px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
-                onClick={() => setConfirmOpen(false)}
-              >
-                {labels.cancel}
-              </button>
-              <button
-                type="button"
-                disabled={!certAccepted || !signature.trim() || isPending}
-                onClick={handleSubmit}
-                className="rounded-md bg-teal-700 px-4 py-1.5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
-              >
-                {labels.confirmSubmit}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+            {labels.certificationStatement}
+          </Label>
+
+          <Input
+            placeholder={labels.customerSignature}
+            value={signature}
+            onChange={(e) => setSignature(e.target.value)}
+          />
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setConfirmOpen(false)}>
+              {labels.cancel}
+            </Button>
+            <Button
+              type="button"
+              disabled={!certAccepted || !signature.trim() || isPending}
+              onClick={handleSubmit}
+            >
+              {labels.confirmSubmit}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
   )
 }
 
@@ -474,15 +502,14 @@ function HeaderField({
   onBlur: (v: string) => void
 }) {
   return (
-    <label className="block">
-      <span className="mb-1 block text-xs font-medium text-slate-600">{label}</span>
-      <input
-        className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm disabled:bg-slate-50"
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <Input
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
         onBlur={(e) => onBlur(e.target.value)}
       />
-    </label>
+    </div>
   )
 }

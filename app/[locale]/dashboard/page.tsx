@@ -5,6 +5,8 @@ import SignOutButton from './sign-out-button'
 import PackageList from './package-list'
 import NotificationBell from './notification-bell'
 import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { MapPin, Receipt } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -44,9 +46,15 @@ export default async function DashboardPage() {
     <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-[var(--usj-primary)]">USAJUSHO</h1>
+          <h1 className="text-xl font-bold text-primary">USAJUSHO</h1>
           <div className="flex items-center gap-3">
-            <Link href="/dashboard/invoices" className="text-sm text-teal-700 hover:underline">{t("invoicesLink")}</Link>
+            <Link
+              href="/dashboard/invoices"
+              className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
+              <Receipt className="h-4 w-4" />
+              {t("invoicesLink")}
+            </Link>
             <NotificationBell notifications={notifications ?? []} />
             <SignOutButton />
           </div>
@@ -56,15 +64,18 @@ export default async function DashboardPage() {
           <h2 className="text-2xl font-bold text-slate-900">
             {t("welcome", { name: profile?.full_name || user.email })}
           </h2>
-          <p className="mt-1 text-sm text-slate-500">{user.email}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
         </div>
 
         {profile && (
-          <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <p className="text-sm font-semibold text-teal-700">
-              {t('myAddress')} / Your US Address
-            </p>
-            <div className="mt-3 space-y-0.5 text-sm text-slate-700">
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold text-primary">
+                <MapPin className="h-4 w-4" />
+                {t('myAddress')} / Your US Address
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-0.5 text-sm text-slate-700">
               <p>{profile.full_name}</p>
               <p>{profile.us_address_line1}</p>
               <p className="font-semibold">{profile.us_address_line2}</p>
@@ -72,11 +83,11 @@ export default async function DashboardPage() {
                 {profile.us_city}, {profile.us_state} {profile.us_zip}
               </p>
               <p>United States</p>
-            </div>
-            <p className="mt-4 text-xs text-slate-400">
-              {t("addressNote")}
-            </p>
-          </div>
+              <p className="pt-3 text-xs text-muted-foreground">
+                {t("addressNote")}
+              </p>
+            </CardContent>
+          </Card>
         )}
 
         <div className="mt-8">

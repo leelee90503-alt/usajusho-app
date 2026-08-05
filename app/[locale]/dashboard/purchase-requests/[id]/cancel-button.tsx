@@ -4,6 +4,8 @@ import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter } from "@/i18n/navigation"
 import { cancelPurchaseRequest } from "../actions"
+import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
 
 export default function CancelButton({ requestId }: { requestId: string }) {
   const t = useTranslations("purchaseRequests")
@@ -27,15 +29,11 @@ export default function CancelButton({ requestId }: { requestId: string }) {
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={handleCancel}
-        disabled={isPending}
-        className="rounded-md border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-      >
+      <Button type="button" variant="outline" onClick={handleCancel} disabled={isPending}>
+        {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
         {isPending ? t("cancelButtonPending") : t("cancelButton")}
-      </button>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      </Button>
+      {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
     </div>
   )
 }

@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { createCheckoutSession } from "../actions"
+import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
 
 export default function PayButton({ requestId }: { requestId: string }) {
   const t = useTranslations("purchaseRequests")
@@ -23,15 +25,11 @@ export default function PayButton({ requestId }: { requestId: string }) {
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={handlePay}
-        disabled={isPending}
-        className="rounded-md bg-[var(--usj-primary)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
-      >
+      <Button type="button" onClick={handlePay} disabled={isPending}>
+        {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
         {isPending ? t("payButtonPending") : t("payButton")}
-      </button>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      </Button>
+      {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
     </div>
   )
 }

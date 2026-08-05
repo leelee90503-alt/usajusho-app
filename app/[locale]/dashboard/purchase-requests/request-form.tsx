@@ -3,6 +3,10 @@
 import { useRef, useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { submitPurchaseRequest } from "./actions"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 
 export default function RequestForm() {
   const t = useTranslations("purchaseRequests")
@@ -24,60 +28,51 @@ export default function RequestForm() {
   }
 
   return (
-    <form ref={formRef} action={handleSubmit} className="mt-4 space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-slate-700">
-          {t("productUrlLabel")}
-        </label>
-        <input
+    <form ref={formRef} action={handleSubmit} className="space-y-4">
+      <div className="space-y-1.5">
+        <Label htmlFor="product_url">{t("productUrlLabel")}</Label>
+        <Input
+          id="product_url"
           type="url"
           name="product_url"
           placeholder="https://www.amazon.com/..."
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
         />
-        <p className="mt-1 text-xs text-slate-400">{t("productUrlNote")}</p>
+        <p className="text-xs text-muted-foreground">{t("productUrlNote")}</p>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-slate-700">
-          {t("productDescriptionLabel")}
-        </label>
-        <textarea
+      <div className="space-y-1.5">
+        <Label htmlFor="product_description">{t("productDescriptionLabel")}</Label>
+        <Textarea
+          id="product_description"
           name="product_description"
           required
           rows={4}
           placeholder={t("productDescriptionPlaceholder")}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-slate-700">
-          {t("budgetCapLabel")}
-        </label>
-        <input
+      <div className="space-y-1.5">
+        <Label htmlFor="budget_cap">{t("budgetCapLabel")}</Label>
+        <Input
+          id="budget_cap"
           type="number"
           name="budget_cap"
           min="0"
           step="0.01"
           placeholder="150.00"
-          className="mt-1 w-full max-w-[200px] rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          className="max-w-[200px]"
         />
       </div>
 
       {message && (
-        <p className="text-sm text-teal-700" role="status">
+        <p className="text-sm text-primary" role="status">
           {message}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-md bg-[var(--usj-primary)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={isPending}>
         {isPending ? t("submitting") : t("submitButton")}
-      </button>
+      </Button>
     </form>
   )
 }

@@ -6,6 +6,8 @@ import Link from 'next/link'
 import PrintButton from './print-button'
 import InvoiceForm from './invoice-form'
 import { createOrGetDraftInvoice } from './invoice-actions'
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ArrowLeft } from 'lucide-react'
 
 export default async function InvoiceDetailPage({
   params,
@@ -37,7 +39,6 @@ export default async function InvoiceDetailPage({
   if (!pkg) {
     notFound()
   }
-
 
   const it = await getTranslations("invoiceForm")
   const invoiceFormLabels = {
@@ -88,34 +89,38 @@ export default async function InvoiceDetailPage({
     <main className="min-h-screen bg-slate-50 print:bg-white">
       <div className="mx-auto max-w-2xl px-6 py-10">
         <div className="flex items-center justify-between print:hidden">
-          <Link href="/dashboard/invoices" className="text-sm text-teal-700 hover:underline">
+          <Link
+            href="/dashboard/invoices"
+            className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+          >
+            <ArrowLeft className="h-4 w-4" />
             {t("backToInvoices")}
           </Link>
           <PrintButton label={t("print")} />
         </div>
 
-        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">{t("title")}</h1>
-              <p className="mt-1 text-xs text-slate-500">
-                {t("suiteLabel")}
-                {pkg.profiles?.suite_number}
-              </p>
-            </div>
-            <p className="text-sm font-semibold text-teal-700">USAJUSHO</p>
-          </div>
+        <Card className="mt-6">
+          <CardHeader className="border-b">
+            <CardTitle className="text-xl font-bold text-slate-900">{t("title")}</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              {t("suiteLabel")}
+              {pkg.profiles?.suite_number}
+            </p>
+            <CardAction>
+              <p className="text-sm font-semibold text-primary">USAJUSHO</p>
+            </CardAction>
+          </CardHeader>
 
-          <div className="mt-6 border-t border-slate-200 pt-6">
+          <CardContent>
             <table className="w-full text-sm">
               <tbody>
                 <tr>
-                  <td className="py-1.5 text-slate-500">{t("itemNameLabel")}</td>
+                  <td className="py-1.5 text-muted-foreground">{t("itemNameLabel")}</td>
                   <td className="py-1.5 text-right font-medium text-slate-900">{pkg.item_name}</td>
                 </tr>
                 {pkg.tracking_number && (
                   <tr>
-                    <td className="py-1.5 text-slate-500">{t("trackingNumberLabel")}</td>
+                    <td className="py-1.5 text-muted-foreground">{t("trackingNumberLabel")}</td>
                     <td className="py-1.5 text-right font-medium text-slate-900">
                       {pkg.tracking_number}
                     </td>
@@ -123,7 +128,7 @@ export default async function InvoiceDetailPage({
                 )}
                 {pkg.weight_kg != null && (
                   <tr>
-                    <td className="py-1.5 text-slate-500">{t("weightLabel")}</td>
+                    <td className="py-1.5 text-muted-foreground">{t("weightLabel")}</td>
                     <td className="py-1.5 text-right font-medium text-slate-900">
                       {pkg.weight_kg} {t("weightUnit")}
                     </td>
@@ -131,7 +136,7 @@ export default async function InvoiceDetailPage({
                 )}
                 {pkg.length_cm && pkg.width_cm && pkg.height_cm && (
                   <tr>
-                    <td className="py-1.5 text-slate-500">{t("dimensionsLabel")}</td>
+                    <td className="py-1.5 text-muted-foreground">{t("dimensionsLabel")}</td>
                     <td className="py-1.5 text-right font-medium text-slate-900">
                       {pkg.length_cm} x {pkg.width_cm} x {pkg.height_cm} {t("dimensionsUnit")}
                     </td>
@@ -139,38 +144,38 @@ export default async function InvoiceDetailPage({
                 )}
                 {pkg.chargeable_weight_kg != null && (
                   <tr>
-                    <td className="py-1.5 text-slate-500">{t("chargeableWeightLabel")}</td>
+                    <td className="py-1.5 text-muted-foreground">{t("chargeableWeightLabel")}</td>
                     <td className="py-1.5 text-right font-medium text-slate-900">
                       {pkg.chargeable_weight_kg} {t("weightUnit")}
                     </td>
                   </tr>
                 )}
                 <tr>
-                  <td className="py-1.5 text-slate-500">{t("paidOnLabel")}</td>
+                  <td className="py-1.5 text-muted-foreground">{t("paidOnLabel")}</td>
                   <td className="py-1.5 text-right font-medium text-slate-900">
                     {new Date(pkg.updated_at).toLocaleDateString()}
                   </td>
                 </tr>
               </tbody>
             </table>
-          </div>
 
-          <div className="mt-6 flex items-center justify-between border-t border-slate-200 pt-6">
-            <p className="text-sm font-semibold text-slate-900">{t("totalLabel")}</p>
-            <p className="text-lg font-bold text-teal-700">
-              {pkg.quote_amount != null ? Number(pkg.quote_amount).toLocaleString() : "-"}{" "}
-              {t("currency")}
-            </p>
-          </div>
+            <div className="mt-6 flex items-center justify-between border-t border-slate-200 pt-6">
+              <p className="text-sm font-semibold text-slate-900">{t("totalLabel")}</p>
+              <p className="text-lg font-bold text-primary">
+                {pkg.quote_amount != null ? Number(pkg.quote_amount).toLocaleString() : "-"}{" "}
+                {t("currency")}
+              </p>
+            </div>
 
-          {pkg.quote_note && (
-            <p className="mt-4 text-xs text-slate-500">{pkg.quote_note}</p>
-          )}
+            {pkg.quote_note && (
+              <p className="mt-4 text-xs text-muted-foreground">{pkg.quote_note}</p>
+            )}
+          </CardContent>
+        </Card>
 
-      {invoiceResult.invoice && (
-        <InvoiceForm invoice={invoiceResult.invoice} labels={invoiceFormLabels} />
-      )}
-        </div>
+        {invoiceResult.invoice && (
+          <InvoiceForm invoice={invoiceResult.invoice} labels={invoiceFormLabels} />
+        )}
       </div>
     </main>
   )
