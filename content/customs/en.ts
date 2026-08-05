@@ -5,7 +5,7 @@ export const customsEn: CustomsDoc = {
   title: "Prohibited & Restricted Items for Japan",
   lede:
     "Japanese customs law bans certain items from being imported outright, and caps the quantity of others. If something turns out to be undeliverable after you've already bought it, it can't be returned or resold. Please check this page before you buy.",
-  updatedNote: "Last updated: ____-__-__ / Contents are subject to change without notice",
+  updatedNote: "Last updated: 2026-08-05 / Contents are subject to change without notice",
   noticeParagraphs: [
     "If a shipment fails customs clearance, the item will be disposed of or returned at your expense. Disposal and return fees apply separately, and the item's price is not refundable.",
     "If you're unsure about an item, please contact us before you buy it — we'll check whether it can be shipped.",

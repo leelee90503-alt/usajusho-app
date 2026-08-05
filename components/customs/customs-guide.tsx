@@ -385,11 +385,8 @@ export default function CustomsGuide({ doc }: { doc: CustomsDoc }) {
           <h2 className="mb-2 text-base font-bold text-primary">
             {doc.footerContactHeading}
           </h2>
-          <p className="mb-2 text-sm leading-relaxed text-slate-600">
+          <p className="text-sm leading-relaxed text-slate-600">
             {doc.footerContactParagraph}
-          </p>
-          <p className="text-sm font-medium text-slate-700">
-            {doc.footerContactLine}
           </p>
         </div>
       </section>
