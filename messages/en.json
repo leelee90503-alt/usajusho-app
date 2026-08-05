@@ -558,5 +558,9 @@
     "whitelistRemove": "Remove",
     "whitelistRemoveConfirm": "Remove {label} ({domain})?",
     "whitelistEmpty": "No stores whitelisted yet. Add one below."
+  },
+  "footer": {
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy"
   }
 }

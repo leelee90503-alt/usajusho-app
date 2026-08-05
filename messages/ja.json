@@ -558,5 +558,9 @@
     "whitelistRemove": "削除",
     "whitelistRemoveConfirm": "{label}（{domain}）を削除しますか？",
     "whitelistEmpty": "まだ登録されたストアがありません。下のフォームから追加してください。"
+  },
+  "footer": {
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー"
   }
 }
