@@ -16,14 +16,17 @@ begin
   new_suite := 'USJ-' || lpad(nextval('public.suite_number_seq')::text, 6, '0');
 
   insert into public.profiles (
-    id, full_name, suite_number, us_address_line1, us_address_line2, email
+    id, full_name, suite_number, us_address_line1, us_address_line2, us_city, us_state, us_zip, email
   )
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'full_name', ''),
     new_suite,
-    '1234 NE Logistics Way',
+    '18533 S Western Ave',
     'Suite ' || new_suite,
+    'Gardena',
+    'CA',
+    '90248',
     new.email
   );
   return new;

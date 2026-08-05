@@ -78,7 +78,6 @@ export default async function DashboardPage() {
             <CardContent className="space-y-0.5 text-sm text-slate-700">
               <p>{profile.full_name}</p>
               <p>{profile.us_address_line1}</p>
-              <p className="font-semibold">{profile.us_address_line2}</p>
               <p>
                 {profile.us_city}, {profile.us_state} {profile.us_zip}
               </p>

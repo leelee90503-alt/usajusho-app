@@ -5,9 +5,9 @@ create table if not exists public.profiles (
   suite_number text unique not null,
   us_address_line1 text not null,
   us_address_line2 text not null,
-  us_city text not null default 'Portland',
-  us_state text not null default 'OR',
-  us_zip text not null default '97220',
+  us_city text not null default 'Gardena',
+  us_state text not null default 'CA',
+  us_zip text not null default '90248',
   created_at timestamptz not null default now()
 );
 
@@ -35,14 +35,17 @@ begin
   new_suite := 'USJ-' || lpad(nextval('public.suite_number_seq')::text, 6, '0');
 
   insert into public.profiles (
-    id, full_name, suite_number, us_address_line1, us_address_line2
+    id, full_name, suite_number, us_address_line1, us_address_line2, us_city, us_state, us_zip
   )
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'full_name', ''),
     new_suite,
-    '1234 NE Logistics Way',
-    'Suite ' || new_suite
+    '18533 S Western Ave',
+    'Suite ' || new_suite,
+    'Gardena',
+    'CA',
+    '90248'
   );
   return new;
 end;
