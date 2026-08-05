@@ -10,7 +10,10 @@ import {
   refundPurchaseRequest,
   cancelRequestAsAdmin,
 } from "./actions"
-import { estimatePurchaseAgencyFee } from "@/lib/purchase-agency-pricing"
+import {
+  estimatePurchaseAgencyFee,
+  type PurchaseAgencyFeeSettings,
+} from "@/lib/purchase-agency-pricing"
 
 type Profile = { full_name: string | null; suite_number: string | null } | null
 
@@ -40,7 +43,13 @@ const STATUS_STYLES: Record<string, string> = {
   refunded: "bg-slate-100 text-slate-500",
 }
 
-export default function RequestRow({ request }: { request: PurchaseRequest }) {
+export default function RequestRow({
+  request,
+  feeSettings,
+}: {
+  request: PurchaseRequest
+  feeSettings: PurchaseAgencyFeeSettings
+}) {
   const t = useTranslations("adminPurchaseRequests")
   const [isPending, startTransition] = useTransition()
   const [message, setMessage] = useState<string | null>(null)
@@ -64,7 +73,7 @@ export default function RequestRow({ request }: { request: PurchaseRequest }) {
   function handleSuggestFee() {
     const priceCents = Math.round(Number(itemPrice || "0") * 100)
     if (!priceCents) return
-    const estimate = estimatePurchaseAgencyFee(priceCents)
+    const estimate = estimatePurchaseAgencyFee(priceCents, feeSettings)
     setFee(String(estimate.feeCents / 100))
   }
 

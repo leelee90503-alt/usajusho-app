@@ -220,3 +220,40 @@ export async function cancelRequestAsAdmin(requestId: string) {
   revalidatePath(`/admin/purchase-requests/${requestId}`)
   return { success: true }
 }
+
+export async function saveFeeSettings(formData: FormData) {
+  const supabase = await requireAdmin()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const flatFeeDollars = Number(formData.get("flat_fee_dollars"))
+  const feePercent = Number(formData.get("fee_percent"))
+
+  if (Number.isNaN(flatFeeDollars) || flatFeeDollars < 0) {
+    return { error: "正しい定額手数料を入力してください。" }
+  }
+  if (Number.isNaN(feePercent) || feePercent < 0) {
+    return { error: "正しい手数料率を入力してください。" }
+  }
+
+  const flatFeeCents = Math.round(flatFeeDollars * 100)
+
+  const { error } = await supabase
+    .from("purchase_agency_settings")
+    .update({
+      flat_fee_cents: flatFeeCents,
+      fee_percent: feePercent,
+      updated_at: new Date().toISOString(),
+      updated_by: user?.id ?? null,
+    })
+    .eq("id", 1)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath("/admin/purchase-requests")
+  return { success: true }
+}

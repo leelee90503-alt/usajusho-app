@@ -2,6 +2,10 @@ import { redirect, Link } from "@/i18n/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from "next-intl/server"
 import RequestRow from "./request-row"
+import FeeSettingsForm from "./fee-settings-form"
+import {
+  getPurchaseAgencyFeeSettings,
+} from "@/lib/purchase-agency-pricing"
 
 export default async function AdminPurchaseRequestsPage({
   searchParams,
@@ -41,6 +45,7 @@ export default async function AdminPurchaseRequestsPage({
     .order("created_at", { ascending: false })
 
   const requests = allRequests ?? []
+  const feeSettings = await getPurchaseAgencyFeeSettings()
   const filtered = status
     ? requests.filter((r) => r.status === status)
     : requests
@@ -71,6 +76,8 @@ export default async function AdminPurchaseRequestsPage({
         </div>
         <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
 
+        <FeeSettingsForm initialSettings={feeSettings} />
+
         <form className="mt-6 flex flex-wrap items-center gap-2" method="get">
           <select
             name="status"
@@ -93,7 +100,7 @@ export default async function AdminPurchaseRequestsPage({
 
         <div className="mt-6 space-y-3">
           {filtered.map((request) => (
-            <RequestRow key={request.id} request={request} />
+            <RequestRow key={request.id} request={request} feeSettings={feeSettings} />
           ))}
 
           {filtered.length === 0 && (
