@@ -77,7 +77,7 @@ export default async function AdminPurchaseRequestsPage({
         <FeeSettingsForm
           initialSettings={{
             flatFeeCents: feeSettings.flatFeeCents,
-            feePercent: feeSettings.feePercent * 100,
+            feePercent: Math.round(feeSettings.feePercent * 10000) / 100,
           }}
         />
 
