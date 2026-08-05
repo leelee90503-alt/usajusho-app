@@ -3,9 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from "next-intl/server"
 import RequestRow from "./request-row"
 import FeeSettingsForm from "./fee-settings-form"
-import {
-  getPurchaseAgencyFeeSettings,
-} from "@/lib/purchase-agency-pricing"
+import { getPurchaseAgencyFeeSettings } from "@/lib/purchase-agency-settings"
 
 export default async function AdminPurchaseRequestsPage({
   searchParams,
