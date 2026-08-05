@@ -168,8 +168,16 @@ export default async function Home() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-center">
           <div className="order-2 md:order-1 grid grid-cols-2 gap-3">
-            <div className="aspect-square rounded-lg bg-[var(--usj-surface)] border border-slate-200" aria-hidden="true" />
-            <div className="aspect-square rounded-lg bg-[var(--usj-surface)] border border-slate-200 mt-6" aria-hidden="true" />
+            <img
+              src="/images/inspection-exterior.svg"
+              alt={t("inspection.exteriorAlt")}
+              className="aspect-square rounded-lg bg-[var(--usj-surface)] border border-slate-200 object-cover w-full"
+            />
+            <img
+              src="/images/inspection-interior.svg"
+              alt={t("inspection.interiorAlt")}
+              className="aspect-square rounded-lg bg-[var(--usj-surface)] border border-slate-200 object-cover w-full mt-6"
+            />
           </div>
           <div className="order-1 md:order-2">
             <h2 className="text-2xl md:text-3xl font-bold text-[var(--usj-primary)] mb-4">

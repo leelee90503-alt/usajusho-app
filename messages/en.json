@@ -64,7 +64,9 @@
     },
     "inspection": {
       "title": "Check every arrival by photo",
-      "description": "When a package arrives at our warehouse, we photograph the exterior and, when needed, the contents. Review the photos anytime from your dashboard before deciding what's next."
+      "description": "When a package arrives at our warehouse, we photograph the exterior and, when needed, the contents. Review the photos anytime from your dashboard before deciding what's next.",
+      "exteriorAlt": "Warehouse staff photographing a package's exterior and shipping label on arrival",
+      "interiorAlt": "An opened package with its contents inspected and checked against the order"
     },
     "consolidation": {
       "title": "Consolidate to save on shipping",

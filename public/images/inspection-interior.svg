@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0F5F4"/>
+      <stop offset="1" stop-color="#E3ECEA"/>
+    </linearGradient>
+    <linearGradient id="boxInner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EDEAE0"/>
+      <stop offset="1" stop-color="#DDD8C8"/>
+    </linearGradient>
+    <linearGradient id="flapGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D8B98B"/>
+      <stop offset="1" stop-color="#C7A574"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#bgGrad2)"/>
+  <ellipse cx="200" cy="330" rx="130" ry="14" fill="#0F2A3C" opacity="0.08"/>
+
+  <!-- open box, front view -->
+  <g>
+    <!-- back flaps open -->
+    <polygon points="90,150 120,80 165,88 145,158" fill="url(#flapGrad)" opacity="0.9"/>
+    <polygon points="310,150 280,80 235,88 255,158" fill="url(#flapGrad)" opacity="0.9"/>
+
+    <!-- box body -->
+    <rect x="95" y="150" width="210" height="140" rx="4" fill="#C7A574"/>
+    <rect x="95" y="150" width="210" height="140" rx="4" fill="none" stroke="#8A6D45" stroke-width="1.5" opacity="0.4"/>
+
+    <!-- inner shadow / cavity -->
+    <polygon points="95,150 305,150 285,172 115,172" fill="url(#boxInner)"/>
+    <rect x="115" y="172" width="170" height="60" fill="#DAD5C4"/>
+
+    <!-- packed contents: folded items -->
+    <rect x="125" y="182" width="62" height="42" rx="4" fill="#FFFFFF" stroke="#D3CFC2" stroke-width="1.5"/>
+    <rect x="135" y="192" width="42" height="5" rx="2" fill="#2EC4B6" opacity="0.8"/>
+    <rect x="135" y="201" width="30" height="5" rx="2" fill="#0F2A3C" opacity="0.55"/>
+
+    <rect x="195" y="178" width="56" height="48" rx="4" fill="#0F2A3C"/>
+    <circle cx="223" cy="202" r="14" fill="none" stroke="#2EC4B6" stroke-width="3"/>
+
+    <rect x="257" y="184" width="34" height="40" rx="3" fill="#FFFFFF" stroke="#D3CFC2" stroke-width="1.5"/>
+    <line x1="263" y1="196" x2="285" y2="196" stroke="#8A97A0" stroke-width="3" stroke-linecap="round"/>
+    <line x1="263" y1="206" x2="279" y2="206" stroke="#8A97A0" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- tissue paper edge -->
+    <path d="M115 172 Q140 160 165 172 T215 172 T265 172 T305 172" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.7"/>
+  </g>
+
+  <!-- magnifier / inspection motif -->
+  <g transform="translate(290,235)">
+    <circle cx="0" cy="0" r="30" fill="#FFFFFF" fill-opacity="0.35" stroke="#0F2A3C" stroke-width="4"/>
+    <circle cx="0" cy="0" r="30" fill="none" stroke="#2EC4B6" stroke-width="2" opacity="0.7"/>
+    <line x1="22" y1="22" x2="42" y2="42" stroke="#0F2A3C" stroke-width="7" stroke-linecap="round"/>
+  </g>
+
+  <!-- checkmark badge: inspection passed -->
+  <g transform="translate(88,72)">
+    <circle cx="0" cy="0" r="22" fill="#0F2A3C"/>
+    <path d="M-10 0 L-3 8 L12 -9" fill="none" stroke="#2EC4B6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- corner framing brackets -->
+  <g stroke="#0F2A3C" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round">
+    <path d="M40 40 L40 66 M40 40 L66 40"/>
+    <path d="M360 40 L360 66 M360 40 L334 40"/>
+    <path d="M40 360 L40 334 M40 360 L66 360"/>
+    <path d="M360 360 L360 334 M360 360 L334 360"/>
+  </g>
+</svg>
