@@ -1,50 +1,113 @@
 import { SquareClient, SquareEnvironment } from "square"
+import { createAdminClient } from "@/lib/supabase/admin"
 
-// Lazily-constructed singleton Square server SDK client.
+export type SquareMode = "sandbox" | "production"
+
+// The site can run against either Square's Sandbox or Production
+// environment. Which one is active is stored in
+// public.purchase_agency_settings.square_mode (a single admin-editable
+// row), not baked in at build/deploy time - this lets an admin flip the
+// live site between test and real payments from /admin/purchase-requests
+// without a redeploy.
 //
-// SQUARE_ACCESS_TOKEN does not exist in this environment yet (real Square
-// API credentials will be supplied later, from a Sandbox or Production
-// application in the Square Developer Dashboard). We intentionally do not
-// read the env var at module load time so that importing this file never
-// crashes local dev or the build - the token is only required once a
-// caller actually needs to talk to Square (creating a Payment Link,
-// issuing a refund, etc.).
-let squareClient: SquareClient | null = null
+// Each mode has its own credential set, read from env vars suffixed
+// _SANDBOX / _PRODUCTION:
+//   SQUARE_ACCESS_TOKEN_SANDBOX / SQUARE_ACCESS_TOKEN_PRODUCTION
+//   SQUARE_LOCATION_ID_SANDBOX / SQUARE_LOCATION_ID_PRODUCTION
+//   SQUARE_WEBHOOK_SIGNATURE_KEY_SANDBOX / SQUARE_WEBHOOK_SIGNATURE_KEY_PRODUCTION
 
-export function getSquare(): SquareClient {
-  if (squareClient) {
-    return squareClient
+const clients: Partial<Record<SquareMode, SquareClient>> = {}
+
+function envSuffix(mode: SquareMode): "SANDBOX" | "PRODUCTION" {
+  return mode === "production" ? "PRODUCTION" : "SANDBOX"
+}
+
+function getAccessToken(mode: SquareMode): string | undefined {
+  return process.env[`SQUARE_ACCESS_TOKEN_${envSuffix(mode)}`]
+}
+
+function getLocationId(mode: SquareMode): string | undefined {
+  return process.env[`SQUARE_LOCATION_ID_${envSuffix(mode)}`]
+}
+
+function getWebhookSignatureKey(mode: SquareMode): string | undefined {
+  return process.env[`SQUARE_WEBHOOK_SIGNATURE_KEY_${envSuffix(mode)}`]
+}
+
+/**
+ * Reads the currently-active Square environment from the database using
+ * the service-role client, so it works regardless of who's calling it
+ * (a logged-in customer creating a checkout link, an admin issuing a
+ * refund, or an unauthenticated Square webhook request). Defaults to
+ * "sandbox" - the safe choice - if the row is missing or the query fails.
+ */
+export async function getSquareMode(): Promise<SquareMode> {
+  try {
+    const supabase = createAdminClient()
+    const { data } = await supabase
+      .from("purchase_agency_settings")
+      .select("square_mode")
+      .eq("id", 1)
+      .maybeSingle()
+
+    return data?.square_mode === "production" ? "production" : "sandbox"
+  } catch {
+    return "sandbox"
+  }
+}
+
+export async function getSquare(): Promise<SquareClient> {
+  const mode = await getSquareMode()
+
+  const cached = clients[mode]
+  if (cached) {
+    return cached
   }
 
-  const accessToken = process.env.SQUARE_ACCESS_TOKEN
+  const accessToken = getAccessToken(mode)
   if (!accessToken) {
     throw new Error(
-      "SQUARE_ACCESS_TOKEN is not set. Add it to .env.local (and to the " +
-        "Vercel project's environment variables) once real Square API " +
-        "credentials are available.",
+      `SQUARE_ACCESS_TOKEN_${envSuffix(mode)} is not set. Add it to ` +
+        ".env.local (and to the Vercel project's environment variables) " +
+        `for the currently-selected Square ${mode} environment.`,
     )
   }
 
-  const environment =
-    process.env.SQUARE_ENVIRONMENT === "production"
-      ? SquareEnvironment.Production
-      : SquareEnvironment.Sandbox
-
-  squareClient = new SquareClient({
+  const client = new SquareClient({
     token: accessToken,
-    environment,
+    environment:
+      mode === "production" ? SquareEnvironment.Production : SquareEnvironment.Sandbox,
   })
-  return squareClient
+  clients[mode] = client
+  return client
 }
 
-export function getSquareLocationId(): string {
-  const locationId = process.env.SQUARE_LOCATION_ID
+export async function getSquareLocationId(): Promise<string> {
+  const mode = await getSquareMode()
+  const locationId = getLocationId(mode)
   if (!locationId) {
     throw new Error(
-      "SQUARE_LOCATION_ID is not set. Add it to .env.local (and to the " +
-        "Vercel project's environment variables) once a Square Location " +
-        "has been created.",
+      `SQUARE_LOCATION_ID_${envSuffix(mode)} is not set. Add it to ` +
+        ".env.local (and to the Vercel project's environment variables) " +
+        `for the currently-selected Square ${mode} environment.`,
     )
   }
   return locationId
+}
+
+/**
+ * Both signature keys (Sandbox + Production), for the webhook route to
+ * verify against. A webhook in flight may have been generated under the
+ * environment that was active *before* an admin just switched modes, so
+ * the route accepts a signature that matches either key rather than only
+ * the currently-active one.
+ */
+export function getSquareWebhookSignatureKeys(): {
+  sandbox?: string
+  production?: string
+} {
+  return {
+    sandbox: getWebhookSignatureKey("sandbox"),
+    production: getWebhookSignatureKey("production"),
+  }
 }

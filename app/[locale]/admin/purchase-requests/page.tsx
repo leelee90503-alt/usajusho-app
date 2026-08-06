@@ -4,8 +4,10 @@ import { getLocale, getTranslations } from "next-intl/server"
 import RequestRow from "./request-row"
 import FeeSettingsForm from "./fee-settings-form"
 import WhitelistForm from "./whitelist-form"
+import SquareModeToggle from "./square-mode-toggle"
 import { getPurchaseAgencyFeeSettings } from "@/lib/purchase-agency-settings"
 import { getWhitelistDomains } from "@/lib/purchase-agency-whitelist"
+import { getSquareMode } from "@/lib/square"
 import { Button } from "@/components/ui/button"
 
 export default async function AdminPurchaseRequestsPage({
@@ -48,6 +50,7 @@ export default async function AdminPurchaseRequestsPage({
   const requests = allRequests ?? []
   const feeSettings = await getPurchaseAgencyFeeSettings()
   const whitelistDomains = await getWhitelistDomains()
+  const squareMode = await getSquareMode()
   const filtered = status
     ? requests.filter((r) => r.status === status)
     : requests
@@ -85,6 +88,8 @@ export default async function AdminPurchaseRequestsPage({
         />
 
         <WhitelistForm initialDomains={whitelistDomains} />
+
+        <SquareModeToggle initialMode={squareMode} />
 
         <form className="mt-6 flex flex-wrap items-center gap-2" method="get">
           <select

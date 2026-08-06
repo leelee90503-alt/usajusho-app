@@ -1,22 +1,35 @@
 import { NextResponse } from "next/server"
 import { WebhooksHelper } from "square"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { getSquareWebhookSignatureKeys } from "@/lib/square"
 
 // Square webhook endpoint for the purchase-agency payment flow.
 //
-// Configure this URL (https://<your-domain>/api/webhooks/square) as a
-// webhook subscription in the Square Developer Dashboard once real API
-// credentials exist, subscribed to at least: payment.updated,
-// refund.updated. Copy the subscription's signature key into
-// SQUARE_WEBHOOK_SIGNATURE_KEY.
+// Both the Sandbox and Production webhook subscriptions in the Square
+// Developer Dashboard point at this same URL
+// (https://<your-domain>/api/webhooks/square), subscribed to at least:
+// payment.updated, refund.updated. Each subscription has its own signature
+// key - copy them into SQUARE_WEBHOOK_SIGNATURE_KEY_SANDBOX /
+// SQUARE_WEBHOOK_SIGNATURE_KEY_PRODUCTION.
+//
+// Because the site can switch between Sandbox/Production at any time (see
+// lib/square.ts), this route verifies the incoming signature against
+// *both* keys rather than only whichever mode is currently active - a
+// webhook already in flight when an admin flips the mode would otherwise
+// be rejected.
 //
 // Note: this handler parses the raw webhook JSON itself (rather than via
 // the Square SDK's response deserializers), so field names below are the
 // wire format's snake_case (order_id, payment_id), not the SDK's camelCase.
 export async function POST(request: Request) {
-  const signatureKey = process.env.SQUARE_WEBHOOK_SIGNATURE_KEY
-  if (!signatureKey) {
-    console.error("SQUARE_WEBHOOK_SIGNATURE_KEY is not set; rejecting webhook call.")
+  const { sandbox: sandboxKey, production: productionKey } =
+    getSquareWebhookSignatureKeys()
+
+  if (!sandboxKey && !productionKey) {
+    console.error(
+      "Neither SQUARE_WEBHOOK_SIGNATURE_KEY_SANDBOX nor " +
+        "SQUARE_WEBHOOK_SIGNATURE_KEY_PRODUCTION is set; rejecting webhook call.",
+    )
     return NextResponse.json(
       { error: "Webhook not configured" },
       { status: 500 },
@@ -32,19 +45,25 @@ export async function POST(request: Request) {
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://usajusho-app.vercel.app"
+  const notificationUrl = `${siteUrl}/api/webhooks/square`
 
-  let isValid = false
-  try {
-    isValid = await WebhooksHelper.verifySignature({
-      requestBody: payload,
-      signatureHeader: signature,
-      signatureKey,
-      notificationUrl: `${siteUrl}/api/webhooks/square`,
-    })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "unknown error"
-    console.error("Square webhook signature verification error:", message)
+  async function matchesKey(signatureKey: string | undefined) {
+    if (!signatureKey) return false
+    try {
+      return await WebhooksHelper.verifySignature({
+        requestBody: payload,
+        signatureHeader: signature!,
+        signatureKey,
+        notificationUrl,
+      })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown error"
+      console.error("Square webhook signature verification error:", message)
+      return false
+    }
   }
+
+  const isValid = (await matchesKey(sandboxKey)) || (await matchesKey(productionKey))
 
   if (!isValid) {
     console.error("Square webhook signature verification failed")

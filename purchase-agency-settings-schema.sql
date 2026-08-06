@@ -11,11 +11,17 @@ create table if not exists public.purchase_agency_settings (
   id integer primary key default 1,
   flat_fee_cents integer not null default 600,
   fee_percent numeric(6,2) not null default 7,
+  -- Which Square environment (Sandbox test vs. Production live) the whole
+  -- site currently processes payments under. Read by lib/square.ts via the
+  -- service-role client; toggled by admins from /admin/purchase-requests
+  -- so the switch takes effect immediately without a redeploy.
+  square_mode text not null default 'sandbox',
   updated_at timestamptz not null default now(),
   updated_by uuid references auth.users(id) on delete set null,
   constraint purchase_agency_settings_singleton check (id = 1),
   constraint purchase_agency_settings_flat_fee_check check (flat_fee_cents >= 0),
-  constraint purchase_agency_settings_percent_check check (fee_percent >= 0)
+  constraint purchase_agency_settings_percent_check check (fee_percent >= 0),
+  constraint purchase_agency_settings_square_mode_check check (square_mode in ('sandbox', 'production'))
 );
 
 alter table public.purchase_agency_settings enable row level security;

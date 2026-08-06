@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { randomUUID } from "crypto"
 import { notifyUser } from "@/lib/notifications"
-import { getSquare } from "@/lib/square"
+import { getSquare, getSquareMode, type SquareMode } from "@/lib/square"
 
 async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>> {
   const locale = await getLocale()
@@ -176,7 +176,7 @@ export async function refundPurchaseRequest(requestId: string) {
   }
 
   try {
-    const square = getSquare()
+    const square = await getSquare()
     await square.refunds.refundPayment({
       idempotencyKey: randomUUID(),
       paymentId: request.square_payment_id,
@@ -279,6 +279,43 @@ export async function saveFeeSettings(formData: FormData) {
 
   revalidatePath("/admin/purchase-requests")
   return { success: true }
+}
+
+// Real, functional Sandbox <-> Production switch for Square payments. This
+// flips public.purchase_agency_settings.square_mode, which lib/square.ts
+// reads (via the service-role client) on every checkout-link creation,
+// refund, and webhook verification - so the change takes effect
+// immediately for the whole live site, no redeploy needed.
+export async function getCurrentSquareMode(): Promise<SquareMode> {
+  return getSquareMode()
+}
+
+export async function setSquareMode(mode: SquareMode) {
+  const supabase = await requireAdmin()
+
+  if (mode !== "sandbox" && mode !== "production") {
+    return { error: "Invalid mode" }
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const { error } = await supabase
+    .from("purchase_agency_settings")
+    .update({
+      square_mode: mode,
+      updated_at: new Date().toISOString(),
+      updated_by: user?.id ?? null,
+    })
+    .eq("id", 1)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath("/admin/purchase-requests")
+  return { success: true, mode }
 }
 
 // Normalizes a raw domain/URL typed by an admin into a bare lowercase

@@ -114,7 +114,8 @@ export async function createCheckoutSession(requestId: string) {
     process.env.NEXT_PUBLIC_SITE_URL || "https://usajusho-app.vercel.app"
 
   try {
-    const square = getSquare()
+    const square = await getSquare()
+    const locationId = await getSquareLocationId()
     const { paymentLink } = await square.checkout.paymentLinks.create({
       idempotencyKey: randomUUID(),
       quickPay: {
@@ -123,7 +124,7 @@ export async function createCheckoutSession(requestId: string) {
           amount: BigInt(request.quote_total_cents),
           currency: "USD",
         },
-        locationId: getSquareLocationId(),
+        locationId,
       },
       checkoutOptions: {
         redirectUrl: `${siteUrl}/dashboard/purchase-requests/${request.id}?paid=1`,
