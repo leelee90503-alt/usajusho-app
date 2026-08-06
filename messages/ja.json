@@ -244,7 +244,9 @@
     "viewReceipt": "領収書を見る",
     "markMatched": "照合済みにする",
     "usersLink": "会員管理",
-    "pricingLink": "配送料金"
+    "pricingLink": "配送料金",
+    "deleteDeclaration": "削除",
+    "confirmDeleteDeclaration": "この事前申告を削除しますか？この操作は取り消せません。"
   },
   "packageStatus": {
     "arrived": "到着済み",
@@ -666,7 +668,11 @@
       "pending": "保留中",
       "matched": "照合済み",
       "cancelled": "キャンセル"
-    }
+    },
+    "addInfo": "追加情報を入力",
+    "saveInfo": "保存",
+    "cancel": "キャンセル",
+    "infoUpdated": "更新しました。スタッフに通知されました。"
   },
   "seo": {
     "home": {

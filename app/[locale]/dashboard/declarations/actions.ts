@@ -66,7 +66,15 @@ export async function createDeclaration(formData: FormData) {
   return { success: true }
 }
 
-export async function deleteDeclaration(id: string) {
+// Lets a customer fill in (or correct) the tracking number and/or note on a
+// declaration they already submitted. Only allowed while the declaration is
+// still "pending" - the underlying RLS update policy enforces this too, so
+// this is defense in depth, not the only guard. When something actually
+// changed, the admins are notified so they know to look at it again.
+export async function updateDeclarationDetails(
+  id: string,
+  values: { origin_tracking_number: string; note: string }
+) {
   const supabase = await createClient()
 
   const {
@@ -77,16 +85,31 @@ export async function deleteDeclaration(id: string) {
     return { error: "ログインしてください。" }
   }
 
-  const { data: declaration } = await supabase
+  const origin_tracking_number = values.origin_tracking_number.trim()
+  const note = values.note.trim()
+
+  const { data: existing } = await supabase
     .from("package_declarations")
-    .select("receipt_path")
+    .select("item_name, origin_tracking_number, note, status")
     .eq("id", id)
     .eq("user_id", user.id)
     .single()
 
+  if (!existing) {
+    return { error: "Declaration not found." }
+  }
+
+  if (existing.status !== "pending") {
+    return { error: "This declaration can no longer be edited." }
+  }
+
   const { error } = await supabase
     .from("package_declarations")
-    .delete()
+    .update({
+      origin_tracking_number: origin_tracking_number || null,
+      note: note || null,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", id)
     .eq("user_id", user.id)
 
@@ -94,8 +117,15 @@ export async function deleteDeclaration(id: string) {
     return { error: error.message }
   }
 
-  if (declaration?.receipt_path) {
-    await supabase.storage.from("package-receipts").remove([declaration.receipt_path])
+  const changed =
+    (existing.origin_tracking_number || "") !== origin_tracking_number ||
+    (existing.note || "") !== note
+
+  if (changed) {
+    await notifyAdmins({
+      title: "事前申告に追加情報が入力されました",
+      body: `${existing.item_name} の事前申告に追跡番号またはメモが追加・変更されました。管理画面からご確認ください。`,
+    })
   }
 
   revalidatePath("/dashboard/declarations")

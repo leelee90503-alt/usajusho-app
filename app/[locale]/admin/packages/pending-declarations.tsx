@@ -2,10 +2,10 @@
 
 import { useTransition } from "react"
 import { useTranslations } from "next-intl"
-import { markDeclarationMatched } from "./declarations-actions"
+import { markDeclarationMatched, adminDeleteDeclaration } from "./declarations-actions"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Check } from "lucide-react"
+import { Check, Trash2 } from "lucide-react"
 
 type Declaration = {
   id: string
@@ -25,6 +25,15 @@ export default function PendingDeclarations({ declarations }: { declarations: De
   function handleMatch(id: string) {
     startTransition(async () => {
       await markDeclarationMatched(id)
+    })
+  }
+
+  function handleDelete(id: string) {
+    if (!window.confirm(t("confirmDeleteDeclaration"))) {
+      return
+    }
+    startTransition(async () => {
+      await adminDeleteDeclaration(id)
     })
   }
 
@@ -69,16 +78,28 @@ export default function PendingDeclarations({ declarations }: { declarations: De
                   </a>
                 )}
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={isPending}
-                onClick={() => handleMatch(d.id)}
-              >
-                <Check className="h-4 w-4" />
-                {t("markMatched")}
-              </Button>
+              <div className="flex flex-col items-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isPending}
+                  onClick={() => handleMatch(d.id)}
+                >
+                  <Check className="h-4 w-4" />
+                  {t("markMatched")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={isPending}
+                  onClick={() => handleDelete(d.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {t("deleteDeclaration")}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
