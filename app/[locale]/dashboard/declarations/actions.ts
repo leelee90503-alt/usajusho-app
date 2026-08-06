@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { notifyAdmins } from "@/lib/notifications"
 
 export async function createDeclaration(formData: FormData) {
   const supabase = await createClient()
@@ -55,6 +56,11 @@ export async function createDeclaration(formData: FormData) {
   if (error) {
     return { error: error.message }
   }
+
+  await notifyAdmins({
+    title: "新しい荷物の事前申告が届きました",
+    body: `${item_name} の事前申告が届きました。管理画面からご確認ください。`,
+  })
 
   revalidatePath("/dashboard/declarations")
   return { success: true }

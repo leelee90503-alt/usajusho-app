@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { notifyAdmins } from "@/lib/notifications"
 
 export async function requestShipment(packageIds: string[]) {
   if (!packageIds || packageIds.length === 0) {
@@ -28,6 +29,11 @@ export async function requestShipment(packageIds: string[]) {
   if (error) {
     return { error: error.message }
   }
+
+  await notifyAdmins({
+    title: "発送リクエストが届きました",
+    body: `${packageIds.length}件の荷物について発送リクエストが届きました。管理画面からご確認ください。`,
+  })
 
   revalidatePath("/dashboard")
   revalidatePath("/admin/packages")
@@ -59,6 +65,12 @@ export async function payForShipment(packageId: string) {
   if (error) {
     return { error: error.message }
   }
+
+  await notifyAdmins({
+    packageId,
+    title: "配送料のお支払いが完了しました",
+    body: "配送料のお支払いが完了しました。管理画面からご確認ください。",
+  })
 
   revalidatePath("/dashboard")
   revalidatePath("/admin/packages")

@@ -5,6 +5,7 @@ import { getLocale } from "next-intl/server"
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { getStripe } from "@/lib/stripe"
+import { notifyAdmins } from "@/lib/notifications"
 
 export async function submitPurchaseRequest(formData: FormData) {
   const locale = await getLocale()
@@ -46,6 +47,11 @@ export async function submitPurchaseRequest(formData: FormData) {
   if (error) {
     return { error: error.message }
   }
+
+  await notifyAdmins({
+    title: "新しい購入代行のご依頼が届きました",
+    body: `${productDescription.slice(0, 50)} の購入代行リクエストが届きました。管理画面からご確認ください。`,
+  })
 
   revalidatePath("/dashboard/purchase-requests")
   return { success: true }

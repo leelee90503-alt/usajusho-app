@@ -207,6 +207,16 @@ export async function refundPurchaseRequest(requestId: string) {
 export async function cancelRequestAsAdmin(requestId: string) {
   const supabase = await requireAdmin()
 
+  const { data: request, error: fetchError } = await supabase
+    .from("purchase_requests")
+    .select("id, user_id, product_description")
+    .eq("id", requestId)
+    .single()
+
+  if (fetchError || !request) {
+    return { error: "リクエストが見つかりません。" }
+  }
+
   const { error } = await supabase
     .from("purchase_requests")
     .update({ status: "cancelled", updated_at: new Date().toISOString() })
@@ -215,6 +225,12 @@ export async function cancelRequestAsAdmin(requestId: string) {
   if (error) {
     return { error: error.message }
   }
+
+  await notifyUser(supabase, {
+    userId: request.user_id,
+    title: "購入代行のご依頼がキャンセルされました",
+    body: `${request.product_description.slice(0, 50)} のご依頼はキャンセルされました。ご不明な点がございましたらサポートまでお問い合わせください。`,
+  })
 
   revalidatePath("/admin/purchase-requests")
   revalidatePath(`/admin/purchase-requests/${requestId}`)
