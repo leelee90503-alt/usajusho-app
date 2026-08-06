@@ -164,7 +164,8 @@
     "welcome": "Welcome, {name}",
     "myPackages": "My Packages",
     "addressNote": "Use this address as your shipping destination at US online stores.",
-    "invoicesLink": "Invoices"
+    "invoicesLink": "Invoices",
+    "declarationsLink": "Declare a Package"
   },
   "nav": {
     "adminPackages": "Admin: Package Intake",
@@ -223,7 +224,12 @@
     "emptyNone": "No packages have been registered yet.",
     "emptyFiltered": "No packages match your filters.",
     "purchaseRequestsLink": "Purchase Requests",
-    "shippingLink": "Shipping Address"
+    "shippingLink": "Shipping Address",
+    "pendingDeclarations": "Pending Declarations ({count})",
+    "orderAmount": "Order total",
+    "originTracking": "Origin tracking",
+    "viewReceipt": "View receipt",
+    "markMatched": "Mark matched"
   },
   "packageStatus": {
     "arrived": "Arrived",
@@ -609,5 +615,27 @@
     "savedWithCount": "Saved. Updated {count} existing customer(s).",
     "saving": "Saving...",
     "save": "Save"
+  },
+  "packageDeclarations": {
+    "pageTitle": "Declare a Package",
+    "pageDescription": "Let us know about an order you placed elsewhere so we can match it with your package when it arrives.",
+    "backLink": "Back to Dashboard",
+    "formHeading": "New Declaration",
+    "itemNameLabel": "What did you order?",
+    "orderAmountLabel": "Order Total (USD)",
+    "trackingLabel": "Tracking Number (optional)",
+    "trackingHint": "This is the tracking number from the store you ordered from (e.g. Amazon), not your shipment to Japan.",
+    "noteLabel": "Note",
+    "receiptLabel": "Receipt (optional)",
+    "submitting": "Submitting...",
+    "submit": "Submit Declaration",
+    "success": "Declaration submitted.",
+    "empty": "You haven't declared any packages yet.",
+    "viewReceipt": "View Receipt",
+    "status": {
+      "pending": "Pending",
+      "matched": "Matched",
+      "cancelled": "Cancelled"
+    }
   }
 }

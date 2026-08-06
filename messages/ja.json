@@ -164,7 +164,8 @@
     "welcome": "ようこそ、{name}さん",
     "myPackages": "届いた荷物",
     "addressNote": "この住所を米国のオンラインショップでの配送先として使用してください。",
-    "invoicesLink": "請求書"
+    "invoicesLink": "請求書",
+    "declarationsLink": "パッケージを申告する"
   },
   "nav": {
     "adminPackages": "管理者: 荷物到着登録",
@@ -223,7 +224,12 @@
     "emptyNone": "登録された荷物はまだありません。",
     "emptyFiltered": "条件に一致する荷物がありません。",
     "purchaseRequestsLink": "購入代行リクエスト",
-    "shippingLink": "配送先住所"
+    "shippingLink": "配送先住所",
+    "pendingDeclarations": "保留中の申告（{count}件）",
+    "orderAmount": "注文金額",
+    "originTracking": "発送元追跡番号",
+    "viewReceipt": "領収書を見る",
+    "markMatched": "照合済みにする"
   },
   "packageStatus": {
     "arrived": "到着済み",
@@ -609,5 +615,27 @@
     "savedWithCount": "保存しました。既存のお客様{count}件を更新しました。",
     "saving": "保存中...",
     "save": "保存"
+  },
+  "packageDeclarations": {
+    "pageTitle": "パッケージ申告",
+    "pageDescription": "他のサイトでご注文いただいた商品について事前にお知らせいただくと、荷物到着時の照合がスムーズになります。",
+    "backLink": "ダッシュボードに戻る",
+    "formHeading": "新規申告",
+    "itemNameLabel": "何を注文しましたか？",
+    "orderAmountLabel": "注文金額（USD）",
+    "trackingLabel": "追跡番号（任意）",
+    "trackingHint": "これはご注文先のストア（例：Amazon）から発行された追跡番号です。弊社から日本へのお荷物の追跡番号ではありません。",
+    "noteLabel": "メモ",
+    "receiptLabel": "領収書（任意）",
+    "submitting": "送信中...",
+    "submit": "申告を送信",
+    "success": "申告を送信しました。",
+    "empty": "申告された荷物はまだありません。",
+    "viewReceipt": "領収書を見る",
+    "status": {
+      "pending": "保留中",
+      "matched": "照合済み",
+      "cancelled": "キャンセル"
+    }
   }
 }

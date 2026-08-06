@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from 'next-intl/server'
 import AddPackageForm from "./add-package-form"
 import PackageRow from "./package-row"
+import PendingDeclarations from "./pending-declarations"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -51,6 +52,24 @@ export default async function AdminPackagesPage({
     .from("packages")
     .select("*, profiles(full_name, suite_number)")
     .order("created_at", { ascending: false })
+
+  const { data: pendingDeclarations } = await supabase
+    .from("package_declarations")
+    .select("*, profiles(full_name, suite_number)")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false })
+
+  const declarationsWithUrls = await Promise.all(
+    (pendingDeclarations ?? []).map(async (d) => {
+      if (!d.receipt_path) {
+        return { ...d, receipt_url: null }
+      }
+      const { data: signed } = await supabase.storage
+        .from("package-receipts")
+        .createSignedUrl(d.receipt_path, 60 * 60)
+      return { ...d, receipt_url: signed?.signedUrl ?? null }
+    })
+  )
 
   const { data: activeRates } = await supabase
     .from("shipping_rates")
@@ -152,6 +171,8 @@ export default async function AdminPackagesPage({
         <div className="mt-6">
           <AddPackageForm />
         </div>
+
+        <PendingDeclarations declarations={declarationsWithUrls} />
 
         <div className="mt-10">
           <div className="flex flex-wrap items-center justify-between gap-3">

@@ -6,7 +6,7 @@ import PackageList from './package-list'
 import NotificationBell from './notification-bell'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { MapPin, Receipt } from 'lucide-react'
+import { MapPin, Receipt, PackagePlus } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -60,6 +60,13 @@ export default async function DashboardPage() {
             >
               <Receipt className="h-4 w-4" />
               {t("invoicesLink")}
+            </Link>
+            <Link
+              href="/dashboard/declarations"
+              className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
+              <PackagePlus className="h-4 w-4" />
+              {t("declarationsLink")}
             </Link>
             <NotificationBell notifications={notifications ?? []} />
             <SignOutButton />
