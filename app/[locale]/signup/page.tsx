@@ -24,6 +24,7 @@ export default function SignupPage() {
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   // Once signUp() succeeds, Supabase requires email confirmation before a
@@ -33,8 +34,14 @@ export default function SignupPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError(null)
+
+    if (password !== confirmPassword) {
+      setError(t('passwordMismatch'))
+      return
+    }
+
+    setLoading(true)
 
     const { error } = await supabase.auth.signUp({
       email,
@@ -134,9 +141,22 @@ export default function SignupPage() {
               <Input
                 id="signup-password"
                 type="password"
+                autoComplete="new-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="signup-confirm-password">{t('confirmPassword')}</Label>
+              <Input
+                id="signup-confirm-password"
+                type="password"
+                autoComplete="new-password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
 

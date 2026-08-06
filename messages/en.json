@@ -149,7 +149,9 @@
     "noAccount": "Don't have an account?",
     "signupLink": "Sign Up",
     "emailConfirmed": "Your email address has been confirmed. Please log in.",
-    "emailConfirmError": "This confirmation link is invalid or has expired. Please try again."
+    "emailConfirmError": "This confirmation link is invalid or has expired. Please try again.",
+    "forgotPasswordLink": "Forgot password?",
+    "passwordReset": "Your password has been reset. Please log in with your new password."
   },
   "signup": {
     "title": "Sign Up",
@@ -163,7 +165,9 @@
     "loginLink": "Log In",
     "checkEmailTitle": "Check your email",
     "checkEmailDescription": "We sent a confirmation email to {email}. Click the link in the email to activate your account.",
-    "goToLogin": "Go to Login"
+    "goToLogin": "Go to Login",
+    "confirmPassword": "Confirm password",
+    "passwordMismatch": "Passwords do not match."
   },
   "dashboard": {
     "myAddress": "My US Address",
@@ -238,7 +242,8 @@
     "orderAmount": "Order total",
     "originTracking": "Origin tracking",
     "viewReceipt": "View receipt",
-    "markMatched": "Mark matched"
+    "markMatched": "Mark matched",
+    "usersLink": "Users"
   },
   "packageStatus": {
     "arrived": "Arrived",
@@ -695,5 +700,53 @@
       "title": "Sign Up Free - USAJUSHO",
       "description": "Create your free USAJUSHO account and get your own US address in minutes."
     }
+  },
+  "forgotPassword": {
+    "title": "Reset your password",
+    "description": "Enter your account's email address and we'll send you a link to reset your password.",
+    "email": "Email address",
+    "submit": "Send reset link",
+    "submitting": "Sending...",
+    "backToLogin": "Back to Login",
+    "checkEmailTitle": "Check your email",
+    "checkEmailDescription": "If an account exists for {email}, we've sent a password reset link. Click the link in the email to choose a new password.",
+    "goToLogin": "Go to Login",
+    "resetError": "This reset link is invalid or has expired. Please request a new one."
+  },
+  "resetPassword": {
+    "title": "Set a new password",
+    "description": "Choose a new password for your account.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "passwordMismatch": "Passwords do not match.",
+    "submit": "Save new password",
+    "submitting": "Saving...",
+    "expiredTitle": "Link expired",
+    "expiredDescription": "This password reset link is invalid or has expired. Please request a new one.",
+    "requestNewLink": "Request a new link"
+  },
+  "adminUsers": {
+    "title": "Admin: User Management",
+    "description": "View customers' accounts and reset their email address or password.",
+    "packagesLink": "Package Management",
+    "searchPlaceholder": "Search by name, suite, or email",
+    "searchButton": "Search",
+    "clear": "Clear",
+    "allUsers": "All Users ({count})",
+    "emptyNone": "No users yet.",
+    "emptyFiltered": "No users match your search.",
+    "adminBadge": "Admin",
+    "suiteLabel": "Suite {suite}",
+    "changeEmail": "Change Email",
+    "resetPasswordButton": "Reset Password",
+    "cancel": "Cancel",
+    "newEmailLabel": "New email address",
+    "saveEmail": "Save Email",
+    "emailUpdated": "The user's email has been updated.",
+    "newPasswordLabel": "New password",
+    "generatePassword": "Generate",
+    "savePassword": "Reset Password",
+    "passwordUpdated": "Password reset. Share the new password below with the customer.",
+    "newPasswordDisplay": "New password: {password}"
   }
 }

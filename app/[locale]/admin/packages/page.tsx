@@ -123,6 +123,9 @@ export default async function AdminPackagesPage({
             <Button asChild variant="ghost" size="sm">
               <Link href="/admin/purchase-requests">{t("purchaseRequestsLink")}</Link>
             </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/users">{t("usersLink")}</Link>
+            </Button>
           </nav>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">

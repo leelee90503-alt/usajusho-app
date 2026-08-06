@@ -149,7 +149,9 @@
     "noAccount": "アカウントをお持ちでないですか？",
     "signupLink": "会員登録",
     "emailConfirmed": "メールアドレスの確認が完了しました。ログインしてください。",
-    "emailConfirmError": "確認リンクが無効か、有効期限が切れています。もう一度お試しください。"
+    "emailConfirmError": "確認リンクが無効か、有効期限が切れています。もう一度お試しください。",
+    "forgotPasswordLink": "パスワードをお忘れですか？",
+    "passwordReset": "パスワードをリセットしました。新しいパスワードでログインしてください。"
   },
   "signup": {
     "title": "会員登録",
@@ -163,7 +165,9 @@
     "loginLink": "ログイン",
     "checkEmailTitle": "確認メールを送信しました",
     "checkEmailDescription": "{email} 宛に確認メールを送信しました。メール内のリンクをクリックしてアカウントを有効化してください。",
-    "goToLogin": "ログインページへ"
+    "goToLogin": "ログインページへ",
+    "confirmPassword": "パスワード（確認）",
+    "passwordMismatch": "パスワードが一致しません。"
   },
   "dashboard": {
     "myAddress": "私の米国住所",
@@ -238,7 +242,8 @@
     "orderAmount": "注文金額",
     "originTracking": "発送元追跡番号",
     "viewReceipt": "領収書を見る",
-    "markMatched": "照合済みにする"
+    "markMatched": "照合済みにする",
+    "usersLink": "会員管理"
   },
   "packageStatus": {
     "arrived": "到着済み",
@@ -695,5 +700,53 @@
       "title": "無料会員登録 - USAJUSHO",
       "description": "USAJUSHOに無料登録して、あなた専用の米国住所を取得しましょう。登録は数分で完了します。"
     }
+  },
+  "forgotPassword": {
+    "title": "パスワードをリセット",
+    "description": "登録済みのメールアドレスを入力すると、パスワード再設定用のリンクをお送りします。",
+    "email": "メールアドレス",
+    "submit": "リセットリンクを送信",
+    "submitting": "送信中...",
+    "backToLogin": "ログインページへ戻る",
+    "checkEmailTitle": "確認メールを送信しました",
+    "checkEmailDescription": "{email} 宛のアカウントが存在する場合、パスワード再設定リンクを送信しました。メール内のリンクをクリックして新しいパスワードを設定してください。",
+    "goToLogin": "ログインページへ",
+    "resetError": "このリセットリンクは無効か、有効期限が切れています。もう一度お試しください。"
+  },
+  "resetPassword": {
+    "title": "新しいパスワードを設定",
+    "description": "アカウントの新しいパスワードを設定してください。",
+    "newPassword": "新しいパスワード",
+    "confirmPassword": "新しいパスワード（確認）",
+    "passwordMismatch": "パスワードが一致しません。",
+    "submit": "新しいパスワードを保存",
+    "submitting": "保存中...",
+    "expiredTitle": "リンクの有効期限切れ",
+    "expiredDescription": "このパスワード再設定リンクは無効か、有効期限が切れています。もう一度お試しください。",
+    "requestNewLink": "新しいリンクをリクエスト"
+  },
+  "adminUsers": {
+    "title": "管理者：会員管理",
+    "description": "顧客アカウントを確認し、メールアドレスまたはパスワードをリセットできます。",
+    "packagesLink": "荷物管理",
+    "searchPlaceholder": "名前・スイート番号・メールアドレスで検索",
+    "searchButton": "検索",
+    "clear": "クリア",
+    "allUsers": "全ての会員（{count}）",
+    "emptyNone": "会員がまだいません。",
+    "emptyFiltered": "条件に一致する会員がいません。",
+    "adminBadge": "管理者",
+    "suiteLabel": "スイート {suite}",
+    "changeEmail": "メール変更",
+    "resetPasswordButton": "パスワードリセット",
+    "cancel": "キャンセル",
+    "newEmailLabel": "新しいメールアドレス",
+    "saveEmail": "メールを保存",
+    "emailUpdated": "メールアドレスを更新しました。",
+    "newPasswordLabel": "新しいパスワード",
+    "generatePassword": "自動生成",
+    "savePassword": "パスワードをリセット",
+    "passwordUpdated": "パスワードをリセットしました。下の新しいパスワードをお客様にお伝えください。",
+    "newPasswordDisplay": "新しいパスワード：{password}"
   }
 }
