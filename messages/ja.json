@@ -642,5 +642,39 @@
       "matched": "照合済み",
       "cancelled": "キャンセル"
     }
+  },
+  "seo": {
+    "home": {
+      "title": "米国転送サービス｜あなた専用の米国住所で日本から米国ショッピング - USAJUSHO",
+      "description": "米国の専用住所を無料で取得。Amazon・Walmartなど米国限定ショッピングを、検品・まとめ発送で送料を押えて日本へお届けします。"
+    },
+    "howItWorks": {
+      "title": "米国転送サービスの使い方 - USAJUSHO",
+      "description": "会員登録から米国住所の取得、荷物の検品、まとめ発送、日本到着まで。USAJUSHOのご利用の流れをわかりやすく解説します。"
+    },
+    "purchaseAgency": {
+      "title": "アメリカ購入代行サービス｜クレジットカード不要 - USAJUSHO",
+      "description": "米国のクレジットカードがなくてもOK。USAJUSHOが代わりに商品を購入し、検品・発送まで代行します。"
+    },
+    "customs": {
+      "title": "米国から日本への関税・通関ガイド - USAJUSHO",
+      "description": "個人輸入時の関税の仕組みと計算方法、輸入禁止品目まで。USAJUSHOご利用前に知っておきたい通関の基礎知識をまとめました。"
+    },
+    "legalTerms": {
+      "title": "利用規約 - USAJUSHO",
+      "description": "USAJUSHOの米国転送・購入代行サービスにおける利用規約をご案内します。"
+    },
+    "legalPrivacy": {
+      "title": "個人情報保護方針 - USAJUSHO",
+      "description": "USAJUSHOにおけるお客様の個人情報の取り扱いについてご案内します。"
+    },
+    "login": {
+      "title": "ログイン - USAJUSHO",
+      "description": "USAJUSHOアカウントにログインして、米国住所の管理や荷物の追跡を行えます。"
+    },
+    "signup": {
+      "title": "無料会員登録 - USAJUSHO",
+      "description": "USAJUSHOに無料登録して、あなた専用の米国住所を取得しましょう。登録は数分で完了します。"
+    }
   }
 }

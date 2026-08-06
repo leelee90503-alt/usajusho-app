@@ -642,5 +642,39 @@
       "matched": "Matched",
       "cancelled": "Cancelled"
     }
+  },
+  "seo": {
+    "home": {
+      "title": "US Package Forwarding to Japan | Your Own US Address - USAJUSHO",
+      "description": "Get a free US address. Shop Amazon, Walmart, and other US-only stores, then let USAJUSHO inspect, consolidate, and ship your packages to Japan for less."
+    },
+    "howItWorks": {
+      "title": "How USAJUSHO Works - US to Japan Package Forwarding",
+      "description": "From signing up and getting your US address to inspection, consolidation, and delivery in Japan — here's how USAJUSHO works, step by step."
+    },
+    "purchaseAgency": {
+      "title": "US Purchase Agency Service | No US Credit Card Needed - USAJUSHO",
+      "description": "Don't have a US credit card? USAJUSHO buys the item for you, then inspects and ships it to Japan."
+    },
+    "customs": {
+      "title": "Japan Customs & Duties Guide for US Imports - USAJUSHO",
+      "description": "Understand how customs duties are calculated and which items are restricted before shipping from the US to Japan with USAJUSHO."
+    },
+    "legalTerms": {
+      "title": "Terms of Service - USAJUSHO",
+      "description": "Terms of service for USAJUSHO's US package forwarding and purchase agency service."
+    },
+    "legalPrivacy": {
+      "title": "Privacy Policy - USAJUSHO",
+      "description": "How USAJUSHO collects, uses, and protects your personal information."
+    },
+    "login": {
+      "title": "Log In - USAJUSHO",
+      "description": "Log in to your USAJUSHO account to manage your US address and track your packages."
+    },
+    "signup": {
+      "title": "Sign Up Free - USAJUSHO",
+      "description": "Create your free USAJUSHO account and get your own US address in minutes."
+    }
   }
 }
