@@ -246,7 +246,8 @@
     "usersLink": "会員管理",
     "pricingLink": "配送料金",
     "deleteDeclaration": "削除",
-    "confirmDeleteDeclaration": "この事前申告を削除しますか？この操作は取り消せません。"
+    "confirmDeleteDeclaration": "この事前申告を削除しますか？この操作は取り消せません。",
+    "homeLink": "ホーム"
   },
   "packageStatus": {
     "arrived": "到着済み",
@@ -755,5 +756,23 @@
     "savePassword": "パスワードをリセット",
     "passwordUpdated": "パスワードをリセットしました。下の新しいパスワードをお客様にお伝えください。",
     "newPasswordDisplay": "新しいパスワード：{password}"
+  },
+  "adminHome": {
+    "title": "管理者ダッシュボード",
+    "description": "サイト全体で対応が必要な項目をまとめて確認できます。",
+    "statNeedsAction": "対応待ちの荷物",
+    "statPendingDeclarations": "事前申告（未処理）",
+    "statNewPurchaseRequests": "新規の購入代行依頼",
+    "statInvoicesNeedReview": "確認待ちのインボイス",
+    "statTotalPackages": "総荷物数",
+    "statUsers": "総会員数",
+    "quickLinksHeading": "その他の設定",
+    "packagesCard": "荷物管理",
+    "usersCard": "会員管理",
+    "purchaseRequestsCard": "購入代行リクエスト",
+    "invoicesCard": "インボイス管理",
+    "pricingCard": "配送料金設定",
+    "shippingCard": "配送設定",
+    "settingsCard": "メール通知設定"
   }
 }

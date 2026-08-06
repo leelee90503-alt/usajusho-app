@@ -246,7 +246,8 @@
     "usersLink": "Users",
     "pricingLink": "Shipping Rates",
     "deleteDeclaration": "Delete",
-    "confirmDeleteDeclaration": "Are you sure you want to delete this declaration? This cannot be undone."
+    "confirmDeleteDeclaration": "Are you sure you want to delete this declaration? This cannot be undone.",
+    "homeLink": "Home"
   },
   "packageStatus": {
     "arrived": "Arrived",
@@ -755,5 +756,23 @@
     "savePassword": "Reset Password",
     "passwordUpdated": "Password reset. Share the new password below with the customer.",
     "newPasswordDisplay": "New password: {password}"
+  },
+  "adminHome": {
+    "title": "Admin Dashboard",
+    "description": "An overview of what needs your attention across the site.",
+    "statNeedsAction": "Awaiting Action",
+    "statPendingDeclarations": "Pending Declarations",
+    "statNewPurchaseRequests": "New Purchase Requests",
+    "statInvoicesNeedReview": "Invoices Awaiting Review",
+    "statTotalPackages": "Total Packages",
+    "statUsers": "Total Users",
+    "quickLinksHeading": "Other Settings",
+    "packagesCard": "Package Management",
+    "usersCard": "User Management",
+    "purchaseRequestsCard": "Purchase Requests",
+    "invoicesCard": "Commercial Invoices",
+    "pricingCard": "Shipping Rates",
+    "shippingCard": "Shipping Settings",
+    "settingsCard": "Email Notification Settings"
   }
 }

@@ -112,6 +112,9 @@ export default async function AdminPackagesPage({
           <h1 className="text-xl font-bold text-primary">{t("title")}</h1>
           <nav className="flex items-center gap-1">
             <Button asChild variant="ghost" size="sm">
+              <Link href="/admin">{t("homeLink")}</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
               <Link href="/admin/pricing">{t("pricingLink")}</Link>
             </Button>
             <Button asChild variant="ghost" size="sm">
