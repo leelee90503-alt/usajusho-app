@@ -51,7 +51,7 @@ export default async function DashboardPage() {
   return (
     <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-3xl px-6 py-10">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-xl font-bold text-primary">USAJUSHO</h1>
           <div className="flex flex-wrap items-center gap-3">
             <Link
@@ -62,18 +62,18 @@ export default async function DashboardPage() {
               {t("purchaseRequestsLink")}
             </Link>
             <Link
-              href="/dashboard/invoices"
-              className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-            >
-              <Receipt className="h-4 w-4" />
-              {t("invoicesLink")}
-            </Link>
-            <Link
               href="/dashboard/declarations"
               className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
             >
               <PackagePlus className="h-4 w-4" />
               {t("declarationsLink")}
+            </Link>
+            <Link
+              href="/dashboard/invoices"
+              className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
+              <Receipt className="h-4 w-4" />
+              {t("invoicesLink")}
             </Link>
             <NotificationBell notifications={notifications ?? []} />
             <SignOutButton />
