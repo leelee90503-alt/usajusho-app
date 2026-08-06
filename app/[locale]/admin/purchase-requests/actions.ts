@@ -4,8 +4,9 @@ import { redirect } from "@/i18n/navigation"
 import { getLocale } from "next-intl/server"
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { randomUUID } from "crypto"
 import { notifyUser } from "@/lib/notifications"
-import { getStripe } from "@/lib/stripe"
+import { getSquare } from "@/lib/square"
 
 async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>> {
   const locale = await getLocale()
@@ -162,7 +163,7 @@ export async function refundPurchaseRequest(requestId: string) {
 
   const { data: request, error: fetchError } = await supabase
     .from("purchase_requests")
-    .select("id, user_id, status, stripe_payment_intent_id, product_description")
+    .select("id, user_id, status, square_payment_id, quote_total_cents, product_description")
     .eq("id", requestId)
     .single()
 
@@ -170,18 +171,24 @@ export async function refundPurchaseRequest(requestId: string) {
     return { error: "リクエストが見つかりません。" }
   }
 
-  if (!request.stripe_payment_intent_id) {
-    return { error: "このリクエストにはStripeの支払い情報がありません。" }
+  if (!request.square_payment_id || !request.quote_total_cents) {
+    return { error: "このリクエストにはSquareの支払い情報がありません。" }
   }
 
   try {
-    const stripe = getStripe()
-    await stripe.refunds.create({
-      payment_intent: request.stripe_payment_intent_id,
+    const square = getSquare()
+    await square.refunds.refundPayment({
+      idempotencyKey: randomUUID(),
+      paymentId: request.square_payment_id,
+      amountMoney: {
+        amount: BigInt(request.quote_total_cents),
+        currency: "USD",
+      },
+      reason: "USAJUSHO admin refund",
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown error"
-    return { error: `Stripeの返金処理に失敗しました: ${message}` }
+    return { error: `Squareの返金処理に失敗しました: ${message}` }
   }
 
   const { error: updateError } = await supabase

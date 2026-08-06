@@ -52,9 +52,9 @@ export async function payForShipment(packageId: string) {
     return { error: "ログインしてください。" }
   }
 
-  // NOTE: Stripe is not yet connected. This marks the package as paid directly
-  // as a stand-in for a real checkout flow. Swap this for a Stripe Checkout
-  // session + webhook once payment credentials are available.
+  // NOTE: Square is not yet connected. This marks the package as paid directly
+  // as a stand-in for a real checkout flow. Swap this for a Square Payment
+  // Link + webhook once payment credentials are available.
   const { error } = await supabase
     .from("packages")
     .update({ status: "paid", updated_at: new Date().toISOString() })

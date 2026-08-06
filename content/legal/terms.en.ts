@@ -38,7 +38,7 @@ export const termsEn: LegalDoc = {
     {
       heading: `4. Fees and Payment`,
       blocks: [
-        { kind: "p", text: `All fees are stated in US dollars and processed through our third-party payment processor (Stripe). Applicable service fees are shown before you confirm any payment. You are responsible for all customs duties, import taxes, and destination-country charges, which are not included in our fees.` },
+        { kind: "p", text: `All fees are stated in US dollars and processed through our third-party payment processor (Square). Applicable service fees are shown before you confirm any payment. You are responsible for all customs duties, import taxes, and destination-country charges, which are not included in our fees.` },
       ],
     },
     {

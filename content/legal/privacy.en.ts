@@ -15,7 +15,7 @@ export const privacyEn: LegalDoc = {
           `Identifiers: name, email address, mailing address, phone number, USAJUSHO suite/account number.`,
           `Account Information: login credentials (managed securely by our authentication provider), profile details.`,
           `Commercial Information: purchase-proxy requests, order and quote history, shipment and package details, transaction history.`,
-          `Financial Information: payment is processed directly by our payment processor (Stripe); we do not store your full card number. We retain limited payment metadata (e.g., transaction ID, amount, status).`,
+          `Financial Information: payment is processed directly by our payment processor (Square); we do not store your full card number. We retain limited payment metadata (e.g., transaction ID, amount, status).`,
           `Geolocation/Shipping Information: shipping and billing addresses you provide.`,
           `Communications: messages you send us and records of notifications we send you.`,
         ] },
@@ -25,7 +25,7 @@ export const privacyEn: LegalDoc = {
     {
       heading: `2. Sources of Personal Information`,
       blocks: [
-        { kind: "p", text: `We collect personal information directly from you (account registration, forms, purchase-proxy requests, support messages) and, to a limited extent, from our service providers acting on our behalf (e.g., payment confirmations from Stripe).` },
+        { kind: "p", text: `We collect personal information directly from you (account registration, forms, purchase-proxy requests, support messages) and, to a limited extent, from our service providers acting on our behalf (e.g., payment confirmations from Square).` },
       ],
     },
     {
@@ -39,7 +39,7 @@ export const privacyEn: LegalDoc = {
       blocks: [
         { kind: "p", text: `We share personal information only with service providers who process it on our behalf and are contractually restricted from using it for any other purpose:` },
         { kind: "ul", items: [
-          `Stripe (payment processing): processes your payment information to complete transactions.`,
+          `Square (payment processing): processes your payment information to complete transactions.`,
           `Supabase (database hosting and authentication): stores your account and order data and manages secure login.`,
           `Vercel (application hosting): hosts and delivers our website.`,
           `EmailJS (transactional email delivery): sends account and order-related notification emails on our behalf.`,

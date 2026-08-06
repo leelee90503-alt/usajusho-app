@@ -1,7 +1,7 @@
 -- Purchase agency ("purchase-proxy" / buy-for-me) request lifecycle.
 -- Flow: customer submits a product URL/description -> admin reviews and
 -- sends a quote (item price + fee + note + expiry) -> customer pays via
--- Stripe Checkout -> admin marks purchasing -> purchased, linking the
+-- Square Checkout -> admin marks purchasing -> purchased, linking the
 -- request to a row in public.packages so it joins the normal warehouse
 -- pipeline (inspection/photos/consolidation/shipping) once it arrives.
 
@@ -18,8 +18,8 @@ create table if not exists public.purchase_requests (
   quote_total_cents integer,
   quote_note text,
   quote_expires_at timestamptz,
-  stripe_checkout_session_id text,
-  stripe_payment_intent_id text,
+  square_order_id text,
+  square_payment_id text,
   linked_package_id uuid references public.packages(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),

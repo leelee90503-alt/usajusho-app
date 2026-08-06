@@ -1,10 +1,11 @@
 "use server"
 
+import { randomUUID } from "crypto"
 import { redirect } from "@/i18n/navigation"
 import { getLocale } from "next-intl/server"
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
-import { getStripe } from "@/lib/stripe"
+import { getSquare, getSquareLocationId } from "@/lib/square"
 import { notifyAdmins } from "@/lib/notifications"
 
 export async function submitPurchaseRequest(formData: FormData) {
@@ -113,43 +114,43 @@ export async function createCheckoutSession(requestId: string) {
     process.env.NEXT_PUBLIC_SITE_URL || "https://usajusho-app.vercel.app"
 
   try {
-    const stripe = getStripe()
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      customer_email: user.email ?? undefined,
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            unit_amount: request.quote_total_cents,
-            product_data: {
-              name: "USAJUSHO 購入代行",
-              description: request.product_description.slice(0, 500),
-            },
-          },
-          quantity: 1,
+    const square = getSquare()
+    const { paymentLink } = await square.checkout.paymentLinks.create({
+      idempotencyKey: randomUUID(),
+      quickPay: {
+        name: "USAJUSHO 購入代行",
+        priceMoney: {
+          amount: BigInt(request.quote_total_cents),
+          currency: "USD",
         },
-      ],
-      success_url: `${siteUrl}/dashboard/purchase-requests/${request.id}?paid=1`,
-      cancel_url: `${siteUrl}/dashboard/purchase-requests/${request.id}?cancelled=1`,
-      metadata: {
-        purchase_request_id: request.id,
+        locationId: getSquareLocationId(),
       },
+      checkoutOptions: {
+        redirectUrl: `${siteUrl}/dashboard/purchase-requests/${request.id}?paid=1`,
+      },
+      prePopulatedData: {
+        buyerEmail: user.email ?? undefined,
+      },
+      paymentNote: request.product_description.slice(0, 500),
     })
+
+    if (!paymentLink?.url || !paymentLink.orderId) {
+      throw new Error("Square did not return a payment link URL")
+    }
 
     await supabase
       .from("purchase_requests")
       .update({
         status: "awaiting_payment",
-        stripe_checkout_session_id: session.id,
+        square_order_id: paymentLink.orderId,
         updated_at: new Date().toISOString(),
       })
       .eq("id", request.id)
 
     revalidatePath(`/dashboard/purchase-requests/${request.id}`)
-    return { url: session.url }
+    return { url: paymentLink.url }
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown error"
-    return { error: `Stripe Checkoutセッションの作成に失敗しました: ${message}` }
+    return { error: `Square Checkoutリンクの作成に失敗しました: ${message}` }
   }
 }
