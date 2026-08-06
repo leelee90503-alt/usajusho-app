@@ -147,17 +147,23 @@
     "submit": "ログイン",
     "submitting": "ログイン中...",
     "noAccount": "アカウントをお持ちでないですか？",
-    "signupLink": "会員登録"
+    "signupLink": "会員登録",
+    "emailConfirmed": "メールアドレスの確認が完了しました。ログインしてください。",
+    "emailConfirmError": "確認リンクが無効か、有効期限が切れています。もう一度お試しください。"
   },
   "signup": {
     "title": "会員登録",
-    "fullName": "お名前",
+    "firstName": "名",
+    "lastName": "姓",
     "email": "メールアドレス",
     "password": "パスワード",
     "submit": "会員登録",
     "submitting": "登録中...",
     "hasAccount": "すでにアカウントをお持ちですか？",
-    "loginLink": "ログイン"
+    "loginLink": "ログイン",
+    "checkEmailTitle": "確認メールを送信しました",
+    "checkEmailDescription": "{email} 宛に確認メールを送信しました。メール内のリンクをクリックしてアカウントを有効化してください。",
+    "goToLogin": "ログインページへ"
   },
   "dashboard": {
     "myAddress": "私の米国住所",

@@ -147,17 +147,23 @@
     "submit": "Log In",
     "submitting": "Logging in...",
     "noAccount": "Don't have an account?",
-    "signupLink": "Sign Up"
+    "signupLink": "Sign Up",
+    "emailConfirmed": "Your email address has been confirmed. Please log in.",
+    "emailConfirmError": "This confirmation link is invalid or has expired. Please try again."
   },
   "signup": {
     "title": "Sign Up",
-    "fullName": "Full name",
+    "firstName": "First name",
+    "lastName": "Last name",
     "email": "Email address",
     "password": "Password",
     "submit": "Sign Up",
     "submitting": "Signing up...",
     "hasAccount": "Already have an account?",
-    "loginLink": "Log In"
+    "loginLink": "Log In",
+    "checkEmailTitle": "Check your email",
+    "checkEmailDescription": "We sent a confirmation email to {email}. Click the link in the email to activate your account.",
+    "goToLogin": "Go to Login"
   },
   "dashboard": {
     "myAddress": "My US Address",

@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter, Link } from '@/i18n/navigation'
+import { Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Loader2 } from 'lucide-react'
+import { Loader2, MailCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,13 +19,17 @@ import {
 
 export default function SignupPage() {
   const t = useTranslations('signup')
-  const router = useRouter()
   const supabase = createClient()
-  const [fullName, setFullName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Once signUp() succeeds, Supabase requires email confirmation before a
+  // session exists - there is no dashboard to send the user to yet, so we
+  // show a "check your email" screen here instead of navigating away.
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -36,7 +40,11 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          full_name: `${firstName} ${lastName}`.trim(),
+        },
       },
     })
 
@@ -46,8 +54,33 @@ export default function SignupPage() {
       return
     }
 
-    router.push('/dashboard')
-    router.refresh()
+    setSubmittedEmail(email)
+    setLoading(false)
+  }
+
+  if (submittedEmail) {
+    return (
+      <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-[var(--usj-surface)] px-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <MailCheck className="h-5 w-5 text-primary" aria-hidden="true" />
+            </div>
+            <CardTitle className="text-xl font-bold text-primary">
+              {t('checkEmailTitle')}
+            </CardTitle>
+            <CardDescription>
+              {t('checkEmailDescription', { email: submittedEmail })}
+            </CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/login">{t('goToLogin')}</Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      </main>
+    )
   }
 
   return (
@@ -60,15 +93,29 @@ export default function SignupPage() {
 
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="signup-fullname">{t('fullName')}</Label>
-              <Input
-                id="signup-fullname"
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="signup-firstname">{t('firstName')}</Label>
+                <Input
+                  id="signup-firstname"
+                  type="text"
+                  autoComplete="given-name"
+                  required
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="signup-lastname">{t('lastName')}</Label>
+                <Input
+                  id="signup-lastname"
+                  type="text"
+                  autoComplete="family-name"
+                  required
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">

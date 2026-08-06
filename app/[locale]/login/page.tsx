@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter, Link } from '@/i18n/navigation'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,14 +18,18 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
-export default function LoginPage() {
+function LoginForm() {
   const t = useTranslations('login')
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const justConfirmed = searchParams.get('confirmed') === '1'
+  const confirmError = searchParams.get('confirm_error') === '1'
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -53,6 +58,17 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            {justConfirmed && (
+              <p className="rounded-md bg-teal-50 px-3 py-2 text-sm text-teal-800">
+                {t('emailConfirmed')}
+              </p>
+            )}
+            {confirmError && (
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {t('emailConfirmError')}
+              </p>
+            )}
+
             <div className="space-y-1.5">
               <Label htmlFor="login-email">{t('email')}</Label>
               <Input
@@ -98,5 +114,13 @@ export default function LoginPage() {
         </form>
       </Card>
     </main>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   )
 }
