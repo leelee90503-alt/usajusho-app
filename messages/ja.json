@@ -243,7 +243,8 @@
     "originTracking": "発送元追跡番号",
     "viewReceipt": "領収書を見る",
     "markMatched": "照合済みにする",
-    "usersLink": "会員管理"
+    "usersLink": "会員管理",
+    "pricingLink": "配送料金"
   },
   "packageStatus": {
     "arrived": "到着済み",

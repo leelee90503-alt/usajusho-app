@@ -243,7 +243,8 @@
     "originTracking": "Origin tracking",
     "viewReceipt": "View receipt",
     "markMatched": "Mark matched",
-    "usersLink": "Users"
+    "usersLink": "Users",
+    "pricingLink": "Shipping Rates"
   },
   "packageStatus": {
     "arrived": "Arrived",
