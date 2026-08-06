@@ -53,6 +53,26 @@ export function ShopArt({ className }: IconProps) {
   )
 }
 
+export function DeclareArt({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 200 160" className={className} aria-hidden="true">
+      <rect width="200" height="160" rx="16" fill="var(--usj-surface)" />
+      <path
+        d="M70 30h60v96l-10-7-10 7-10-7-10 7-10-7-10 7V30z"
+        fill="none"
+        stroke="var(--usj-primary)"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d="M82 50h36M82 64h36M82 78h20" stroke="var(--usj-primary)" strokeWidth="3" strokeLinecap="round" />
+      <g transform="translate(148,116)">
+        <circle r="18" fill="var(--usj-accent)" />
+        <path d="M-8 0 L-2 6 L9 -7" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+    </svg>
+  )
+}
+
 export function WarehouseArt({ className }: IconProps) {
   return (
     <svg viewBox="0 0 200 160" className={className} aria-hidden="true">

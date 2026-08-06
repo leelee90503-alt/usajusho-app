@@ -118,6 +118,7 @@ export default async function Home() {
               { title: t("journey.step4Title"), description: t("journey.step4Description") },
               { title: t("journey.step5Title"), description: t("journey.step5Description") },
               { title: t("journey.step6Title"), description: t("journey.step6Description") },
+              { title: t("journey.step7Title"), description: t("journey.step7Description") },
             ]}
           />
         </div>

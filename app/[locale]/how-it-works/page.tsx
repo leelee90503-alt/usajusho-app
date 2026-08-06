@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import {
   SignupArt,
   ShopArt,
+  DeclareArt,
   WarehouseArt,
   ConsolidateArt,
   ShipArt,
@@ -17,10 +18,11 @@ export default async function HowItWorksPage() {
   const steps = [
     { Art: SignupArt, title: t("step1Title"), youDo: t("step1YouDo"), weHandle: t("step1WeHandle") },
     { Art: ShopArt, title: t("step2Title"), youDo: t("step2YouDo"), weHandle: t("step2WeHandle") },
-    { Art: WarehouseArt, title: t("step3Title"), youDo: t("step3YouDo"), weHandle: t("step3WeHandle") },
-    { Art: ConsolidateArt, title: t("step4Title"), youDo: t("step4YouDo"), weHandle: t("step4WeHandle") },
-    { Art: ShipArt, title: t("step5Title"), youDo: t("step5YouDo"), weHandle: t("step5WeHandle") },
-    { Art: DeliveredArt, title: t("step6Title"), youDo: t("step6YouDo"), weHandle: t("step6WeHandle") },
+    { Art: DeclareArt, title: t("step3Title"), youDo: t("step3YouDo"), weHandle: t("step3WeHandle") },
+    { Art: WarehouseArt, title: t("step4Title"), youDo: t("step4YouDo"), weHandle: t("step4WeHandle") },
+    { Art: ConsolidateArt, title: t("step5Title"), youDo: t("step5YouDo"), weHandle: t("step5WeHandle") },
+    { Art: ShipArt, title: t("step6Title"), youDo: t("step6YouDo"), weHandle: t("step6WeHandle") },
+    { Art: DeliveredArt, title: t("step7Title"), youDo: t("step7YouDo"), weHandle: t("step7WeHandle") },
   ]
 
   return (

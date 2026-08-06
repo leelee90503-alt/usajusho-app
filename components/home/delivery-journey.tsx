@@ -11,7 +11,7 @@ type Step = {
  * art) in the USAJUSHO navy / teal palette.
  */
 export default function DeliveryJourney({ steps }: { steps: Step[] }) {
-  const icons = [SignupIcon, CartIcon, WarehouseIcon, InvoiceIcon, PlaneIcon, HomeIcon]
+  const icons = [SignupIcon, CartIcon, DeclareIcon, WarehouseIcon, InvoiceIcon, PlaneIcon, HomeIcon]
 
   return (
     <div className="relative">
@@ -31,7 +31,7 @@ export default function DeliveryJourney({ steps }: { steps: Step[] }) {
             strokeDasharray="6 6"
           />
         </svg>
-        <ol className="relative grid grid-cols-6 gap-4">
+        <ol className="relative grid grid-cols-7 gap-4">
           {steps.map((step, i) => {
             const Icon = icons[i]
             return (
@@ -99,6 +99,27 @@ function CartIcon({ className }: IconProps) {
       />
       <circle cx="10" cy="20" r="1.3" fill="currentColor" />
       <circle cx="17" cy="20" r="1.3" fill="currentColor" />
+    </svg>
+  )
+}
+
+function DeclareIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M6 3h12v14.5l-1.5-1-1.5 1-1.5-1-1.5 1-1.5-1-1.5 1-1.5-1-1.5 1V3z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path d="M8.5 7h7M8.5 10h7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path
+        d="M8.5 13.5l1.8 1.8L14 11.5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   )
 }
