@@ -173,7 +173,8 @@
     "myPackages": "届いた荷物",
     "addressNote": "この住所を米国のオンラインショップでの配送先として使用してください。",
     "invoicesLink": "請求書",
-    "declarationsLink": "パッケージを申告する"
+    "declarationsLink": "パッケージを申告する",
+    "purchaseRequestsLink": "購入代行リクエスト"
   },
   "nav": {
     "adminPackages": "管理者: 荷物到着登録",

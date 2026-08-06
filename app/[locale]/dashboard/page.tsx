@@ -6,7 +6,7 @@ import PackageList from './package-list'
 import NotificationBell from './notification-bell'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { MapPin, Receipt, PackagePlus } from 'lucide-react'
+import { MapPin, Receipt, PackagePlus, ShoppingCart } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -53,7 +53,14 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-primary">USAJUSHO</h1>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/dashboard/purchase-requests"
+              className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {t("purchaseRequestsLink")}
+            </Link>
             <Link
               href="/dashboard/invoices"
               className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"

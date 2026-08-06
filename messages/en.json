@@ -173,7 +173,8 @@
     "myPackages": "My Packages",
     "addressNote": "Use this address as your shipping destination at US online stores.",
     "invoicesLink": "Invoices",
-    "declarationsLink": "Declare a Package"
+    "declarationsLink": "Declare a Package",
+    "purchaseRequestsLink": "Purchase Requests"
   },
   "nav": {
     "adminPackages": "Admin: Package Intake",
