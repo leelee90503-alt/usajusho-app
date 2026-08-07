@@ -209,6 +209,10 @@ export async function resolveMissingPackage(
     body: `${pkg.item_name} の送料見積り ¥${params.quoteAmount.toLocaleString()} が届きました。${
       memo ? `メモ: ${memo} ` : ""
     }ダッシュボードからお支払いください。`,
+    titleEn: "Your shipping quote is ready",
+    bodyEn: `Your shipping quote of ¥${params.quoteAmount.toLocaleString()} for "${pkg.item_name}" is ready.${
+      memo ? ` Note: ${memo}.` : ""
+    } Please pay from your dashboard.`,
   })
 
   revalidatePath("/admin/packages")
@@ -279,6 +283,8 @@ export async function updatePackageStatus(packageId: string, status: string) {
       packageId,
       title: "発送が完了しました",
       body: `${updated.item_name} の発送が完了しました。追跡番号: ${updated.tracking_number}`,
+      titleEn: "Your package has shipped",
+      bodyEn: `"${updated.item_name}" has shipped. Tracking number: ${updated.tracking_number}`,
     })
   }
 
@@ -320,6 +326,8 @@ export async function markShipped(packageId: string, trackingNumber: string) {
       packageId,
       title: "発送が完了しました",
       body: `${updated.item_name} の発送が完了しました。追跡番号: ${trimmed}`,
+      titleEn: "Your package has shipped",
+      bodyEn: `"${updated.item_name}" has shipped. Tracking number: ${trimmed}`,
     })
   }
 

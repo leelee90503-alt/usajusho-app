@@ -405,8 +405,10 @@ export async function adminSubmitOnBehalf(invoiceId: string) {
   await notifyUser(supabase, {
     userId: invoice.user_id,
     packageId: invoice.package_id,
-    title: "Invoice submitted",
-    body: `Your commercial invoice ${invoice.invoice_number ?? ""} has been submitted for review.`,
+    title: "インボイスが提出されました",
+    body: `商業インボイス${invoice.invoice_number ?? ""}がレビューのため提出されました。`,
+    titleEn: "Invoice submitted",
+    bodyEn: `Your commercial invoice ${invoice.invoice_number ?? ""} has been submitted for review.`,
   })
 
   revalidatePath(`/admin/invoices/${invoice.package_id}`)
@@ -447,8 +449,10 @@ export async function adminRequestCorrection(invoiceId: string, correctionNote: 
   await notifyUser(supabase, {
     userId: invoice.user_id,
     packageId: invoice.package_id,
-    title: "Invoice correction needed",
-    body: `Your commercial invoice ${invoice.invoice_number ?? ""} needs a correction: ${correctionNote.trim()}`,
+    title: "インボイスの修正が必要です",
+    body: `商業インボイス${invoice.invoice_number ?? ""}に修正が必要です: ${correctionNote.trim()}`,
+    titleEn: "Invoice correction needed",
+    bodyEn: `Your commercial invoice ${invoice.invoice_number ?? ""} needs a correction: ${correctionNote.trim()}`,
   })
 
   revalidatePath(`/admin/invoices/${invoice.package_id}`)
@@ -496,8 +500,10 @@ export async function adminApproveAndComplete(invoiceId: string) {
   await notifyUser(supabase, {
     userId: invoice.user_id,
     packageId: invoice.package_id,
-    title: "Invoice approved",
-    body: `Your commercial invoice ${invoice.invoice_number ?? ""} has been approved and is now complete.`,
+    title: "インボイスが承認されました",
+    body: `商業インボイス${invoice.invoice_number ?? ""}が承認され、完了しました。`,
+    titleEn: "Invoice approved",
+    bodyEn: `Your commercial invoice ${invoice.invoice_number ?? ""} has been approved and is now complete.`,
   })
 
   revalidatePath(`/admin/invoices/${invoice.package_id}`)

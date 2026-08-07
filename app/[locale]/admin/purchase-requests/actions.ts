@@ -71,6 +71,11 @@ export async function sendQuote(
       body: `${updated.product_description.slice(0, 50)} の見積り $${(
         totalCents / 100
       ).toLocaleString()} が届きました。ダッシュボードからお支払いください。`,
+      titleEn: "Your purchase-agency quote is ready",
+      bodyEn: `Your quote of $${(totalCents / 100).toLocaleString()} for "${updated.product_description.slice(
+        0,
+        50
+      )}" is ready. Please pay from your dashboard.`,
     })
   }
 
@@ -154,6 +159,9 @@ export async function markPurchasedAndLinkPackage(
     packageId: pkg.id,
     title: "商品の購入が完了しました",
     body: "ご依頼の商品を購入しました。倉庫への到着後、通常の配送フローでお届けします。",
+    titleEn: "Your item has been purchased",
+    bodyEn:
+      "We've purchased the item you requested. It will be delivered through our normal shipping process once it arrives at our warehouse.",
   })
 
   revalidatePath("/admin/purchase-requests")
@@ -208,6 +216,8 @@ export async function refundPurchaseRequest(requestId: string) {
     userId: request.user_id,
     title: "返金処理が完了しました",
     body: `${request.product_description.slice(0, 50)} のご依頼について返金処理を行いました。`,
+    titleEn: "Your refund has been processed",
+    bodyEn: `We've processed a refund for your request "${request.product_description.slice(0, 50)}".`,
   })
 
   revalidatePath("/admin/purchase-requests")
@@ -241,6 +251,11 @@ export async function cancelRequestAsAdmin(requestId: string) {
     userId: request.user_id,
     title: "購入代行のご依頼がキャンセルされました",
     body: `${request.product_description.slice(0, 50)} のご依頼はキャンセルされました。ご不明な点がございましたらサポートまでお問い合わせください。`,
+    titleEn: "Your purchase-agency request has been cancelled",
+    bodyEn: `Your request "${request.product_description.slice(
+      0,
+      50
+    )}" has been cancelled. Please contact support if you have any questions.`,
   })
 
   revalidatePath("/admin/purchase-requests")

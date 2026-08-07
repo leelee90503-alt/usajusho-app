@@ -6,6 +6,15 @@ type NotifyParams = {
   packageId?: string | null
   title: string
   body: string
+  // Optional English translation. When present, the customer-facing
+  // NotificationBell picks title_en/body_en instead of title/body when the
+  // customer's currently selected locale is "en" (see notification-bell.tsx).
+  // Optional (unlike notifyAdmins, where it's required) so this can be
+  // rolled out call site by call site without breaking the ones not yet
+  // translated - those simply have title_en/body_en = null and keep
+  // showing Japanese regardless of locale, exactly like before.
+  titleEn?: string
+  bodyEn?: string
 }
 
 // Creates an in-app notification row for the user, and sends a real email
@@ -14,13 +23,15 @@ type NotifyParams = {
 // entered, this silently falls back to in-app notifications only - no code
 // changes or redeploys are needed once the admin fills in the settings form.
 export async function notifyUser(supabase: SupabaseClient, params: NotifyParams) {
-  const { userId, packageId, title, body } = params
+  const { userId, packageId, title, body, titleEn, bodyEn } = params
 
   const { error } = await supabase.from("notifications").insert({
     user_id: userId,
     package_id: packageId ?? null,
     title,
     body,
+    title_en: titleEn ?? null,
+    body_en: bodyEn ?? null,
   })
   if (error) {
     console.error("Failed to create notification:", error.message)

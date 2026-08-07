@@ -101,6 +101,10 @@ export async function matchAndQuoteDeclaration(
     body: `${itemName} の送料見積り ¥${params.quoteAmount.toLocaleString()} が届きました。${
       memo ? `メモ: ${memo} ` : ""
     }ダッシュボードからお支払いください。`,
+    titleEn: "Your shipping quote is ready",
+    bodyEn: `Your shipping quote of ¥${params.quoteAmount.toLocaleString()} for "${itemName}" is ready.${
+      memo ? ` Note: ${memo}.` : ""
+    } Please pay from your dashboard.`,
   })
 
   revalidatePath("/admin/packages")
