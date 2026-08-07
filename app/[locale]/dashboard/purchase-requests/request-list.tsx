@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ShoppingCart } from "lucide-react"
+import { formatUSD } from "@/lib/format"
 
 type PurchaseRequest = {
   id: string
@@ -73,7 +74,7 @@ export default function RequestList({
               {request.quote_total_cents != null && (
                 <p className="mt-2 text-sm text-slate-600">
                   {t("quoteLabel")}: $
-                  {(request.quote_total_cents / 100).toLocaleString()}
+                  {formatUSD(request.quote_total_cents / 100)}
                 </p>
               )}
             </CardContent>

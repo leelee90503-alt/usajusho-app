@@ -50,7 +50,7 @@ export default async function AdminPackagesPage({
 
   const { data: allPackages } = await supabase
     .from("packages")
-    .select("*, profiles(full_name, suite_number)")
+    .select("*, profiles(full_name, suite_number, phone_number, japan_postal_code, japan_prefecture, japan_city, japan_address_line1, japan_address_line2)")
     .order("created_at", { ascending: false })
 
   const packages = allPackages ?? []

@@ -6,7 +6,7 @@ import PackageList from './package-list'
 import NotificationBell from './notification-bell'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { MapPin, Receipt, PackagePlus, ShoppingCart } from 'lucide-react'
+import { MapPin, Receipt, PackagePlus, ShoppingCart, UserRound } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -52,6 +52,13 @@ export default async function DashboardPage() {
     <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="flex flex-wrap items-center justify-end gap-3">
+          <Link
+            href="/dashboard/profile"
+            className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+          >
+            <UserRound className="h-4 w-4" />
+            {t("profileLink")}
+          </Link>
           <Link
             href="/dashboard/purchase-requests"
             className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
@@ -113,7 +120,7 @@ export default async function DashboardPage() {
           <h3 className="text-lg font-semibold text-slate-900">
             {t("myPackages")}
           </h3>
-          <PackageList packages={packages ?? []} />
+          <PackageList packages={packages ?? []} profile={profile ?? null} />
         </div>
       </div>
     </main>

@@ -19,14 +19,43 @@ type Package = {
   quote_note: string | null
 }
 
+type Profile = {
+  full_name: string | null
+  phone_number: string | null
+  japan_postal_code: string | null
+  japan_prefecture: string | null
+  japan_city: string | null
+  japan_address_line1: string | null
+  japan_address_line2: string | null
+}
+
+function formatJapanAddress(profile: Profile | null) {
+  if (!profile) return null
+  const parts = [
+    profile.japan_postal_code ? `〒${profile.japan_postal_code}` : null,
+    profile.japan_prefecture,
+    profile.japan_city,
+    profile.japan_address_line1,
+    profile.japan_address_line2,
+  ].filter(Boolean)
+  return parts.length > 0 ? parts.join(" ") : null
+}
+
 const STATUS_BADGE_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   quoted: "default",
   paid: "secondary",
   shipped: "secondary",
 }
 
-export default function PackageList({ packages }: { packages: Package[] }) {
+export default function PackageList({
+  packages,
+  profile = null,
+}: {
+  packages: Package[]
+  profile?: Profile | null
+}) {
   const t = useTranslations("packageList")
+  const japanAddress = formatJapanAddress(profile)
   const STATUS_LABELS: Record<string, string> = {
     quoted: t("statusQuoted"),
     paid: t("statusPaid"),
@@ -101,6 +130,12 @@ export default function PackageList({ packages }: { packages: Package[] }) {
                   {pkg.quote_note && (
                     <p className="mt-1 text-xs text-muted-foreground">{pkg.quote_note}</p>
                   )}
+                  <div className="mt-2 space-y-0.5 border-t border-slate-200 pt-2 text-xs text-slate-600">
+                    <p className="font-semibold text-slate-700">{t("quoteRecipientHeading")}</p>
+                    <p>{t("quoteRecipientName")}{profile?.full_name || "—"}</p>
+                    <p>{t("quoteRecipientPhone")}{profile?.phone_number || t("quoteRecipientNotSet")}</p>
+                    <p>{t("quoteRecipientAddress")}{japanAddress || t("quoteRecipientNotSet")}</p>
+                  </div>
                   <Button
                     type="button"
                     onClick={() => handlePay(pkg.id)}

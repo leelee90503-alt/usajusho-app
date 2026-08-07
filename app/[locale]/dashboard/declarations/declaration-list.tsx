@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import CarrierTrackLink from "@/components/carrier-track-link"
 import { Pencil } from "lucide-react"
+import { formatUSD } from "@/lib/format"
 
 type Declaration = {
   id: string
@@ -75,7 +76,7 @@ function DeclarationCard({ declaration: d }: { declaration: Declaration }) {
             <p className="font-semibold text-slate-900">{d.item_name}</p>
             {d.order_amount != null && (
               <p className="mt-1 text-xs text-muted-foreground">
-                {t("orderAmountLabel")}: ${Number(d.order_amount).toLocaleString()}
+                {t("orderAmountLabel")}: ${formatUSD(d.order_amount)}
               </p>
             )}
             {d.origin_tracking_number && (

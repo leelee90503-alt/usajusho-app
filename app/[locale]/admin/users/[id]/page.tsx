@@ -3,10 +3,12 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { getLocale, getTranslations } from "next-intl/server"
 import UserRow from "../user-row"
+import ContactInfoForm from "./contact-info-form"
 import CarrierTrackLink from "@/components/carrier-track-link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft } from "lucide-react"
+import { formatUSD } from "@/lib/format"
 
 export default async function AdminUserDetailPage({
   params,
@@ -45,7 +47,7 @@ export default async function AdminUserDetailPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, full_name, suite_number, is_admin, email")
+    .select("id, full_name, suite_number, is_admin, email, phone_number, japan_postal_code, japan_prefecture, japan_city, japan_address_line1, japan_address_line2")
     .eq("id", id)
     .single()
 
@@ -135,6 +137,20 @@ export default async function AdminUserDetailPage({
           />
         </div>
 
+        <div className="mt-4">
+          <ContactInfoForm
+            userId={profile.id}
+            profile={{
+              phone_number: profile.phone_number,
+              japan_postal_code: profile.japan_postal_code,
+              japan_prefecture: profile.japan_prefecture,
+              japan_city: profile.japan_city,
+              japan_address_line1: profile.japan_address_line1,
+              japan_address_line2: profile.japan_address_line2,
+            }}
+          />
+        </div>
+
         <section className="mt-8">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">
@@ -221,7 +237,7 @@ export default async function AdminUserDetailPage({
                       <p className="mt-0.5 text-xs text-muted-foreground">
                         {t("declaredValueLabel")}{" "}
                         {inv.total_declared_value != null
-                          ? `$${Number(inv.total_declared_value).toLocaleString()}`
+                          ? `$${formatUSD(inv.total_declared_value)}`
                           : "—"}
                       </p>
                     </div>

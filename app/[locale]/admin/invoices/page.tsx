@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { formatUSD } from "@/lib/format"
 
 type ProfileJoin = { full_name: string | null; suite_number: string | null } | { full_name: string | null; suite_number: string | null }[] | null
 
@@ -177,7 +178,7 @@ export default async function AdminInvoicesPage({
                   )}
                 </TableCell>
                 <TableCell className="text-foreground">
-                  {invoice ? `$${Number(invoice.total_declared_value).toLocaleString()}` : "—"}
+                  {invoice ? `$${formatUSD(invoice.total_declared_value)}` : "—"}
                 </TableCell>
                 <TableCell className="text-right">
                   <Link

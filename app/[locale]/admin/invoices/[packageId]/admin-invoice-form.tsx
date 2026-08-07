@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { formatUSD } from "@/lib/format"
 import {
   Table,
   TableBody,
@@ -358,7 +359,7 @@ export default function AdminInvoiceForm({
                     </TableCell>
                     <TableCell className="font-medium text-foreground">
                       {labels.currencySymbol}
-                      {Number(item.item_total_amount).toLocaleString()}
+                      {formatUSD(item.item_total_amount)}
                     </TableCell>
                     <TableCell>
                       <Input
@@ -456,7 +457,7 @@ export default function AdminInvoiceForm({
           <p className="text-sm font-semibold text-foreground">{labels.totalDeclaredValue}</p>
           <p className="text-lg font-bold text-accent">
             {labels.currencySymbol}
-            {Number(invoice.total_declared_value).toLocaleString()}
+            {formatUSD(invoice.total_declared_value)}
           </p>
         </div>
 

@@ -7,6 +7,7 @@ import CancelButton from "./cancel-button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft } from "lucide-react"
+import { formatUSD } from "@/lib/format"
 
 const STATUS_BADGE_CLASS: Record<string, string> = {
   submitted: "bg-slate-100 text-slate-700",
@@ -99,7 +100,7 @@ export default async function PurchaseRequestDetailPage({
               {request.budget_cap_cents != null && (
                 <p className="text-sm text-slate-600">
                   {t("budgetCapLabel")}: $
-                  {(request.budget_cap_cents / 100).toLocaleString()}
+                  {formatUSD(request.budget_cap_cents / 100)}
                 </p>
               )}
             </CardContent>
@@ -124,16 +125,16 @@ export default async function PurchaseRequestDetailPage({
                 <div className="flex justify-between">
                   <span>{t("quoteItemPrice")}</span>
                   <span>
-                    ${((request.quote_item_price_cents ?? 0) / 100).toLocaleString()}
+                    ${formatUSD((request.quote_item_price_cents ?? 0) / 100)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t("quoteFee")}</span>
-                  <span>${((request.quote_fee_cents ?? 0) / 100).toLocaleString()}</span>
+                  <span>${formatUSD((request.quote_fee_cents ?? 0) / 100)}</span>
                 </div>
                 <div className="flex justify-between border-t border-slate-200 pt-1 font-semibold text-slate-900">
                   <span>{t("quoteTotal")}</span>
-                  <span>${(request.quote_total_cents / 100).toLocaleString()}</span>
+                  <span>${formatUSD(request.quote_total_cents / 100)}</span>
                 </div>
                 {request.quote_note && (
                   <p className="pt-2 text-sm text-muted-foreground">

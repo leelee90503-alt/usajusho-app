@@ -58,6 +58,40 @@ export async function adminUpdateUserEmail(userId: string, newEmail: string) {
   return { success: true }
 }
 
+export async function adminUpdateUserContactInfo(
+  userId: string,
+  fields: {
+    phone_number: string
+    japan_postal_code: string
+    japan_prefecture: string
+    japan_city: string
+    japan_address_line1: string
+    japan_address_line2: string
+  }
+) {
+  await requireAdmin()
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      phone_number: fields.phone_number.trim() || null,
+      japan_postal_code: fields.japan_postal_code.trim() || null,
+      japan_prefecture: fields.japan_prefecture.trim() || null,
+      japan_city: fields.japan_city.trim() || null,
+      japan_address_line1: fields.japan_address_line1.trim() || null,
+      japan_address_line2: fields.japan_address_line2.trim() || null,
+    })
+    .eq("id", userId)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath(`/admin/users/${userId}`)
+  return { success: true }
+}
+
 export async function adminResetUserPassword(userId: string, newPassword: string) {
   await requireAdmin()
 

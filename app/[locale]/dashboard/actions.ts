@@ -68,6 +68,46 @@ export async function markNotificationRead(notificationId: string) {
   return { success: true }
 }
 
+export async function updateContactInfo(fields: {
+  phone_number: string
+  japan_postal_code: string
+  japan_prefecture: string
+  japan_city: string
+  japan_address_line1: string
+  japan_address_line2: string
+}) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: "ログインしてください。" }
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      phone_number: fields.phone_number.trim() || null,
+      japan_postal_code: fields.japan_postal_code.trim() || null,
+      japan_prefecture: fields.japan_prefecture.trim() || null,
+      japan_city: fields.japan_city.trim() || null,
+      japan_address_line1: fields.japan_address_line1.trim() || null,
+      japan_address_line2: fields.japan_address_line2.trim() || null,
+    })
+    .eq("id", user.id)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath("/dashboard")
+  revalidatePath("/dashboard/profile")
+
+  return { success: true }
+}
+
 export async function markAllNotificationsRead() {
   const supabase = await createClient()
 

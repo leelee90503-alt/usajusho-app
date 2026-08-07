@@ -178,7 +178,8 @@
     "addressNote": "Use this address as your shipping destination at US online stores.",
     "invoicesLink": "Invoices",
     "declarationsLink": "Declare a Package",
-    "purchaseRequestsLink": "Purchase Requests"
+    "purchaseRequestsLink": "Purchase Requests",
+    "profileLink": "My Profile"
   },
   "nav": {
     "adminPackages": "Admin: Package Intake",
@@ -201,7 +202,12 @@
     "pay": "Pay",
     "statusQuoted": "Quoted",
     "statusPaid": "Paid",
-    "statusShipped": "Shipped"
+    "statusShipped": "Shipped",
+    "quoteRecipientHeading": "Recipient",
+    "quoteRecipientName": "Name: ",
+    "quoteRecipientPhone": "Phone: ",
+    "quoteRecipientAddress": "Address: ",
+    "quoteRecipientNotSet": "Not set"
   },
   "notificationBell": {
     "title": "Notifications",
@@ -291,7 +297,10 @@
     "markShippedButton": "Mark as Shipped",
     "markShippedMissingTracking": "Please enter a tracking number.",
     "markShippedSuccess": "Marked as shipped.",
-    "markShippedInvoiceWarning": "The commercial invoice is not marked complete yet. Mark as shipped anyway?"
+    "markShippedInvoiceWarning": "The commercial invoice is not marked complete yet. Mark as shipped anyway?",
+    "quoteRecipientPhone": "Phone: ",
+    "quoteRecipientAddress": "Address: ",
+    "quoteRecipientNotSet": "Not set"
   },
   "addPackageForm": {
     "heading": "Register an Unmatched Package",
@@ -793,7 +802,13 @@
     "purchaseRequestsHeading": "Purchase Requests ({count})",
     "purchaseRequestsEmpty": "No purchase requests yet.",
     "purchaseRequestsLink": "Manage in Purchase Requests →",
-    "declaredValueLabel": "Declared value:"
+    "declaredValueLabel": "Declared value:",
+    "contactInfoHeading": "Contact Info",
+    "contactInfoSaved": "Contact info updated.",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "notSet": "Not set"
   },
   "adminHome": {
     "title": "Admin Dashboard",
@@ -822,5 +837,23 @@
   "carrierTrack": {
     "detectedCarrier": "Track on {carrier}",
     "unknownCarrier": "Search tracking status"
+  },
+  "contactInfo": {
+    "phoneNumber": "Phone Number",
+    "japanAddressHeading": "Japan Address",
+    "japanPostalCode": "Postal Code",
+    "japanPrefecture": "Prefecture",
+    "japanCity": "City",
+    "japanAddressLine1": "Address Line 1",
+    "japanAddressLine2": "Address Line 2 (optional)"
+  },
+  "profileForm": {
+    "backLink": "Back to Dashboard",
+    "title": "My Profile",
+    "nameLabel": "Name",
+    "emailLabel": "Email address",
+    "saving": "Saving...",
+    "save": "Save",
+    "saveSuccess": "Saved."
   }
 }

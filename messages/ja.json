@@ -178,7 +178,8 @@
     "addressNote": "この住所を米国のオンラインショップでの配送先として使用してください。",
     "invoicesLink": "請求書",
     "declarationsLink": "パッケージを申告する",
-    "purchaseRequestsLink": "購入代行リクエスト"
+    "purchaseRequestsLink": "購入代行リクエスト",
+    "profileLink": "マイプロフィール"
   },
   "nav": {
     "adminPackages": "管理者: 荷物到着登録",
@@ -201,7 +202,12 @@
     "pay": "支払う",
     "statusQuoted": "見積済み",
     "statusPaid": "支払い済み",
-    "statusShipped": "発送完了"
+    "statusShipped": "発送完了",
+    "quoteRecipientHeading": "お届け先",
+    "quoteRecipientName": "氏名：",
+    "quoteRecipientPhone": "電話番号：",
+    "quoteRecipientAddress": "住所：",
+    "quoteRecipientNotSet": "未設定"
   },
   "notificationBell": {
     "title": "通知",
@@ -291,7 +297,10 @@
     "markShippedButton": "発送完了にする",
     "markShippedMissingTracking": "配送追跡番号を入力してください。",
     "markShippedSuccess": "発送完了として記録しました。",
-    "markShippedInvoiceWarning": "商業インボイスがまだ完了していません。それでも発送完了にしますか？"
+    "markShippedInvoiceWarning": "商業インボイスがまだ完了していません。それでも発送完了にしますか？",
+    "quoteRecipientPhone": "電話番号：",
+    "quoteRecipientAddress": "住所：",
+    "quoteRecipientNotSet": "未設定"
   },
   "addPackageForm": {
     "heading": "一致しない荷物を登録",
@@ -793,7 +802,13 @@
     "purchaseRequestsHeading": "購入代行依頼（{count}件）",
     "purchaseRequestsEmpty": "まだ購入代行依頼がありません。",
     "purchaseRequestsLink": "購入代行管理で見る →",
-    "declaredValueLabel": "申告価格："
+    "declaredValueLabel": "申告価格：",
+    "contactInfoHeading": "連絡先情報",
+    "contactInfoSaved": "連絡先情報を更新しました。",
+    "edit": "編集",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "notSet": "未設定"
   },
   "adminHome": {
     "title": "管理者ダッシュボード",
@@ -822,5 +837,23 @@
   "carrierTrack": {
     "detectedCarrier": "{carrier}で追跡する",
     "unknownCarrier": "配送状況を検索"
+  },
+  "contactInfo": {
+    "phoneNumber": "電話番号",
+    "japanAddressHeading": "日本の住所",
+    "japanPostalCode": "郵便番号",
+    "japanPrefecture": "都道府県",
+    "japanCity": "市区町村",
+    "japanAddressLine1": "住所1",
+    "japanAddressLine2": "住所2（任意）"
+  },
+  "profileForm": {
+    "backLink": "ダッシュボードに戻る",
+    "title": "マイプロフィール",
+    "nameLabel": "氏名",
+    "emailLabel": "メールアドレス",
+    "saving": "保存中...",
+    "save": "保存",
+    "saveSuccess": "保存しました。"
   }
 }

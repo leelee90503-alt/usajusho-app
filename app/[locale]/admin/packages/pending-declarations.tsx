@@ -4,6 +4,7 @@ import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { matchAndQuoteDeclaration, adminDeleteDeclaration } from "./declarations-actions"
 import { estimateQuote, type ShippingRate } from "@/lib/pricing"
+import { formatUSD } from "@/lib/format"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -153,7 +154,7 @@ function DeclarationCard({
           <p className="mt-1">{d.item_name}</p>
           {d.order_amount != null && (
             <p className="mt-1 text-xs text-muted-foreground">
-              {t("orderAmount")}: ${Number(d.order_amount).toLocaleString()}
+              {t("orderAmount")}: ${formatUSD(d.order_amount)}
             </p>
           )}
           {d.origin_tracking_number && (

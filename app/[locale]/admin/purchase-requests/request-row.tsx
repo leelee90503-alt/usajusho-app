@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import { formatUSD } from "@/lib/format"
 
 type Profile = { full_name: string | null; suite_number: string | null } | null
 
@@ -166,7 +167,7 @@ export default function RequestRow({
             {request.budget_cap_cents != null && (
               <p className="mt-1 text-xs text-muted-foreground">
                 {t("budgetCapLabel")}: $
-                {(request.budget_cap_cents / 100).toLocaleString()}
+                {formatUSD(request.budget_cap_cents / 100)}
               </p>
             )}
           </div>

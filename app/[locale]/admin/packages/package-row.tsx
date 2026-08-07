@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import CarrierTrackLink from "@/components/carrier-track-link"
 import { Trash2 } from "lucide-react"
+import { formatUSD } from "@/lib/format"
 
 type PackageWithProfile = {
   id: string
@@ -25,7 +26,28 @@ type PackageWithProfile = {
   chargeable_weight_kg: number | null
   quote_amount: number | null
   quote_note: string | null
-  profiles?: { full_name: string | null; suite_number: string | null } | null
+  profiles?: {
+    full_name: string | null
+    suite_number: string | null
+    phone_number: string | null
+    japan_postal_code: string | null
+    japan_prefecture: string | null
+    japan_city: string | null
+    japan_address_line1: string | null
+    japan_address_line2: string | null
+  } | null
+}
+
+function formatJapanAddress(profile: PackageWithProfile["profiles"]) {
+  if (!profile) return null
+  const parts = [
+    profile.japan_postal_code ? `〒${profile.japan_postal_code}` : null,
+    profile.japan_prefecture,
+    profile.japan_city,
+    profile.japan_address_line1,
+    profile.japan_address_line2,
+  ].filter(Boolean)
+  return parts.length > 0 ? parts.join(" ") : null
 }
 
 type LinkedDeclaration = {
@@ -75,6 +97,7 @@ export default function PackageRow({
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
   const [trackingInput, setTrackingInput] = useState(() => pkg.tracking_number ?? "")
   const [shipMessage, setShipMessage] = useState<string | null>(null)
+  const japanAddress = formatJapanAddress(pkg.profiles)
 
   function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const status = e.target.value
@@ -153,13 +176,17 @@ export default function PackageRow({
                 {pkg.quote_note && (
                   <span className="ml-1 font-normal text-muted-foreground">({pkg.quote_note})</span>
                 )}
+                <span className="mt-1 block space-y-0.5 font-normal text-muted-foreground">
+                  <span className="block">{t("quoteRecipientPhone")}{pkg.profiles?.phone_number || t("quoteRecipientNotSet")}</span>
+                  <span className="block">{t("quoteRecipientAddress")}{japanAddress || t("quoteRecipientNotSet")}</span>
+                </span>
               </p>
             )}
             {declaration && (declaration.order_amount != null || declaration.origin_tracking_number) && (
               <div className="mt-2 rounded-md bg-slate-50 px-2 py-1.5 text-xs text-muted-foreground">
                 <p className="font-semibold text-slate-700">{t("linkedDeclarationHeading")}</p>
                 {declaration.order_amount != null && (
-                  <p>{tAdmin("orderAmount")}: ${Number(declaration.order_amount).toLocaleString()}</p>
+                  <p>{tAdmin("orderAmount")}: ${formatUSD(declaration.order_amount)}</p>
                 )}
                 {declaration.origin_tracking_number && (
                   <p className="flex flex-wrap items-center gap-1.5">
