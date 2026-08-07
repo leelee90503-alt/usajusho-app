@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server"
 import { notifyUser } from "@/lib/notifications"
 import { calculateChargeableWeight } from "@/lib/pricing"
 
-async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>> {
+export async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>> {
   const locale = await getLocale()
   const supabase = await createClient()
   const {
@@ -33,10 +33,16 @@ async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>>
   return supabase
 }
 
-export async function addPackage(formData: FormData) {
+// Registers a physical package that arrived without a matching pre-declaration
+// (the admin searched the pending declarations list and could not find the
+// order it belongs to). The package has no known owner yet, so it is created
+// with user_id left blank and status "missing" -- it will not appear on any
+// customer's dashboard until an admin later links it to a suite number via
+// resolveMissingPackage() below, which also sends the shipping quote in the
+// same step.
+export async function registerMissingPackage(formData: FormData) {
   const supabase = await requireAdmin()
 
-  const suiteNumber = String(formData.get("suite_number") || "").trim()
   const itemName = String(formData.get("item_name") || "").trim()
   const trackingNumber = String(formData.get("tracking_number") || "").trim()
   const weightKgRaw = formData.get("weight_kg")
@@ -45,18 +51,8 @@ export async function addPackage(formData: FormData) {
   const heightCmRaw = formData.get("height_cm")
   const adminNote = String(formData.get("admin_note") || "").trim()
 
-  if (!suiteNumber || !itemName) {
-    return { error: "スイート番号と品名は必須です。" }
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("suite_number", suiteNumber)
-    .single()
-
-  if (profileError || !profile) {
-    return { error: `スイート番号 ${suiteNumber} のユーザーが見つかりません。` }
+  if (!itemName) {
+    return { error: "品名は必須です。" }
   }
 
   const weightKg = weightKgRaw ? Number(weightKgRaw) : null
@@ -72,7 +68,7 @@ export async function addPackage(formData: FormData) {
   })
 
   const { error: insertError } = await supabase.from("packages").insert({
-    user_id: profile.id,
+    user_id: null,
     item_name: itemName,
     tracking_number: trackingNumber || null,
     weight_kg: weightKg,
@@ -82,20 +78,141 @@ export async function addPackage(formData: FormData) {
     volumetric_weight_kg: volumetricWeightKg || null,
     chargeable_weight_kg: chargeableWeightKg || null,
     admin_note: adminNote || null,
-    status: "arrived",
+    status: "missing",
   })
 
   if (insertError) {
     return { error: insertError.message }
   }
 
+  revalidatePath("/admin/packages")
+  return { success: true }
+}
+
+// Resolves a "missing" package (no owner yet, or -- for packages created via
+// the purchase-agency flow -- an owner but no weight/quote yet) by assigning
+// it to a customer and sending the shipping quote in the same step. If the
+// package already has an owner, suiteNumber is ignored. If a matching
+// customer has exactly one pending pre-declaration on file, it is
+// auto-linked to this package too, so it drops off the pending list.
+export async function resolveMissingPackage(
+  packageId: string,
+  params: {
+    suiteNumber?: string
+    weightKg: number | null
+    lengthCm: number | null
+    widthCm: number | null
+    heightCm: number | null
+    trackingNumber: string
+    memo: string
+    quoteAmount: number
+  }
+) {
+  const supabase = await requireAdmin()
+
+  const { data: pkg, error: pkgError } = await supabase
+    .from("packages")
+    .select("id, user_id, item_name, status")
+    .eq("id", packageId)
+    .single()
+
+  if (pkgError || !pkg) {
+    return { error: "荷物が見つかりません。" }
+  }
+
+  if (pkg.status !== "missing") {
+    return { error: "この荷物はすでに処理済みです。" }
+  }
+
+  if (!params.quoteAmount || params.quoteAmount <= 0) {
+    return { error: "正しい見積金額を入力してください。" }
+  }
+
+  let targetUserId = pkg.user_id
+
+  if (!targetUserId) {
+    const suiteNumber = (params.suiteNumber || "").trim()
+    if (!suiteNumber) {
+      return { error: "スイート番号を入力してください。" }
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("suite_number", suiteNumber)
+      .single()
+
+    if (profileError || !profile) {
+      return { error: `スイート番号 ${suiteNumber} のユーザーが見つかりません。` }
+    }
+
+    targetUserId = profile.id
+  }
+
+  const { volumetricWeightKg, chargeableWeightKg } = calculateChargeableWeight({
+    weightKg: params.weightKg,
+    lengthCm: params.lengthCm,
+    widthCm: params.widthCm,
+    heightCm: params.heightCm,
+  })
+
+  const memo = params.memo.trim() || null
+
+  const { error: updateError } = await supabase
+    .from("packages")
+    .update({
+      user_id: targetUserId,
+      weight_kg: params.weightKg,
+      length_cm: params.lengthCm,
+      width_cm: params.widthCm,
+      height_cm: params.heightCm,
+      volumetric_weight_kg: volumetricWeightKg || null,
+      chargeable_weight_kg: chargeableWeightKg || null,
+      tracking_number: params.trackingNumber.trim() || null,
+      admin_note: memo,
+      quote_amount: params.quoteAmount,
+      quote_note: memo,
+      status: "quoted",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", packageId)
+
+  if (updateError) {
+    return { error: updateError.message }
+  }
+
+  // Best-effort: if this customer has exactly one pending pre-declaration,
+  // it almost certainly refers to this same package, so link it too. If
+  // there's more than one, it's ambiguous -- leave them all pending so an
+  // admin can match the right one by hand.
+  const { data: pendingDeclarations } = await supabase
+    .from("package_declarations")
+    .select("id")
+    .eq("user_id", targetUserId)
+    .eq("status", "pending")
+
+  if (pendingDeclarations && pendingDeclarations.length === 1) {
+    await supabase
+      .from("package_declarations")
+      .update({
+        status: "matched",
+        matched_package_id: packageId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", pendingDeclarations[0].id)
+  }
+
   await notifyUser(supabase, {
-    userId: profile.id,
-    title: "荷物が届きました",
-    body: `${itemName} が届きました。ダッシュボードからご確認ください。`,
+    userId: targetUserId,
+    packageId,
+    title: "送料の見積りが届きました",
+    body: `${pkg.item_name} の送料見積り ¥${params.quoteAmount.toLocaleString()} が届きました。${
+      memo ? `メモ: ${memo} ` : ""
+    }ダッシュボードからお支払いください。`,
   })
 
   revalidatePath("/admin/packages")
+  revalidatePath("/dashboard")
   return { success: true }
 }
 
@@ -121,6 +238,27 @@ export async function updatePackageStatus(packageId: string, status: string) {
 
     if (!current?.tracking_number?.trim()) {
       return { error: "発送完了にする前に、配送追跡番号を入力してください。" }
+    }
+  }
+
+  // A "missing" package has no confirmed owner (user_id may be null) until
+  // it's resolved via resolveMissingPackage(), which assigns the customer
+  // and sends the quote together. Block the raw status dropdown from moving
+  // a missing package to any other status directly -- doing so would strand
+  // a package with no owner in a status customers are expected to see.
+  if (status !== "missing") {
+    const { data: current, error: fetchError } = await supabase
+      .from("packages")
+      .select("status, user_id")
+      .eq("id", packageId)
+      .single()
+
+    if (fetchError) {
+      return { error: fetchError.message }
+    }
+
+    if (current?.status === "missing" && !current.user_id) {
+      return { error: "先にお客様のスイート番号を入力して紐づけてください。" }
     }
   }
 
@@ -218,35 +356,3 @@ export async function deletePackage(packageId: string) {
   return { success: true }
 }
 
-export async function submitQuote(packageId: string, quoteAmount: number, quoteNote: string) {
-  const supabase = await requireAdmin()
-
-  const { data: updated, error } = await supabase
-    .from("packages")
-    .update({
-      quote_amount: quoteAmount,
-      quote_note: quoteNote || null,
-      status: "quoted",
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", packageId)
-    .select("user_id, item_name")
-    .single()
-
-  if (error) {
-    return { error: error.message }
-  }
-
-  if (updated) {
-    await notifyUser(supabase, {
-      userId: updated.user_id,
-      packageId,
-      title: "送料の見積りが届きました",
-      body: `${updated.item_name} の送料見積り ¥${quoteAmount.toLocaleString()} が届きました。ダッシュボードからお支払いください。`,
-    })
-  }
-
-  revalidatePath("/admin/packages")
-  revalidatePath("/dashboard")
-  return { success: true }
-}

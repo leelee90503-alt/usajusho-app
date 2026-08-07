@@ -1,12 +1,17 @@
 alter table public.profiles add column if not exists is_admin boolean not null default false;
 
+-- user_id is nullable: a package physically registered with no matching
+-- pre-declaration is created with status 'missing' and no owner yet, until
+-- an admin links it to a customer's suite number (see
+-- packages-missing-status-migration.sql for the migration that dropped the
+-- original NOT NULL constraint on an already-live table).
 create table if not exists public.packages (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references public.profiles(id) on delete cascade,
+  user_id uuid references public.profiles(id) on delete cascade,
   item_name text not null,
   tracking_number text,
   weight_lbs numeric(10,2),
-  status text not null default 'arrived',
+  status text not null default 'missing',
   admin_note text,
   photo_url text,
   created_at timestamptz not null default now(),

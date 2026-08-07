@@ -117,12 +117,16 @@ export async function markPurchasedAndLinkPackage(
     return { error: "このリクエストは購入中の状態ではありません。" }
   }
 
+  // Created with status "missing" even though the customer is already known:
+  // the item hasn't physically arrived at the warehouse yet, so it still
+  // needs an admin to weigh/measure it and send a quote via the Missing
+  // Packages flow on /admin/packages before it can move to "quoted".
   const { data: pkg, error: pkgError } = await supabase
     .from("packages")
     .insert({
       user_id: request.user_id,
       item_name: itemName,
-      status: "requested",
+      status: "missing",
       admin_note: `購入代行リクエスト ${request.id} 経由で作成`,
     })
     .select("id")

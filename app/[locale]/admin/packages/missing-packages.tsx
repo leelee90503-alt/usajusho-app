@@ -2,78 +2,81 @@
 
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
-import { matchAndQuoteDeclaration, adminDeleteDeclaration } from "./declarations-actions"
+import { resolveMissingPackage, deletePackage } from "./actions"
 import { estimateQuote, type ShippingRate } from "@/lib/pricing"
+import CarrierTrackLink from "@/components/carrier-track-link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Check, Trash2 } from "lucide-react"
 
-type Declaration = {
+type MissingPackage = {
   id: string
   item_name: string
-  order_amount: number | null
-  origin_tracking_number: string | null
-  note: string | null
-  receipt_url: string | null
-  created_at: string
-  profiles: { full_name: string | null; suite_number: string | null } | null
+  tracking_number: string | null
+  admin_note: string | null
+  weight_kg: number | null
+  length_cm: number | null
+  width_cm: number | null
+  height_cm: number | null
+  user_id: string | null
+  profiles?: { full_name: string | null; suite_number: string | null } | null
 }
 
-export default function PendingDeclarations({
-  declarations,
+export default function MissingPackages({
+  packages,
   rates,
 }: {
-  declarations: Declaration[]
+  packages: MissingPackage[]
   rates: ShippingRate[]
 }) {
   const t = useTranslations("adminPackages")
   const [isPending, startTransition] = useTransition()
-  const [errorByDeclarationId, setErrorByDeclarationId] = useState<Record<string, string>>({})
+  const [errorById, setErrorById] = useState<Record<string, string>>({})
   const [successIds, setSuccessIds] = useState<Set<string>>(new Set())
 
-  function handleMatch(declarationId: string, params: Parameters<typeof matchAndQuoteDeclaration>[1]) {
-    setErrorByDeclarationId((prev) => ({ ...prev, [declarationId]: "" }))
+  function handleResolve(id: string, params: Parameters<typeof resolveMissingPackage>[1]) {
+    setErrorById((prev) => ({ ...prev, [id]: "" }))
     startTransition(async () => {
-      const result = await matchAndQuoteDeclaration(declarationId, params)
+      const result = await resolveMissingPackage(id, params)
       if (result?.error) {
-        setErrorByDeclarationId((prev) => ({ ...prev, [declarationId]: result.error as string }))
+        setErrorById((prev) => ({ ...prev, [id]: result.error as string }))
       } else {
-        setSuccessIds((prev) => new Set(prev).add(declarationId))
+        setSuccessIds((prev) => new Set(prev).add(id))
       }
     })
   }
 
   function handleDelete(id: string) {
-    if (!window.confirm(t("confirmDeleteDeclaration"))) {
-      return
-    }
-    startTransition(async () => {
-      await adminDeleteDeclaration(id)
+    const ok = window.confirm(t("confirmDeletePackage"))
+    if (!ok) return
+    startTransition(() => {
+      deletePackage(id)
     })
   }
 
-  if (!declarations || declarations.length === 0) {
+  if (!packages || packages.length === 0) {
     return null
   }
 
   return (
     <div className="mt-6">
       <h2 className="text-lg font-semibold text-foreground">
-        {t("pendingDeclarations", { count: declarations.length })}
+        {t("missingPackages", { count: packages.length })}
       </h2>
+      <p className="mt-1 text-xs text-muted-foreground">{t("missingPackagesHint")}</p>
       <div className="mt-3 space-y-3">
-        {declarations.map((d) => (
-          <DeclarationCard
-            key={d.id}
-            declaration={d}
+        {packages.map((pkg) => (
+          <MissingPackageCard
+            key={pkg.id}
+            pkg={pkg}
             rates={rates}
             isPending={isPending}
-            error={errorByDeclarationId[d.id]}
-            done={successIds.has(d.id)}
-            onMatch={(params) => handleMatch(d.id, params)}
-            onDelete={() => handleDelete(d.id)}
+            error={errorById[pkg.id]}
+            done={successIds.has(pkg.id)}
+            onResolve={(params) => handleResolve(pkg.id, params)}
+            onDelete={() => handleDelete(pkg.id)}
           />
         ))}
       </div>
@@ -81,31 +84,31 @@ export default function PendingDeclarations({
   )
 }
 
-function DeclarationCard({
-  declaration: d,
+function MissingPackageCard({
+  pkg,
   rates,
   isPending,
   error,
   done,
-  onMatch,
+  onResolve,
   onDelete,
 }: {
-  declaration: Declaration
+  pkg: MissingPackage
   rates: ShippingRate[]
   isPending: boolean
   error?: string
   done: boolean
-  onMatch: (params: Parameters<typeof matchAndQuoteDeclaration>[1]) => void
+  onResolve: (params: Parameters<typeof resolveMissingPackage>[1]) => void
   onDelete: () => void
 }) {
   const t = useTranslations("adminPackages")
-  const [itemName, setItemName] = useState(d.item_name)
-  const [weightKg, setWeightKg] = useState("")
-  const [lengthCm, setLengthCm] = useState("")
-  const [widthCm, setWidthCm] = useState("")
-  const [heightCm, setHeightCm] = useState("")
-  const [trackingNumber, setTrackingNumber] = useState("")
-  const [memo, setMemo] = useState("")
+  const [suiteNumber, setSuiteNumber] = useState("")
+  const [weightKg, setWeightKg] = useState(pkg.weight_kg != null ? String(pkg.weight_kg) : "")
+  const [lengthCm, setLengthCm] = useState(pkg.length_cm != null ? String(pkg.length_cm) : "")
+  const [widthCm, setWidthCm] = useState(pkg.width_cm != null ? String(pkg.width_cm) : "")
+  const [heightCm, setHeightCm] = useState(pkg.height_cm != null ? String(pkg.height_cm) : "")
+  const [trackingNumber, setTrackingNumber] = useState(pkg.tracking_number ?? "")
+  const [memo, setMemo] = useState(pkg.admin_note ?? "")
   const [quoteAmount, setQuoteAmount] = useState("")
 
   const suggestion =
@@ -122,8 +125,8 @@ function DeclarationCard({
       : null
 
   function handleSubmit() {
-    onMatch({
-      itemName,
+    onResolve({
+      suiteNumber: pkg.user_id ? undefined : suiteNumber,
       weightKg: weightKg ? Number(weightKg) : null,
       lengthCm: lengthCm ? Number(lengthCm) : null,
       widthCm: widthCm ? Number(widthCm) : null,
@@ -146,41 +149,35 @@ function DeclarationCard({
     <Card>
       <CardContent className="flex flex-col gap-3 py-4">
         <div className="text-sm">
-          <p className="font-semibold text-slate-900">
-            {d.profiles?.suite_number ? `#${d.profiles.suite_number} · ` : ""}
-            {d.profiles?.full_name ?? "-"}
-          </p>
-          <p className="mt-1">{d.item_name}</p>
-          {d.order_amount != null && (
-            <p className="mt-1 text-xs text-muted-foreground">
-              {t("orderAmount")}: ${Number(d.order_amount).toLocaleString()}
+          <p className="font-semibold text-slate-900">{pkg.item_name}</p>
+          {pkg.tracking_number && (
+            <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+              <span>{pkg.tracking_number}</span>
+              <CarrierTrackLink trackingNumber={pkg.tracking_number} />
             </p>
           )}
-          {d.origin_tracking_number && (
+          {pkg.user_id && (
             <p className="mt-1 text-xs text-muted-foreground">
-              {t("originTracking")}: {d.origin_tracking_number}
+              {pkg.profiles?.suite_number ? `#${pkg.profiles.suite_number} · ` : ""}
+              {pkg.profiles?.full_name ?? ""}
             </p>
-          )}
-          {d.note && <p className="mt-1 text-xs text-slate-600">{d.note}</p>}
-          {d.receipt_url && (
-            <a
-              href={d.receipt_url}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-1 inline-block text-xs text-primary underline"
-            >
-              {t("viewReceipt")}
-            </a>
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-3 rounded-lg border border-teal-200 bg-teal-50 p-3 sm:grid-cols-4">
-          <div className="col-span-2 space-y-1 sm:col-span-4">
-            <Label className="text-xs font-normal text-teal-800">{t("matchItemNameLabel")}</Label>
-            <Input value={itemName} onChange={(e) => setItemName(e.target.value)} className="bg-white" />
-          </div>
+        <div className="grid grid-cols-2 gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 sm:grid-cols-4">
+          {!pkg.user_id && (
+            <div className="col-span-2 space-y-1 sm:col-span-4">
+              <Label className="text-xs font-normal text-amber-800">{t("matchSuiteLabel")}</Label>
+              <Input
+                value={suiteNumber}
+                onChange={(e) => setSuiteNumber(e.target.value)}
+                placeholder="USJ-001001"
+                className="bg-white"
+              />
+            </div>
+          )}
           <div className="space-y-1">
-            <Label className="text-xs font-normal text-teal-800">{t("matchWeightLabel")}</Label>
+            <Label className="text-xs font-normal text-amber-800">{t("matchWeightLabel")}</Label>
             <Input
               type="number"
               step="0.01"
@@ -190,7 +187,7 @@ function DeclarationCard({
             />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs font-normal text-teal-800">{t("matchLengthLabel")}</Label>
+            <Label className="text-xs font-normal text-amber-800">{t("matchLengthLabel")}</Label>
             <Input
               type="number"
               step="0.1"
@@ -200,7 +197,7 @@ function DeclarationCard({
             />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs font-normal text-teal-800">{t("matchWidthLabel")}</Label>
+            <Label className="text-xs font-normal text-amber-800">{t("matchWidthLabel")}</Label>
             <Input
               type="number"
               step="0.1"
@@ -210,7 +207,7 @@ function DeclarationCard({
             />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs font-normal text-teal-800">{t("matchHeightLabel")}</Label>
+            <Label className="text-xs font-normal text-amber-800">{t("matchHeightLabel")}</Label>
             <Input
               type="number"
               step="0.1"
@@ -220,7 +217,7 @@ function DeclarationCard({
             />
           </div>
           <div className="col-span-2 space-y-1 sm:col-span-4">
-            <Label className="text-xs font-normal text-teal-800">{t("matchTrackingLabel")}</Label>
+            <Label className="text-xs font-normal text-amber-800">{t("matchTrackingLabel")}</Label>
             <Input
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
@@ -228,11 +225,11 @@ function DeclarationCard({
             />
           </div>
           <div className="col-span-2 space-y-1 sm:col-span-4">
-            <Label className="text-xs font-normal text-teal-800">{t("matchMemoLabel")}</Label>
+            <Label className="text-xs font-normal text-amber-800">{t("matchMemoLabel")}</Label>
             <Input value={memo} onChange={(e) => setMemo(e.target.value)} className="bg-white" />
           </div>
           <div className="col-span-2 space-y-1">
-            <Label className="text-xs font-normal text-teal-800">{t("matchQuoteAmountLabel")}</Label>
+            <Label className="text-xs font-normal text-amber-800">{t("matchQuoteAmountLabel")}</Label>
             <Input
               type="number"
               value={quoteAmount}
@@ -254,7 +251,7 @@ function DeclarationCard({
             </Button>
           </div>
           {suggestion?.amount != null && (
-            <p className="col-span-2 w-full text-xs text-teal-800 sm:col-span-4">
+            <p className="col-span-2 w-full text-xs text-amber-800 sm:col-span-4">
               {t("suggestedAmountShort", { amount: suggestion.amount.toLocaleString() })}
             </p>
           )}
@@ -264,7 +261,7 @@ function DeclarationCard({
         <div className="flex justify-end">
           <Button type="button" variant="ghost" size="sm" disabled={isPending} onClick={onDelete}>
             <Trash2 className="h-4 w-4" />
-            {t("deleteDeclaration")}
+            {t("deletePackage")}
           </Button>
         </div>
       </CardContent>

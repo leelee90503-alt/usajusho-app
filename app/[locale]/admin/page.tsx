@@ -61,13 +61,13 @@ export default async function AdminHomePage() {
 
   const packages = packageStatuses ?? []
   const totalPackages = packages.length
-  const needsActionCount = packages.filter((p) => p.status === "requested").length
+  const needsActionCount = packages.filter((p) => p.status === "missing").length
 
   const statCards = [
     {
       value: needsActionCount,
       label: t("statNeedsAction"),
-      href: "/admin/packages?status=requested",
+      href: "/admin/packages?status=missing",
       accent: true,
     },
     {

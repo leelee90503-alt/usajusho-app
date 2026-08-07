@@ -3,20 +3,34 @@
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { requireAdmin } from "./actions"
+import { notifyUser } from "@/lib/notifications"
+import { calculateChargeableWeight } from "@/lib/pricing"
 
-// Links a customer's pre-declaration to the actual arrived package it
-// describes. Previously this only flipped the declaration's status without
-// ever writing matched_package_id, so the declaration silently dropped off
-// the pending list with no way to find the order it referred to -- admins
-// could not bill shipping or build a commercial invoice for it. Now the
-// admin must pick which arrived package this declaration corresponds to,
-// and that link is persisted so the order stays discoverable afterward.
-export async function markDeclarationMatched(declarationId: string, packageId: string) {
-  const supabase = await createClient()
+// Primary path for handling a physical package arrival: the admin finds the
+// matching pending pre-declaration, enters the item's actual weight/size/
+// tracking info, and sends the shipping quote -- all in one action. This
+// creates the package record (there was no "arrived, unmatched" package to
+// link to; the declaration itself is the order) and moves it straight to
+// "quoted", skipping the old separate arrival/matching step entirely.
+export async function matchAndQuoteDeclaration(
+  declarationId: string,
+  params: {
+    itemName: string
+    weightKg: number | null
+    lengthCm: number | null
+    widthCm: number | null
+    heightCm: number | null
+    trackingNumber: string
+    memo: string
+    quoteAmount: number
+  }
+) {
+  const supabase = await requireAdmin()
 
   const { data: declaration, error: declarationError } = await supabase
     .from("package_declarations")
-    .select("user_id")
+    .select("id, user_id, item_name, status")
     .eq("id", declarationId)
     .single()
 
@@ -24,34 +38,73 @@ export async function markDeclarationMatched(declarationId: string, packageId: s
     return { error: "事前申告が見つかりません。" }
   }
 
-  const { data: pkg, error: pkgError } = await supabase
+  if (declaration.status !== "pending") {
+    return { error: "この事前申告はすでに処理済みです。" }
+  }
+
+  if (!params.quoteAmount || params.quoteAmount <= 0) {
+    return { error: "正しい見積金額を入力してください。" }
+  }
+
+  const itemName = params.itemName.trim() || declaration.item_name
+
+  const { volumetricWeightKg, chargeableWeightKg } = calculateChargeableWeight({
+    weightKg: params.weightKg,
+    lengthCm: params.lengthCm,
+    widthCm: params.widthCm,
+    heightCm: params.heightCm,
+  })
+
+  const memo = params.memo.trim() || null
+
+  const { data: newPackage, error: insertError } = await supabase
     .from("packages")
-    .select("user_id")
-    .eq("id", packageId)
+    .insert({
+      user_id: declaration.user_id,
+      item_name: itemName,
+      tracking_number: params.trackingNumber.trim() || null,
+      weight_kg: params.weightKg,
+      length_cm: params.lengthCm,
+      width_cm: params.widthCm,
+      height_cm: params.heightCm,
+      volumetric_weight_kg: volumetricWeightKg || null,
+      chargeable_weight_kg: chargeableWeightKg || null,
+      admin_note: memo,
+      quote_amount: params.quoteAmount,
+      quote_note: memo,
+      status: "quoted",
+    })
+    .select("id")
     .single()
 
-  if (pkgError || !pkg) {
-    return { error: "紐づける荷物が見つかりません。" }
+  if (insertError || !newPackage) {
+    return { error: insertError?.message ?? "荷物の登録に失敗しました。" }
   }
 
-  if (pkg.user_id !== declaration.user_id) {
-    return { error: "この荷物は別のお客様のものです。" }
-  }
-
-  const { error } = await supabase
+  const { error: matchError } = await supabase
     .from("package_declarations")
     .update({
       status: "matched",
-      matched_package_id: packageId,
+      matched_package_id: newPackage.id,
       updated_at: new Date().toISOString(),
     })
     .eq("id", declarationId)
 
-  if (error) {
-    return { error: error.message }
+  if (matchError) {
+    return { error: matchError.message }
   }
 
+  await notifyUser(supabase, {
+    userId: declaration.user_id,
+    packageId: newPackage.id,
+    title: "送料の見積りが届きました",
+    body: `${itemName} の送料見積り ¥${params.quoteAmount.toLocaleString()} が届きました。${
+      memo ? `メモ: ${memo} ` : ""
+    }ダッシュボードからお支払いください。`,
+  })
+
   revalidatePath("/admin/packages")
+  revalidatePath("/dashboard")
   return { success: true }
 }
 

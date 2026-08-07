@@ -3,8 +3,7 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
-import { updatePackageStatus, deletePackage, submitQuote, markShipped } from "./actions"
-import { estimateQuote, type ShippingRate } from "@/lib/pricing"
+import { updatePackageStatus, deletePackage, markShipped } from "./actions"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -39,8 +38,7 @@ type PackageInvoice = {
 }
 
 const STATUS_BADGE_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-  arrived: "outline",
-  requested: "secondary",
+  missing: "destructive",
   quoted: "default",
   paid: "secondary",
   shipped: "secondary",
@@ -56,12 +54,10 @@ const INVOICE_STATUS_LABEL_KEY: Record<string, string> = {
 
 export default function PackageRow({
   pkg,
-  rates,
   invoice,
   declaration,
 }: {
   pkg: PackageWithProfile
-  rates: ShippingRate[]
   invoice: PackageInvoice | null
   declaration: LinkedDeclaration | null
 }) {
@@ -70,31 +66,12 @@ export default function PackageRow({
   const tAdmin = useTranslations("adminPackages")
   const tInvoices = useTranslations("adminInvoices")
   const STATUS_OPTIONS = [
-    { value: "arrived", label: tStatus("arrived") },
-    { value: "requested", label: tStatus("requested") },
+    { value: "missing", label: tStatus("missing") },
     { value: "quoted", label: tStatus("quoted") },
     { value: "paid", label: tStatus("paid") },
     { value: "shipped", label: tStatus("shipped") },
   ]
   const [isPending, startTransition] = useTransition()
-  const suggestion =
-    rates.length > 0
-      ? estimateQuote(
-          {
-            weightKg: pkg.weight_kg,
-            lengthCm: pkg.length_cm,
-            widthCm: pkg.width_cm,
-            heightCm: pkg.height_cm,
-          },
-          rates,
-        )
-      : null
-
-  const [quoteAmount, setQuoteAmount] = useState(() =>
-    suggestion?.amount != null ? String(suggestion.amount) : "",
-  )
-  const [quoteNote, setQuoteNote] = useState("")
-  const [quoteMessage, setQuoteMessage] = useState<string | null>(null)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
   const [trackingInput, setTrackingInput] = useState(() => pkg.tracking_number ?? "")
   const [shipMessage, setShipMessage] = useState<string | null>(null)
@@ -115,23 +92,6 @@ export default function PackageRow({
     if (!ok) return
     startTransition(() => {
       deletePackage(pkg.id)
-    })
-  }
-
-  function handleSubmitQuote() {
-    const amount = Number(quoteAmount)
-    if (!amount || amount <= 0) {
-      setQuoteMessage(t("quoteInvalidAmount"))
-      return
-    }
-    setQuoteMessage(null)
-    startTransition(async () => {
-      const result = await submitQuote(pkg.id, amount, quoteNote)
-      if (result?.error) {
-        setQuoteMessage(result.error)
-      } else {
-        setQuoteMessage(t("quoteSentSuccess"))
-      }
     })
   }
 
@@ -251,45 +211,6 @@ export default function PackageRow({
 
         {statusMessage && (
           <p className="mt-2 text-xs text-destructive">{statusMessage}</p>
-        )}
-
-        {pkg.status === "requested" && (
-          <div className="mt-3 flex flex-wrap items-end gap-2 rounded-lg border border-teal-200 bg-teal-50 p-3">
-            <div className="space-y-1">
-              <Label className="text-xs font-normal text-teal-800">{t("quoteAmountFieldLabel")}</Label>
-              <Input
-                type="number"
-                value={quoteAmount}
-                onChange={(e) => setQuoteAmount(e.target.value)}
-                className="w-32"
-                placeholder={t("quoteAmountPlaceholder")}
-              />
-            </div>
-            <div className="flex-1 space-y-1">
-              <Label className="text-xs font-normal text-teal-800">{t("quoteNoteFieldLabel")}</Label>
-              <Input
-                type="text"
-                value={quoteNote}
-                onChange={(e) => setQuoteNote(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleSubmitQuote}
-              disabled={isPending}
-              className="whitespace-nowrap"
-            >
-              {t("submitQuote")}
-            </Button>
-            {suggestion?.amount != null && (
-              <p className="w-full text-xs text-teal-800">
-                {t("suggestedAmount", { amount: suggestion.amount.toLocaleString() })}
-              </p>
-            )}
-            {quoteMessage && <p className="w-full text-xs text-teal-800">{quoteMessage}</p>}
-          </div>
         )}
 
         {pkg.status === "paid" && (

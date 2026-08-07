@@ -95,8 +95,7 @@ export default async function AdminUserDetailPage({
   ])
 
   const packageStatusLabels: Record<string, string> = {
-    arrived: tPkgStatus("arrived"),
-    requested: tPkgStatus("requested"),
+    missing: tPkgStatus("missing"),
     quoted: tPkgStatus("quoted"),
     paid: tPkgStatus("paid"),
     shipped: tPkgStatus("shipped"),

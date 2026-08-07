@@ -4,45 +4,6 @@ import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { notifyAdmins } from "@/lib/notifications"
 
-export async function requestShipment(packageIds: string[]) {
-  if (!packageIds || packageIds.length === 0) {
-    return { error: "発送する荷物を選択してください。" }
-  }
-
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return { error: "ログインしてください。" }
-  }
-
-  const { error } = await supabase
-    .from("packages")
-    .update({ status: "requested", updated_at: new Date().toISOString() })
-    .in("id", packageIds)
-    .eq("user_id", user.id)
-    .eq("status", "arrived")
-
-  if (error) {
-    return { error: error.message }
-  }
-
-  await notifyAdmins({
-    title: "発送リクエストが届きました",
-    body: `${packageIds.length}件の荷物について発送リクエストが届きました。管理画面からご確認ください。`,
-    titleEn: "New shipment request received",
-    bodyEn: `A shipment request has been submitted for ${packageIds.length} package(s). Please check the admin dashboard.`,
-  })
-
-  revalidatePath("/dashboard")
-  revalidatePath("/admin/packages")
-
-  return { success: true }
-}
-
 export async function payForShipment(packageId: string) {
   const supabase = await createClient()
 

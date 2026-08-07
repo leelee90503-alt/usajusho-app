@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
-import { addPackage } from "./actions"
+import { registerMissingPackage } from "./actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -19,7 +19,7 @@ export default function AddPackageForm() {
   function handleSubmit(formData: FormData) {
     setMessage(null)
     startTransition(async () => {
-      const result = await addPackage(formData)
+      const result = await registerMissingPackage(formData)
       if (result?.error) {
         setMessage({ type: "error", text: result.error })
       } else {
@@ -36,11 +36,6 @@ export default function AddPackageForm() {
       </CardHeader>
       <form ref={formRef} action={handleSubmit}>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="pkg-suite">{t("suiteLabel")}</Label>
-            <Input id="pkg-suite" name="suite_number" required />
-          </div>
-
           <div className="space-y-1.5">
             <Label htmlFor="pkg-item-name">{t("itemNameLabel")}</Label>
             <Input id="pkg-item-name" name="item_name" required />

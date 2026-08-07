@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import AddPackageForm from "./add-package-form"
 import PackageRow from "./package-row"
 import PendingDeclarations from "./pending-declarations"
+import MissingPackages from "./missing-packages"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -39,8 +40,7 @@ export default async function AdminPackagesPage({
 
   const STATUS_FILTERS = [
     { value: "", label: t("filterAll") },
-    { value: "arrived", label: t("filterArrived") },
-    { value: "requested", label: t("filterRequested") },
+    { value: "missing", label: t("filterMissing") },
     { value: "quoted", label: t("filterQuoted") },
     { value: "paid", label: t("filterPaid") },
     { value: "shipped", label: t("filterShipped") },
@@ -69,24 +69,11 @@ export default async function AdminPackagesPage({
   const matchedDeclarations = declarations.filter(
     (d) => d.status === "matched" && d.matched_package_id
   )
-  const matchedPackageIds = new Set(matchedDeclarations.map((d) => d.matched_package_id))
   const declarationByPackageId = new Map(
     matchedDeclarations.map((d) => [d.matched_package_id as string, d])
   )
 
-  // Candidate packages a pending declaration can be matched to: the same
-  // customer's arrived packages that aren't already linked to another
-  // declaration.
-  const arrivedPackagesByUserId = new Map<
-    string,
-    { id: string; item_name: string; tracking_number: string | null }[]
-  >()
-  for (const pkg of packages) {
-    if (pkg.status !== "arrived" || matchedPackageIds.has(pkg.id)) continue
-    const list = arrivedPackagesByUserId.get(pkg.user_id) ?? []
-    list.push({ id: pkg.id, item_name: pkg.item_name, tracking_number: pkg.tracking_number })
-    arrivedPackagesByUserId.set(pkg.user_id, list)
-  }
+  const missingPackages = packages.filter((p) => p.status === "missing")
 
   const declarationsWithUrls = await Promise.all(
     pendingDeclarationsRaw.map(async (d) => {
@@ -97,7 +84,7 @@ export default async function AdminPackagesPage({
           .createSignedUrl(d.receipt_path, 60 * 60)
         receipt_url = signed?.signedUrl ?? null
       }
-      return { ...d, receipt_url, candidates: arrivedPackagesByUserId.get(d.user_id) ?? [] }
+      return { ...d, receipt_url }
     })
   )
 
@@ -120,8 +107,7 @@ export default async function AdminPackagesPage({
 
   const statCounts = {
     total: packages.length,
-    arrived: packages.filter((p) => p.status === "arrived").length,
-    requested: packages.filter((p) => p.status === "requested").length,
+    missing: packages.filter((p) => p.status === "missing").length,
     quoted: packages.filter((p) => p.status === "quoted").length,
     paid: packages.filter((p) => p.status === "paid").length,
     shipped: packages.filter((p) => p.status === "shipped").length,
@@ -184,20 +170,20 @@ export default async function AdminPackagesPage({
           </Card>
           <Card>
             <CardContent className="py-3 text-center">
-              <p className="text-2xl font-bold text-accent">{statCounts.arrived}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{t("statArrived")}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="py-3 text-center">
-              <p className="text-2xl font-bold text-accent">{statCounts.requested}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{t("statRequested")}</p>
+              <p className="text-2xl font-bold text-destructive">{statCounts.missing}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("statMissing")}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="py-3 text-center">
               <p className="text-2xl font-bold text-amber-700">{statCounts.quoted}</p>
               <p className="mt-1 text-xs text-muted-foreground">{t("statQuoted")}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-3 text-center">
+              <p className="text-2xl font-bold text-foreground">{statCounts.paid}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("statPaid")}</p>
             </CardContent>
           </Card>
           <Card>
@@ -212,7 +198,9 @@ export default async function AdminPackagesPage({
           <AddPackageForm />
         </div>
 
-        <PendingDeclarations declarations={declarationsWithUrls} />
+        <PendingDeclarations declarations={declarationsWithUrls} rates={rates} />
+
+        <MissingPackages packages={missingPackages} rates={rates} />
 
         <div className="mt-10">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -255,7 +243,6 @@ export default async function AdminPackagesPage({
               <PackageRow
                 key={pkg.id}
                 pkg={pkg}
-                rates={rates}
                 invoice={invoiceByPackageId.get(pkg.id) ?? null}
                 declaration={declarationByPackageId.get(pkg.id) ?? null}
               />
