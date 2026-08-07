@@ -799,6 +799,9 @@
     "title": "管理者ダッシュボード",
     "description": "サイト全体で対応が必要な項目をまとめて確認できます。",
     "statNeedsAction": "対応待ちの荷物",
+    "statQuoted": "見積済み",
+    "statPaid": "支払い済み",
+    "statShipped": "発送完了",
     "statPendingDeclarations": "事前申告（未処理）",
     "statNewPurchaseRequests": "新規の購入代行依頼",
     "statInvoicesNeedReview": "確認待ちのインボイス",
@@ -812,6 +815,9 @@
     "pricingCard": "配送料金設定",
     "shippingCard": "配送設定",
     "settingsCard": "メール通知設定"
+  },
+  "adminLayout": {
+    "homeLink": "管理者ホームへ"
   },
   "carrierTrack": {
     "detectedCarrier": "{carrier}で追跡する",

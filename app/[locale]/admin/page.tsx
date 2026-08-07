@@ -62,6 +62,9 @@ export default async function AdminHomePage() {
   const packages = packageStatuses ?? []
   const totalPackages = packages.length
   const needsActionCount = packages.filter((p) => p.status === "missing").length
+  const quotedCount = packages.filter((p) => p.status === "quoted").length
+  const paidCount = packages.filter((p) => p.status === "paid").length
+  const shippedCount = packages.filter((p) => p.status === "shipped").length
 
   const statCards = [
     {
@@ -69,6 +72,24 @@ export default async function AdminHomePage() {
       label: t("statNeedsAction"),
       href: "/admin/packages?status=missing",
       accent: true,
+    },
+    {
+      value: quotedCount,
+      label: t("statQuoted"),
+      href: "/admin/packages?status=quoted",
+      accent: true,
+    },
+    {
+      value: paidCount,
+      label: t("statPaid"),
+      href: "/admin/packages?status=paid",
+      accent: true,
+    },
+    {
+      value: shippedCount,
+      label: t("statShipped"),
+      href: "/admin/packages?status=shipped",
+      accent: false,
     },
     {
       value: pendingDeclarationsCount ?? 0,

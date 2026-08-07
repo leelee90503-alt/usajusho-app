@@ -799,6 +799,9 @@
     "title": "Admin Dashboard",
     "description": "An overview of what needs your attention across the site.",
     "statNeedsAction": "Awaiting Action",
+    "statQuoted": "Quoted",
+    "statPaid": "Paid",
+    "statShipped": "Shipped",
     "statPendingDeclarations": "Pending Declarations",
     "statNewPurchaseRequests": "New Purchase Requests",
     "statInvoicesNeedReview": "Invoices Awaiting Review",
@@ -812,6 +815,9 @@
     "pricingCard": "Shipping Rates",
     "shippingCard": "Shipping Settings",
     "settingsCard": "Email Notification Settings"
+  },
+  "adminLayout": {
+    "homeLink": "Admin Home"
   },
   "carrierTrack": {
     "detectedCarrier": "Track on {carrier}",
