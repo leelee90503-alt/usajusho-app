@@ -53,21 +53,51 @@ export default async function AdminPackagesPage({
     .select("*, profiles(full_name, suite_number)")
     .order("created_at", { ascending: false })
 
-  const { data: pendingDeclarations } = await supabase
+  const packages = allPackages ?? []
+
+  // Fetch every declaration (not just pending ones) so already-matched
+  // declarations can be looked up by their linked package below -- the
+  // order info they carry (declared value, origin tracking) is what lets
+  // admins bill shipping and build the commercial invoice for that package.
+  const { data: allDeclarations } = await supabase
     .from("package_declarations")
     .select("*, profiles(full_name, suite_number)")
-    .eq("status", "pending")
     .order("created_at", { ascending: false })
 
+  const declarations = allDeclarations ?? []
+  const pendingDeclarationsRaw = declarations.filter((d) => d.status === "pending")
+  const matchedDeclarations = declarations.filter(
+    (d) => d.status === "matched" && d.matched_package_id
+  )
+  const matchedPackageIds = new Set(matchedDeclarations.map((d) => d.matched_package_id))
+  const declarationByPackageId = new Map(
+    matchedDeclarations.map((d) => [d.matched_package_id as string, d])
+  )
+
+  // Candidate packages a pending declaration can be matched to: the same
+  // customer's arrived packages that aren't already linked to another
+  // declaration.
+  const arrivedPackagesByUserId = new Map<
+    string,
+    { id: string; item_name: string; tracking_number: string | null }[]
+  >()
+  for (const pkg of packages) {
+    if (pkg.status !== "arrived" || matchedPackageIds.has(pkg.id)) continue
+    const list = arrivedPackagesByUserId.get(pkg.user_id) ?? []
+    list.push({ id: pkg.id, item_name: pkg.item_name, tracking_number: pkg.tracking_number })
+    arrivedPackagesByUserId.set(pkg.user_id, list)
+  }
+
   const declarationsWithUrls = await Promise.all(
-    (pendingDeclarations ?? []).map(async (d) => {
-      if (!d.receipt_path) {
-        return { ...d, receipt_url: null }
+    pendingDeclarationsRaw.map(async (d) => {
+      let receipt_url: string | null = null
+      if (d.receipt_path) {
+        const { data: signed } = await supabase.storage
+          .from("package-receipts")
+          .createSignedUrl(d.receipt_path, 60 * 60)
+        receipt_url = signed?.signedUrl ?? null
       }
-      const { data: signed } = await supabase.storage
-        .from("package-receipts")
-        .createSignedUrl(d.receipt_path, 60 * 60)
-      return { ...d, receipt_url: signed?.signedUrl ?? null }
+      return { ...d, receipt_url, candidates: arrivedPackagesByUserId.get(d.user_id) ?? [] }
     })
   )
 
@@ -82,7 +112,11 @@ export default async function AdminPackagesPage({
     .from("profiles")
     .select("*", { count: "exact", head: true })
 
-  const packages = allPackages ?? []
+  const { data: allInvoices } = await supabase
+    .from("invoices")
+    .select("id, package_id, status")
+
+  const invoiceByPackageId = new Map((allInvoices ?? []).map((inv) => [inv.package_id, inv]))
 
   const statCounts = {
     total: packages.length,
@@ -218,7 +252,13 @@ export default async function AdminPackagesPage({
 
           <div className="mt-3 space-y-3">
             {filteredPackages.map((pkg) => (
-              <PackageRow key={pkg.id} pkg={pkg} rates={rates} />
+              <PackageRow
+                key={pkg.id}
+                pkg={pkg}
+                rates={rates}
+                invoice={invoiceByPackageId.get(pkg.id) ?? null}
+                declaration={declarationByPackageId.get(pkg.id) ?? null}
+              />
             ))}
 
             {filteredPackages.length === 0 && (

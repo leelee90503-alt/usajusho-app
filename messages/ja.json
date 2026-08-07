@@ -247,7 +247,11 @@
     "pricingLink": "配送料金",
     "deleteDeclaration": "削除",
     "confirmDeleteDeclaration": "この事前申告を削除しますか？この操作は取り消せません。",
-    "homeLink": "ホーム"
+    "homeLink": "ホーム",
+    "matchSelectPlaceholder": "荷物を選択",
+    "matchNoCandidates": "一致する到着済みの荷物がありません。先に荷物を登録してください。",
+    "matchConfirm": "紐づける",
+    "matchMissingSelection": "紐づける荷物を選択してください。"
   },
   "packageStatus": {
     "arrived": "到着済み",
@@ -273,7 +277,16 @@
     "dimensions": "サイズ: ",
     "dimensionsUnit": "cm",
     "chargeableWeight": "請求重量: ",
-    "suggestedAmount": "料金表による目安: {amount}円"
+    "suggestedAmount": "料金表による目安: {amount}円",
+    "linkedDeclarationHeading": "事前申告情報",
+    "commercialInvoiceLabel": "商業インボイス：",
+    "preparingShipmentHeading": "発送準備",
+    "trackingNumberFieldLabel": "配送追跡番号",
+    "trackingNumberPlaceholder": "EE123456789JP",
+    "markShippedButton": "発送完了にする",
+    "markShippedMissingTracking": "配送追跡番号を入力してください。",
+    "markShippedSuccess": "発送完了として記録しました。",
+    "markShippedInvoiceWarning": "商業インボイスがまだ完了していません。それでも発送完了にしますか？"
   },
   "addPackageForm": {
     "heading": "新しい荷物を登録",

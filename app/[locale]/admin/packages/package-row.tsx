@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
-import { updatePackageStatus, deletePackage, submitQuote } from "./actions"
+import { Link } from "@/i18n/navigation"
+import { updatePackageStatus, deletePackage, submitQuote, markShipped } from "./actions"
 import { estimateQuote, type ShippingRate } from "@/lib/pricing"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -27,6 +28,15 @@ type PackageWithProfile = {
   profiles?: { full_name: string | null; suite_number: string | null } | null
 }
 
+type LinkedDeclaration = {
+  order_amount: number | null
+  origin_tracking_number: string | null
+}
+
+type PackageInvoice = {
+  status: string
+}
+
 const STATUS_BADGE_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   arrived: "outline",
   requested: "secondary",
@@ -35,9 +45,29 @@ const STATUS_BADGE_VARIANT: Record<string, "default" | "secondary" | "destructiv
   shipped: "secondary",
 }
 
-export default function PackageRow({ pkg, rates }: { pkg: PackageWithProfile; rates: ShippingRate[] }) {
+const INVOICE_STATUS_LABEL_KEY: Record<string, string> = {
+  draft: "statusDraft",
+  customer_submitted: "statusSubmitted",
+  correction_required: "statusCorrectionRequired",
+  admin_review: "statusAdminReview",
+  complete: "statusComplete",
+}
+
+export default function PackageRow({
+  pkg,
+  rates,
+  invoice,
+  declaration,
+}: {
+  pkg: PackageWithProfile
+  rates: ShippingRate[]
+  invoice: PackageInvoice | null
+  declaration: LinkedDeclaration | null
+}) {
   const t = useTranslations("packageRow")
   const tStatus = useTranslations("packageStatus")
+  const tAdmin = useTranslations("adminPackages")
+  const tInvoices = useTranslations("adminInvoices")
   const STATUS_OPTIONS = [
     { value: "arrived", label: tStatus("arrived") },
     { value: "requested", label: tStatus("requested") },
@@ -64,11 +94,18 @@ export default function PackageRow({ pkg, rates }: { pkg: PackageWithProfile; ra
   )
   const [quoteNote, setQuoteNote] = useState("")
   const [quoteMessage, setQuoteMessage] = useState<string | null>(null)
+  const [statusMessage, setStatusMessage] = useState<string | null>(null)
+  const [trackingInput, setTrackingInput] = useState(() => pkg.tracking_number ?? "")
+  const [shipMessage, setShipMessage] = useState<string | null>(null)
 
   function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const status = e.target.value
-    startTransition(() => {
-      updatePackageStatus(pkg.id, status)
+    setStatusMessage(null)
+    startTransition(async () => {
+      const result = await updatePackageStatus(pkg.id, status)
+      if (result?.error) {
+        setStatusMessage(result.error)
+      }
     })
   }
 
@@ -93,6 +130,27 @@ export default function PackageRow({ pkg, rates }: { pkg: PackageWithProfile; ra
         setQuoteMessage(result.error)
       } else {
         setQuoteMessage(t("quoteSentSuccess"))
+      }
+    })
+  }
+
+  function handleMarkShipped() {
+    const trimmed = trackingInput.trim()
+    if (!trimmed) {
+      setShipMessage(t("markShippedMissingTracking"))
+      return
+    }
+    if (invoice?.status !== "complete") {
+      const proceed = window.confirm(t("markShippedInvoiceWarning"))
+      if (!proceed) return
+    }
+    setShipMessage(null)
+    startTransition(async () => {
+      const result = await markShipped(pkg.id, trimmed)
+      if (result?.error) {
+        setShipMessage(result.error)
+      } else {
+        setShipMessage(t("markShippedSuccess"))
       }
     })
   }
@@ -133,6 +191,25 @@ export default function PackageRow({ pkg, rates }: { pkg: PackageWithProfile; ra
                 )}
               </p>
             )}
+            {declaration && (declaration.order_amount != null || declaration.origin_tracking_number) && (
+              <div className="mt-2 rounded-md bg-slate-50 px-2 py-1.5 text-xs text-muted-foreground">
+                <p className="font-semibold text-slate-700">{t("linkedDeclarationHeading")}</p>
+                {declaration.order_amount != null && (
+                  <p>{tAdmin("orderAmount")}: ${Number(declaration.order_amount).toLocaleString()}</p>
+                )}
+                {declaration.origin_tracking_number && (
+                  <p>{tAdmin("originTracking")}: {declaration.origin_tracking_number}</p>
+                )}
+              </div>
+            )}
+            <p className="mt-2 text-xs text-muted-foreground">
+              {t("commercialInvoiceLabel")}
+              {invoice ? tInvoices(INVOICE_STATUS_LABEL_KEY[invoice.status] ?? "statusDraft") : tInvoices("statusNotStarted")}
+              {" · "}
+              <Link href={`/admin/invoices/${pkg.id}`} className="text-accent underline">
+                {invoice ? tInvoices("viewLink") : tInvoices("createLink")}
+              </Link>
+            </p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -164,6 +241,10 @@ export default function PackageRow({ pkg, rates }: { pkg: PackageWithProfile; ra
             </Button>
           </div>
         </div>
+
+        {statusMessage && (
+          <p className="mt-2 text-xs text-destructive">{statusMessage}</p>
+        )}
 
         {pkg.status === "requested" && (
           <div className="mt-3 flex flex-wrap items-end gap-2 rounded-lg border border-teal-200 bg-teal-50 p-3">
@@ -201,6 +282,32 @@ export default function PackageRow({ pkg, rates }: { pkg: PackageWithProfile; ra
               </p>
             )}
             {quoteMessage && <p className="w-full text-xs text-teal-800">{quoteMessage}</p>}
+          </div>
+        )}
+
+        {pkg.status === "paid" && (
+          <div className="mt-3 flex flex-wrap items-end gap-2 rounded-lg border border-sky-200 bg-sky-50 p-3">
+            <p className="w-full text-xs font-semibold text-sky-800">{t("preparingShipmentHeading")}</p>
+            <div className="space-y-1">
+              <Label className="text-xs font-normal text-sky-800">{t("trackingNumberFieldLabel")}</Label>
+              <Input
+                type="text"
+                value={trackingInput}
+                onChange={(e) => setTrackingInput(e.target.value)}
+                placeholder={t("trackingNumberPlaceholder")}
+                className="w-56"
+              />
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleMarkShipped}
+              disabled={isPending}
+              className="whitespace-nowrap"
+            >
+              {t("markShippedButton")}
+            </Button>
+            {shipMessage && <p className="w-full text-xs text-sky-800">{shipMessage}</p>}
           </div>
         )}
       </CardContent>

@@ -247,7 +247,11 @@
     "pricingLink": "Shipping Rates",
     "deleteDeclaration": "Delete",
     "confirmDeleteDeclaration": "Are you sure you want to delete this declaration? This cannot be undone.",
-    "homeLink": "Home"
+    "homeLink": "Home",
+    "matchSelectPlaceholder": "Select a package",
+    "matchNoCandidates": "No matching arrived package found. Register the package first.",
+    "matchConfirm": "Link",
+    "matchMissingSelection": "Please select a package to link."
   },
   "packageStatus": {
     "arrived": "Arrived",
@@ -273,7 +277,16 @@
     "dimensions": "Dimensions: ",
     "dimensionsUnit": "cm",
     "chargeableWeight": "Chargeable weight: ",
-    "suggestedAmount": "Suggested (from rate table): {amount} JPY"
+    "suggestedAmount": "Suggested (from rate table): {amount} JPY",
+    "linkedDeclarationHeading": "Pre-declaration",
+    "commercialInvoiceLabel": "Commercial invoice: ",
+    "preparingShipmentHeading": "Preparing Shipment",
+    "trackingNumberFieldLabel": "Tracking number",
+    "trackingNumberPlaceholder": "EE123456789JP",
+    "markShippedButton": "Mark as Shipped",
+    "markShippedMissingTracking": "Please enter a tracking number.",
+    "markShippedSuccess": "Marked as shipped.",
+    "markShippedInvoiceWarning": "The commercial invoice is not marked complete yet. Mark as shipped anyway?"
   },
   "addPackageForm": {
     "heading": "Register a New Package",

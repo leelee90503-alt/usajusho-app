@@ -4,13 +4,48 @@ import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 
-export async function markDeclarationMatched(id: string) {
+// Links a customer's pre-declaration to the actual arrived package it
+// describes. Previously this only flipped the declaration's status without
+// ever writing matched_package_id, so the declaration silently dropped off
+// the pending list with no way to find the order it referred to -- admins
+// could not bill shipping or build a commercial invoice for it. Now the
+// admin must pick which arrived package this declaration corresponds to,
+// and that link is persisted so the order stays discoverable afterward.
+export async function markDeclarationMatched(declarationId: string, packageId: string) {
   const supabase = await createClient()
+
+  const { data: declaration, error: declarationError } = await supabase
+    .from("package_declarations")
+    .select("user_id")
+    .eq("id", declarationId)
+    .single()
+
+  if (declarationError || !declaration) {
+    return { error: "事前申告が見つかりません。" }
+  }
+
+  const { data: pkg, error: pkgError } = await supabase
+    .from("packages")
+    .select("user_id")
+    .eq("id", packageId)
+    .single()
+
+  if (pkgError || !pkg) {
+    return { error: "紐づける荷物が見つかりません。" }
+  }
+
+  if (pkg.user_id !== declaration.user_id) {
+    return { error: "この荷物は別のお客様のものです。" }
+  }
 
   const { error } = await supabase
     .from("package_declarations")
-    .update({ status: "matched", updated_at: new Date().toISOString() })
-    .eq("id", id)
+    .update({
+      status: "matched",
+      matched_package_id: packageId,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", declarationId)
 
   if (error) {
     return { error: error.message }

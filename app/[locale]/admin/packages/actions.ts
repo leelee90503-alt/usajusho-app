@@ -102,11 +102,33 @@ export async function addPackage(formData: FormData) {
 export async function updatePackageStatus(packageId: string, status: string) {
   const supabase = await requireAdmin()
 
+  // Shipping a package without ever recording an outbound tracking number
+  // left customers with no way to track their delivery. Block the raw
+  // status dropdown from jumping straight to "shipped" unless a tracking
+  // number is already on file -- the normal path is the "preparing
+  // shipment" panel's markShipped() below, which collects the tracking
+  // number and sets this status together.
+  if (status === "shipped") {
+    const { data: current, error: fetchError } = await supabase
+      .from("packages")
+      .select("tracking_number")
+      .eq("id", packageId)
+      .single()
+
+    if (fetchError) {
+      return { error: fetchError.message }
+    }
+
+    if (!current?.tracking_number?.trim()) {
+      return { error: "発送完了にする前に、配送追跡番号を入力してください。" }
+    }
+  }
+
   const { data: updated, error } = await supabase
     .from("packages")
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", packageId)
-    .select("user_id, item_name")
+    .select("user_id, item_name, tracking_number")
     .single()
 
   if (error) {
@@ -118,11 +140,53 @@ export async function updatePackageStatus(packageId: string, status: string) {
       userId: updated.user_id,
       packageId,
       title: "発送が完了しました",
-      body: `${updated.item_name} の発送が完了しました。`,
+      body: `${updated.item_name} の発送が完了しました。追跡番号: ${updated.tracking_number}`,
     })
   }
 
   revalidatePath("/admin/packages")
+  revalidatePath("/dashboard")
+  return { success: true }
+}
+
+// Primary path for completing a shipment: collects the outbound tracking
+// number (US warehouse -> customer's Japan address) and moves the package
+// to "shipped" in one step, so a shipment is never marked complete without
+// a tracking number attached.
+export async function markShipped(packageId: string, trackingNumber: string) {
+  const supabase = await requireAdmin()
+
+  const trimmed = trackingNumber.trim()
+  if (!trimmed) {
+    return { error: "配送追跡番号を入力してください。" }
+  }
+
+  const { data: updated, error } = await supabase
+    .from("packages")
+    .update({
+      tracking_number: trimmed,
+      status: "shipped",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", packageId)
+    .select("user_id, item_name")
+    .single()
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  if (updated) {
+    await notifyUser(supabase, {
+      userId: updated.user_id,
+      packageId,
+      title: "発送が完了しました",
+      body: `${updated.item_name} の発送が完了しました。追跡番号: ${trimmed}`,
+    })
+  }
+
+  revalidatePath("/admin/packages")
+  revalidatePath("/dashboard")
   return { success: true }
 }
 
