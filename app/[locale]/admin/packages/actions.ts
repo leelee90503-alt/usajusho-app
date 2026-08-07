@@ -193,6 +193,21 @@ export async function markShipped(packageId: string, trackingNumber: string) {
 export async function deletePackage(packageId: string) {
   const supabase = await requireAdmin()
 
+  // Un-match any pre-declarations linked to this package before deleting it.
+  // matched_package_id is ON DELETE SET NULL, so the link would clear on its
+  // own, but the declaration's status would stay stuck at "matched" with no
+  // package to find it by -- orphaning it from both the Pending Declarations
+  // list and the matched-package view on the admin page. Resetting status
+  // back to "pending" here lets the admin re-match it after deletion.
+  const { error: unmatchError } = await supabase
+    .from("package_declarations")
+    .update({ status: "pending", matched_package_id: null, updated_at: new Date().toISOString() })
+    .eq("matched_package_id", packageId)
+
+  if (unmatchError) {
+    return { error: unmatchError.message }
+  }
+
   const { error } = await supabase.from("packages").delete().eq("id", packageId)
 
   if (error) {
