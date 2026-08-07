@@ -60,6 +60,8 @@ export async function createDeclaration(formData: FormData) {
   await notifyAdmins({
     title: "新しい荷物の事前申告が届きました",
     body: `${item_name} の事前申告が届きました。管理画面からご確認ください。`,
+    titleEn: "New package pre-declaration received",
+    bodyEn: `A new pre-declaration has been submitted for "${item_name}". Please check the admin dashboard.`,
   })
 
   revalidatePath("/dashboard/declarations")
@@ -125,6 +127,8 @@ export async function updateDeclarationDetails(
     await notifyAdmins({
       title: "事前申告に追加情報が入力されました",
       body: `${existing.item_name} の事前申告に追跡番号またはメモが追加・変更されました。管理画面からご確認ください。`,
+      titleEn: "Pre-declaration updated with additional info",
+      bodyEn: `The tracking number or note for the pre-declaration "${existing.item_name}" has been added or changed. Please check the admin dashboard.`,
     })
   }
 

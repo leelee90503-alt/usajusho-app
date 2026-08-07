@@ -33,6 +33,8 @@ export async function requestShipment(packageIds: string[]) {
   await notifyAdmins({
     title: "発送リクエストが届きました",
     body: `${packageIds.length}件の荷物について発送リクエストが届きました。管理画面からご確認ください。`,
+    titleEn: "New shipment request received",
+    bodyEn: `A shipment request has been submitted for ${packageIds.length} package(s). Please check the admin dashboard.`,
   })
 
   revalidatePath("/dashboard")
@@ -70,6 +72,8 @@ export async function payForShipment(packageId: string) {
     packageId,
     title: "配送料のお支払いが完了しました",
     body: "配送料のお支払いが完了しました。管理画面からご確認ください。",
+    titleEn: "Shipping payment completed",
+    bodyEn: "The customer has completed payment for shipping. Please check the admin dashboard.",
   })
 
   revalidatePath("/dashboard")

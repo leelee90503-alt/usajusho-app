@@ -29,11 +29,17 @@ export async function notifyUser(supabase: SupabaseClient, params: NotifyParams)
   await sendEmailNotification(supabase, userId, title, body)
 }
 
+// Optional bilingual override for the outgoing email only - the in-app
+// notification row (title/body) is left as-is (Japanese), only the email
+// subject/HTML sent via Resend is swapped for this when present.
+type EmailOverride = { subject: string; bodyHtml: string }
+
 async function sendEmailNotification(
   supabase: SupabaseClient,
   userId: string,
   title: string,
-  body: string
+  body: string,
+  emailOverride?: EmailOverride
 ) {
   try {
     const { data: settings } = await supabase
@@ -60,6 +66,11 @@ async function sendEmailNotification(
 
     const greeting = profile.full_name ? `${profile.full_name} 様,<br/><br/>` : ""
 
+    const subject = emailOverride?.subject ?? title
+    const html = emailOverride
+      ? `<p>${greeting}${emailOverride.bodyHtml}</p>`
+      : `<p>${greeting}${body}</p>`
+
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -69,8 +80,8 @@ async function sendEmailNotification(
       body: JSON.stringify({
         from: "USAJUSHO <info@usajusho.com>",
         to: profile.email,
-        subject: title,
-        html: `<p>${greeting}${body}</p>`,
+        subject,
+        html,
       }),
     })
 
@@ -80,7 +91,7 @@ async function sendEmailNotification(
       return
     }
 
-    console.log(`[email sent] to ${profile.email}: ${title}`)
+    console.log(`[email sent] to ${profile.email}: ${subject}`)
   } catch (err) {
     console.error("Failed to send email notification:", err)
   }
@@ -97,12 +108,24 @@ async function sendEmailNotification(
 // Requires SUPABASE_SERVICE_ROLE_KEY to be set (see lib/supabase/admin.ts).
 // Until it is, this logs a warning and no-ops rather than breaking the
 // customer's action.
+//
+// The in-app notification (title/body) stays Japanese-only, matching the
+// rest of the admin dashboard. The email sent to admins is bilingual
+// (Japanese + English, JP first) since admins have asked to be able to
+// read the alert without necessarily reading Japanese - titleEn/bodyEn are
+// required so every admin-facing notification stays bilingual by default.
 export async function notifyAdmins(params: {
   title: string
   body: string
+  titleEn: string
+  bodyEn: string
   packageId?: string | null
 }) {
-  const { title, body, packageId } = params
+  const { title, body, titleEn, bodyEn, packageId } = params
+  const emailOverride = {
+    subject: `${title} / ${titleEn}`,
+    bodyHtml: `${body}<br/><br/>—<br/><br/>${bodyEn}`,
+  }
 
   let adminSupabase: SupabaseClient
   try {
@@ -141,7 +164,7 @@ export async function notifyAdmins(params: {
       if (error) {
         console.error("Failed to create admin notification:", error.message)
       }
-      await sendEmailNotification(adminSupabase, admin.id, title, body)
+      await sendEmailNotification(adminSupabase, admin.id, title, body, emailOverride)
     })
   )
 }

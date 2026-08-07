@@ -52,6 +52,8 @@ export async function submitPurchaseRequest(formData: FormData) {
   await notifyAdmins({
     title: "新しい購入代行のご依頼が届きました",
     body: `${productDescription.slice(0, 50)} の購入代行リクエストが届きました。管理画面からご確認ください。`,
+    titleEn: "New purchase-agency request received",
+    bodyEn: `A purchase-agency request has been submitted for "${productDescription.slice(0, 50)}". Please check the admin dashboard.`,
   })
 
   revalidatePath("/dashboard/purchase-requests")
