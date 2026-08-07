@@ -1,7 +1,6 @@
 import { getTranslations, getLocale } from 'next-intl/server'
-import { redirect } from '@/i18n/navigation'
+import { redirect, Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/server'
-import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { FileText, ChevronRight } from 'lucide-react'
 

@@ -109,11 +109,12 @@ async function sendEmailNotification(
 // Until it is, this logs a warning and no-ops rather than breaking the
 // customer's action.
 //
-// The in-app notification (title/body) stays Japanese-only, matching the
-// rest of the admin dashboard. The email sent to admins is bilingual
-// (Japanese + English, JP first) since admins have asked to be able to
-// read the alert without necessarily reading Japanese - titleEn/bodyEn are
-// required so every admin-facing notification stays bilingual by default.
+// The in-app notification stores both languages (title/body in Japanese,
+// title_en/body_en in English) so the Admin Dashboard notification panel
+// can render whichever one matches the admin's currently selected locale
+// (see NotificationPanel). The email sent to admins is bilingual (Japanese
+// + English, JP first) for the same reason - titleEn/bodyEn are required so
+// every admin-facing notification stays bilingual by default.
 export async function notifyAdmins(params: {
   title: string
   body: string
@@ -160,6 +161,8 @@ export async function notifyAdmins(params: {
         package_id: packageId ?? null,
         title,
         body,
+        title_en: titleEn,
+        body_en: bodyEn,
       })
       if (error) {
         console.error("Failed to create admin notification:", error.message)

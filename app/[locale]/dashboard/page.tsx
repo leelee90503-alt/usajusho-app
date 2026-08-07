@@ -1,10 +1,9 @@
 import { getTranslations, getLocale } from 'next-intl/server'
-import { redirect } from '@/i18n/navigation'
+import { redirect, Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/server'
 import SignOutButton from './sign-out-button'
 import PackageList from './package-list'
 import NotificationBell from './notification-bell'
-import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MapPin, Receipt, PackagePlus, ShoppingCart, UserRound } from 'lucide-react'
 

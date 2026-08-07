@@ -1,7 +1,6 @@
-import { redirect } from "@/i18n/navigation"
+import { redirect, Link } from "@/i18n/navigation"
 import { getLocale, getTranslations } from "next-intl/server"
 import { createClient } from "@/lib/supabase/server"
-import Link from "next/link"
 import RateRow from "./rate-row"
 import AddRateForm from "./add-rate-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
