@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import CarrierTrackLink from "@/components/carrier-track-link"
 import { Loader2 } from "lucide-react"
 
 export default function DeclarationForm() {
@@ -15,6 +16,7 @@ export default function DeclarationForm() {
   const formRef = useRef<HTMLFormElement>(null)
   const [isPending, startTransition] = useTransition()
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null)
+  const [tracking, setTracking] = useState("")
 
   function handleSubmit(formData: FormData) {
     setMessage(null)
@@ -25,6 +27,7 @@ export default function DeclarationForm() {
       } else {
         setMessage({ type: "success", text: t("success") })
         formRef.current?.reset()
+        setTracking("")
       }
     })
   }
@@ -48,8 +51,14 @@ export default function DeclarationForm() {
 
           <div className="space-y-1.5">
             <Label htmlFor="decl-tracking">{t("trackingLabel")}</Label>
-            <Input id="decl-tracking" name="origin_tracking_number" />
+            <Input
+              id="decl-tracking"
+              name="origin_tracking_number"
+              value={tracking}
+              onChange={(e) => setTracking(e.target.value)}
+            />
             <p className="text-xs text-muted-foreground">{t("trackingHint")}</p>
+            <CarrierTrackLink trackingNumber={tracking} className="text-xs" />
           </div>
 
           <div className="space-y-1.5 sm:col-span-2">

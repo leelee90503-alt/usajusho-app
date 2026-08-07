@@ -787,5 +787,9 @@
     "pricingCard": "Shipping Rates",
     "shippingCard": "Shipping Settings",
     "settingsCard": "Email Notification Settings"
+  },
+  "carrierTrack": {
+    "detectedCarrier": "Track on {carrier}",
+    "unknownCarrier": "Search tracking status"
   }
 }

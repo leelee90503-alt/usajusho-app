@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import CarrierTrackLink from "@/components/carrier-track-link"
 import { Pencil } from "lucide-react"
 
 type Declaration = {
@@ -78,8 +79,9 @@ function DeclarationCard({ declaration: d }: { declaration: Declaration }) {
               </p>
             )}
             {d.origin_tracking_number && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                {t("trackingLabel")}: {d.origin_tracking_number}
+              <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                <span>{t("trackingLabel")}: {d.origin_tracking_number}</span>
+                <CarrierTrackLink trackingNumber={d.origin_tracking_number} />
               </p>
             )}
             {d.note && <p className="mt-1 text-xs text-slate-600">{d.note}</p>}
@@ -126,6 +128,7 @@ function DeclarationCard({ declaration: d }: { declaration: Declaration }) {
                 value={tracking}
                 onChange={(e) => setTracking(e.target.value)}
               />
+              <CarrierTrackLink trackingNumber={tracking} className="text-xs" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor={`note-${d.id}`}>{t("noteLabel")}</Label>

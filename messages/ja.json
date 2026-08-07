@@ -787,5 +787,9 @@
     "pricingCard": "配送料金設定",
     "shippingCard": "配送設定",
     "settingsCard": "メール通知設定"
+  },
+  "carrierTrack": {
+    "detectedCarrier": "{carrier}で追跡する",
+    "unknownCarrier": "配送状況を検索"
   }
 }

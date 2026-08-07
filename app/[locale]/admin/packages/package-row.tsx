@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
+import CarrierTrackLink from "@/components/carrier-track-link"
 import { Trash2 } from "lucide-react"
 
 type PackageWithProfile = {
@@ -165,7 +166,10 @@ export default function PackageRow({
               {pkg.profiles?.full_name} {t("suiteSeparator")} {pkg.profiles?.suite_number}
             </p>
             {pkg.tracking_number && (
-              <p className="mt-1 text-xs text-muted-foreground">{t("trackingNumber")}{pkg.tracking_number}</p>
+              <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                <span>{t("trackingNumber")}{pkg.tracking_number}</span>
+                <CarrierTrackLink trackingNumber={pkg.tracking_number} />
+              </p>
             )}
             {pkg.weight_kg && (
               <p className="mt-1 text-xs text-muted-foreground">{t("weight")}{pkg.weight_kg} {t("weightUnit")}</p>
@@ -198,7 +202,10 @@ export default function PackageRow({
                   <p>{tAdmin("orderAmount")}: ${Number(declaration.order_amount).toLocaleString()}</p>
                 )}
                 {declaration.origin_tracking_number && (
-                  <p>{tAdmin("originTracking")}: {declaration.origin_tracking_number}</p>
+                  <p className="flex flex-wrap items-center gap-1.5">
+                    <span>{tAdmin("originTracking")}: {declaration.origin_tracking_number}</span>
+                    <CarrierTrackLink trackingNumber={declaration.origin_tracking_number} />
+                  </p>
                 )}
               </div>
             )}
@@ -297,6 +304,7 @@ export default function PackageRow({
                 placeholder={t("trackingNumberPlaceholder")}
                 className="w-56"
               />
+              <CarrierTrackLink trackingNumber={trackingInput} className="text-xs" />
             </div>
             <Button
               type="button"
