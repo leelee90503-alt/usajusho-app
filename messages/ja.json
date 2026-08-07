@@ -453,7 +453,10 @@
     "sendCorrection": "修正依頼を送信",
     "approveComplete": "承認して完了",
     "approveCompleteConfirmTitle": "このインボイスを承認しますか？",
-    "approveCompleteConfirmBody": "インボイスを完了としてマークし、お客様に通知します。"
+    "approveCompleteConfirmBody": "インボイスを完了としてマークし、お客様に通知します。",
+    "searchPlaceholder": "お客様名・部屋番号・追跡番号・インボイス番号で検索",
+    "searchButton": "検索",
+    "clear": "クリア"
   },
   "purchaseAgency": {
     "eyebrow": "購入代行",
@@ -768,7 +771,25 @@
     "generatePassword": "自動生成",
     "savePassword": "パスワードをリセット",
     "passwordUpdated": "パスワードをリセットしました。下の新しいパスワードをお客様にお伝えください。",
-    "newPasswordDisplay": "新しいパスワード：{password}"
+    "newPasswordDisplay": "新しいパスワード：{password}",
+    "viewDetails": "詳細を見る"
+  },
+  "adminUserDetail": {
+    "title": "顧客詳細",
+    "backLink": "← 会員一覧に戻る",
+    "notFound": "この顧客が見つかりませんでした。",
+    "packagesHeading": "荷物（{count}件）",
+    "packagesEmpty": "まだ荷物がありません。",
+    "packagesLink": "荷物管理で見る →",
+    "declarationsHeading": "事前申告（{count}件）",
+    "declarationsEmpty": "まだ事前申告がありません。",
+    "invoicesHeading": "インボイス（{count}件）",
+    "invoicesEmpty": "まだインボイスがありません。",
+    "invoicesViewLink": "表示・編集",
+    "purchaseRequestsHeading": "購入代行依頼（{count}件）",
+    "purchaseRequestsEmpty": "まだ購入代行依頼がありません。",
+    "purchaseRequestsLink": "購入代行管理で見る →",
+    "declaredValueLabel": "申告価格："
   },
   "adminHome": {
     "title": "管理者ダッシュボード",

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 import { adminUpdateUserEmail, adminResetUserPassword } from "./actions"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -26,7 +27,13 @@ function generateRandomPassword() {
   return out
 }
 
-export default function UserRow({ user }: { user: User }) {
+export default function UserRow({
+  user,
+  showViewDetails = true,
+}: {
+  user: User
+  showViewDetails?: boolean
+}) {
   const t = useTranslations("adminUsers")
   const [mode, setMode] = useState<"none" | "email" | "password">("none")
   const [isPending, startTransition] = useTransition()
@@ -105,6 +112,11 @@ export default function UserRow({ user }: { user: User }) {
           </div>
 
           <div className="flex items-center gap-2">
+            {showViewDetails && (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/admin/users/${user.id}`}>{t("viewDetails")}</Link>
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={openEmailForm}>
               {t("changeEmail")}
             </Button>

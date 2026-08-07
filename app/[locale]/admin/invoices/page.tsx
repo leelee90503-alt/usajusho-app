@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from "next-intl/server"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -35,7 +37,11 @@ const STATUS_BADGE_CLASS: Record<string, string> = {
   complete: "bg-teal-100 text-teal-800",
 }
 
-export default async function AdminInvoicesPage() {
+export default async function AdminInvoicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
   const locale = await getLocale()
   const supabase = await createClient()
 
@@ -61,9 +67,11 @@ export default async function AdminInvoicesPage() {
 
   const t = await getTranslations("adminInvoices")
 
+  const { q = "" } = await searchParams
+
   const { data: allPackages } = await supabase
     .from("packages")
-    .select("id, item_name, tracking_number, status, created_at, profiles(full_name, suite_number)")
+    .select("id, user_id, item_name, tracking_number, status, created_at, profiles(full_name, suite_number)")
     .order("created_at", { ascending: false })
 
   const { data: allInvoices } = await supabase
@@ -73,18 +81,30 @@ export default async function AdminInvoicesPage() {
   const invoiceByPackageId = new Map((allInvoices ?? []).map((inv) => [inv.package_id, inv]))
 
   const packages = allPackages ?? []
-  const rows = packages.map((pkg) => ({
+  const allRows = packages.map((pkg) => ({
     pkg: { ...pkg, profiles: oneProfile(pkg.profiles as ProfileJoin) },
     invoice: invoiceByPackageId.get(pkg.id) ?? null,
   }))
 
+  const query = q.trim().toLowerCase()
+  const rows = allRows.filter(({ pkg, invoice }) => {
+    if (!query) return true
+    return (
+      pkg.profiles?.full_name?.toLowerCase().includes(query) ||
+      pkg.profiles?.suite_number?.toLowerCase().includes(query) ||
+      pkg.item_name?.toLowerCase().includes(query) ||
+      pkg.tracking_number?.toLowerCase().includes(query) ||
+      invoice?.invoice_number?.toLowerCase().includes(query)
+    )
+  })
+
   const statCounts = {
-    total: rows.length,
-    notStarted: rows.filter((r) => !r.invoice).length,
-    draft: rows.filter((r) => r.invoice?.status === "draft").length,
-    submitted: rows.filter((r) => r.invoice?.status === "customer_submitted").length,
-    correction: rows.filter((r) => r.invoice?.status === "correction_required").length,
-    complete: rows.filter((r) => r.invoice?.status === "complete").length,
+    total: allRows.length,
+    notStarted: allRows.filter((r) => !r.invoice).length,
+    draft: allRows.filter((r) => r.invoice?.status === "draft").length,
+    submitted: allRows.filter((r) => r.invoice?.status === "customer_submitted").length,
+    correction: allRows.filter((r) => r.invoice?.status === "correction_required").length,
+    complete: allRows.filter((r) => r.invoice?.status === "complete").length,
   }
 
   return (
@@ -101,7 +121,25 @@ export default async function AdminInvoicesPage() {
         <StatCard label={t("statComplete")} value={statCounts.complete} />
       </div>
 
-      <Card className="mt-8">
+      <form className="mt-6 flex flex-wrap items-center gap-2" method="get">
+        <Input
+          type="text"
+          name="q"
+          defaultValue={q}
+          placeholder={t("searchPlaceholder")}
+          className="w-72"
+        />
+        <Button type="submit" size="sm">
+          {t("searchButton")}
+        </Button>
+        {q && (
+          <Button asChild variant="link" size="sm" className="text-muted-foreground">
+            <Link href="/admin/invoices">{t("clear")}</Link>
+          </Button>
+        )}
+      </form>
+
+      <Card className="mt-6">
         <Table>
           <TableHeader>
             <TableRow>
@@ -117,7 +155,12 @@ export default async function AdminInvoicesPage() {
             {rows.map(({ pkg, invoice }) => (
               <TableRow key={pkg.id}>
                 <TableCell>
-                  <p className="font-medium text-foreground">{pkg.profiles?.full_name ?? "—"}</p>
+                  <Link
+                    href={`/admin/users/${pkg.user_id}`}
+                    className="font-medium text-foreground hover:text-accent hover:underline"
+                  >
+                    {pkg.profiles?.full_name ?? "—"}
+                  </Link>
                   <p className="text-xs text-muted-foreground">{pkg.profiles?.suite_number ?? ""}</p>
                 </TableCell>
                 <TableCell className="text-foreground">{pkg.item_name}</TableCell>

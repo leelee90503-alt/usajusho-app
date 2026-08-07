@@ -453,7 +453,10 @@
     "sendCorrection": "Send Correction Request",
     "approveComplete": "Approve & Complete",
     "approveCompleteConfirmTitle": "Approve this invoice?",
-    "approveCompleteConfirmBody": "This will mark the invoice as complete and notify the customer."
+    "approveCompleteConfirmBody": "This will mark the invoice as complete and notify the customer.",
+    "searchPlaceholder": "Search by customer name, suite, tracking #, or invoice #",
+    "searchButton": "Search",
+    "clear": "Clear"
   },
   "purchaseAgency": {
     "eyebrow": "Purchase Proxy",
@@ -768,7 +771,25 @@
     "generatePassword": "Generate",
     "savePassword": "Reset Password",
     "passwordUpdated": "Password reset. Share the new password below with the customer.",
-    "newPasswordDisplay": "New password: {password}"
+    "newPasswordDisplay": "New password: {password}",
+    "viewDetails": "View Details"
+  },
+  "adminUserDetail": {
+    "title": "Customer Details",
+    "backLink": "← Back to All Users",
+    "notFound": "This customer could not be found.",
+    "packagesHeading": "Packages ({count})",
+    "packagesEmpty": "No packages yet.",
+    "packagesLink": "Manage in Packages →",
+    "declarationsHeading": "Pre-Declarations ({count})",
+    "declarationsEmpty": "No pre-declarations yet.",
+    "invoicesHeading": "Commercial Invoices ({count})",
+    "invoicesEmpty": "No commercial invoices yet.",
+    "invoicesViewLink": "View / Edit",
+    "purchaseRequestsHeading": "Purchase Requests ({count})",
+    "purchaseRequestsEmpty": "No purchase requests yet.",
+    "purchaseRequestsLink": "Manage in Purchase Requests →",
+    "declaredValueLabel": "Declared value:"
   },
   "adminHome": {
     "title": "Admin Dashboard",
