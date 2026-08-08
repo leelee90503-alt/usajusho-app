@@ -207,9 +207,9 @@
     "weightUnit": "kg",
     "quoteLabel": "Shipping quote: ",
     "pay": "Pay",
-    "statusQuoted": "Quoted",
-    "statusPaid": "Paid",
-    "statusShipped": "Shipped",
+    "statusQuoted": "Please Pay Shipping Fee",
+    "statusPaid": "Payment Complete – Preparing to Ship to Japan",
+    "statusShipped": "Shipped to Japan",
     "quoteRecipientHeading": "Recipient",
     "quoteRecipientName": "Name: ",
     "quoteRecipientPhone": "Phone: ",
@@ -220,7 +220,8 @@
     "chargeStatusAwaitingPayment": "Awaiting Payment",
     "chargeStatusPaid": "Paid",
     "chargeStatusCancelled": "Cancelled",
-    "chargeStatusRefunded": "Refunded"
+    "chargeStatusRefunded": "Refunded",
+    "photosHeading": "Package Photos"
   },
   "notificationBell": {
     "title": "Notifications",
@@ -294,7 +295,12 @@
       "paid": "Paid",
       "cancelled": "Cancelled",
       "refunded": "Refunded"
-    }
+    },
+    "photosLabel": "Package Photos (3–5 required)",
+    "photosHint": "Attach photos taken during inspection.",
+    "photosCountLabel": "{count} selected",
+    "photosRequiredError": "Please attach between 3 and 5 photos.",
+    "photosHeading": "Photos"
   },
   "packageStatus": {
     "missing": "Missing",

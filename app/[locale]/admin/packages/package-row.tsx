@@ -90,16 +90,23 @@ const INVOICE_STATUS_LABEL_KEY: Record<string, string> = {
   complete: "statusComplete",
 }
 
+type PackagePhoto = {
+  id: string
+  url: string
+}
+
 export default function PackageRow({
   pkg,
   invoice,
   declaration,
   additionalCharges = [],
+  photos = [],
 }: {
   pkg: PackageWithProfile
   invoice: PackageInvoice | null
   declaration: LinkedDeclaration | null
   additionalCharges?: AdditionalCharge[]
+  photos?: PackagePhoto[]
 }) {
   const t = useTranslations("packageRow")
   const tStatus = useTranslations("packageStatus")
@@ -258,6 +265,23 @@ export default function PackageRow({
                     <CarrierTrackLink trackingNumber={declaration.origin_tracking_number} />
                   </p>
                 )}
+              </div>
+            )}
+            {photos.length > 0 && (
+              <div className="mt-2">
+                <p className="text-xs font-semibold text-slate-700">{tAdmin("photosHeading")}</p>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  {photos.map((photo) => (
+                    <a key={photo.id} href={photo.url} target="_blank" rel="noopener noreferrer">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={photo.url}
+                        alt=""
+                        className="h-16 w-16 rounded-md border border-slate-200 object-cover"
+                      />
+                    </a>
+                  ))}
+                </div>
               </div>
             )}
             <p className="mt-2 text-xs text-muted-foreground">

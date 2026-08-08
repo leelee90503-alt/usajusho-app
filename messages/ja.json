@@ -207,9 +207,9 @@
     "weightUnit": "kg",
     "quoteLabel": "送料の見積り：",
     "pay": "支払う",
-    "statusQuoted": "見積済み",
-    "statusPaid": "支払い済み",
-    "statusShipped": "発送完了",
+    "statusQuoted": "送料をお支払いください",
+    "statusPaid": "支払い完了 - 日本への発送準備中",
+    "statusShipped": "日本へ発送されました",
     "quoteRecipientHeading": "お届け先",
     "quoteRecipientName": "氏名：",
     "quoteRecipientPhone": "電話番号：",
@@ -220,7 +220,8 @@
     "chargeStatusAwaitingPayment": "支払い待ち",
     "chargeStatusPaid": "支払い済み",
     "chargeStatusCancelled": "キャンセル済み",
-    "chargeStatusRefunded": "返金済み"
+    "chargeStatusRefunded": "返金済み",
+    "photosHeading": "荷物の写真"
   },
   "notificationBell": {
     "title": "通知",
@@ -294,7 +295,12 @@
       "paid": "支払い済み",
       "cancelled": "キャンセル済み",
       "refunded": "返金済み"
-    }
+    },
+    "photosLabel": "荷物の写真（3〜5枚必須）",
+    "photosHint": "検品時に撮影した写真を添付してください。",
+    "photosCountLabel": "{count}枚選択中",
+    "photosRequiredError": "写真を3〜5枚添付してください。",
+    "photosHeading": "写真"
   },
   "packageStatus": {
     "missing": "不明",

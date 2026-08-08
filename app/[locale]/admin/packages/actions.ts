@@ -96,6 +96,9 @@ export async function registerMissingPackage(formData: FormData) {
 // package already has an owner, suiteNumber is ignored. If a matching
 // customer has exactly one pending pre-declaration on file, it is
 // auto-linked to this package too, so it drops off the pending list.
+const MIN_PACKAGE_PHOTOS = 3
+const MAX_PACKAGE_PHOTOS = 5
+
 export async function resolveMissingPackage(
   packageId: string,
   params: {
@@ -107,6 +110,7 @@ export async function resolveMissingPackage(
     trackingNumber: string
     memo: string
     quoteAmount: number | null
+    photos: File[]
   }
 ) {
   const supabase = await requireAdmin()
@@ -123,6 +127,16 @@ export async function resolveMissingPackage(
 
   if (pkg.status !== "missing") {
     return { error: "この荷物はすでに処理済みです。" }
+  }
+
+  // Photos taken during inspection are required every time a quote is
+  // issued (or a prepaid package's arrival is confirmed) so the customer
+  // can see the actual condition of what arrived -- see
+  // package-photos-migration.sql for the storage bucket + table this
+  // writes to.
+  const photos = (params.photos || []).filter((f) => f && f.size > 0)
+  if (photos.length < MIN_PACKAGE_PHOTOS || photos.length > MAX_PACKAGE_PHOTOS) {
+    return { error: `荷物の写真を${MIN_PACKAGE_PHOTOS}〜${MAX_PACKAGE_PHOTOS}枚添付してください。` }
   }
 
   // Packages linked from a purchase-agency request already had their
@@ -193,6 +207,31 @@ export async function resolveMissingPackage(
 
   if (updateError) {
     return { error: updateError.message }
+  }
+
+  // Upload the inspection photos and record them against this package.
+  // Uploaded to "{packageId}/{uuid}.{ext}" so storage RLS can grant the
+  // owning customer read access by package_id (see
+  // package-photos-migration.sql) without needing the admin's own uid in
+  // the path.
+  for (const photo of photos) {
+    const ext = photo.name.includes(".") ? photo.name.split(".").pop() : "jpg"
+    const path = `${packageId}/${crypto.randomUUID()}.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from("package-photos")
+      .upload(path, photo, { contentType: photo.type || undefined })
+
+    if (uploadError) {
+      return { error: uploadError.message }
+    }
+
+    const { error: photoInsertError } = await supabase
+      .from("package_photos")
+      .insert({ package_id: packageId, storage_path: path })
+
+    if (photoInsertError) {
+      return { error: photoInsertError.message }
+    }
   }
 
   // Best-effort: if this customer has exactly one pending pre-declaration,

@@ -50,6 +50,11 @@ type AdditionalCharge = {
   status: string
 }
 
+type PackagePhoto = {
+  id: string
+  url: string
+}
+
 type Profile = {
   full_name: string | null
   phone_number: string | null
@@ -95,12 +100,14 @@ export default function PendingOrderList({
   purchaseRequests,
   profile = null,
   additionalCharges = {},
+  photosByPackageId = {},
 }: {
   packages: PackageOrder[]
   declarations: DeclarationOrder[]
   purchaseRequests: PurchaseRequestOrder[]
   profile?: Profile | null
   additionalCharges?: Record<string, AdditionalCharge[]>
+  photosByPackageId?: Record<string, PackagePhoto[]>
 }) {
   const t = useTranslations("packageList")
   const tDeclarations = useTranslations("packageDeclarations")
@@ -262,6 +269,24 @@ export default function PendingOrderList({
                     {chargeMessage && (
                       <p className="text-sm text-destructive">{chargeMessage}</p>
                     )}
+                  </div>
+                )}
+
+                {(photosByPackageId[order.id] ?? []).length > 0 && (
+                  <div className="mt-3 border-t border-slate-200 pt-3">
+                    <p className="text-xs font-semibold text-slate-700">{t("photosHeading")}</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {(photosByPackageId[order.id] ?? []).map((photo) => (
+                        <a key={photo.id} href={photo.url} target="_blank" rel="noopener noreferrer">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={photo.url}
+                            alt=""
+                            className="h-16 w-16 rounded-md border border-slate-200 object-cover"
+                          />
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 )}
               </CardContent>

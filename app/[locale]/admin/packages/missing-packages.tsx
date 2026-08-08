@@ -114,6 +114,8 @@ function MissingPackageCard({
   const [trackingNumber, setTrackingNumber] = useState(pkg.tracking_number ?? "")
   const [memo, setMemo] = useState(pkg.admin_note ?? "")
   const [quoteAmount, setQuoteAmount] = useState("")
+  const [photos, setPhotos] = useState<File[]>([])
+  const [photosError, setPhotosError] = useState<string | null>(null)
 
   const suggestion =
     rates.length > 0
@@ -129,6 +131,11 @@ function MissingPackageCard({
       : null
 
   function handleSubmit() {
+    if (photos.length < 3 || photos.length > 5) {
+      setPhotosError(t("photosRequiredError"))
+      return
+    }
+    setPhotosError(null)
     onResolve({
       suiteNumber: pkg.user_id ? undefined : suiteNumber,
       weightKg: weightKg ? Number(weightKg) : null,
@@ -138,6 +145,7 @@ function MissingPackageCard({
       trackingNumber,
       memo,
       quoteAmount: isPrepaid ? null : Number(quoteAmount),
+      photos,
     })
   }
 
@@ -231,6 +239,23 @@ function MissingPackageCard({
           <div className="col-span-2 space-y-1 sm:col-span-4">
             <Label className="text-xs font-normal text-amber-800">{t("matchMemoLabel")}</Label>
             <Input value={memo} onChange={(e) => setMemo(e.target.value)} className="bg-white" />
+          </div>
+          <div className="col-span-2 space-y-1 sm:col-span-4">
+            <Label className="text-xs font-normal text-amber-800">{t("photosLabel")}</Label>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                setPhotos(Array.from(e.target.files ?? []))
+                setPhotosError(null)
+              }}
+              className="bg-white"
+            />
+            <p className="text-xs text-amber-800">
+              {t("photosHint")} {t("photosCountLabel", { count: photos.length })}
+            </p>
+            {photosError && <p className="text-xs text-destructive">{photosError}</p>}
           </div>
           {isPrepaid ? (
             <div className="col-span-2 space-y-1 sm:col-span-4">

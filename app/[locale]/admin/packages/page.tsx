@@ -125,6 +125,27 @@ export default async function AdminPackagesPage({
     additionalChargesByPackageId.set(charge.package_id, list)
   }
 
+  // Inspection photos attached when the quote was issued (see
+  // resolveMissingPackage() in ./actions.ts and package-photos-migration.sql).
+  // Signed so the private "package-photos" bucket can be viewed here too.
+  const { data: allPackagePhotos } = await supabase
+    .from("package_photos")
+    .select("id, package_id, storage_path")
+    .order("created_at", { ascending: true })
+
+  const photosByPackageId = new Map<string, { id: string; url: string }[]>()
+  await Promise.all(
+    (allPackagePhotos ?? []).map(async (photo) => {
+      const { data: signed } = await supabase.storage
+        .from("package-photos")
+        .createSignedUrl(photo.storage_path, 60 * 60)
+      if (!signed?.signedUrl) return
+      const list = photosByPackageId.get(photo.package_id) ?? []
+      list.push({ id: photo.id, url: signed.signedUrl })
+      photosByPackageId.set(photo.package_id, list)
+    })
+  )
+
   const statCounts = {
     total: packages.length,
     missing: packages.filter((p) => p.status === "missing").length,
@@ -267,6 +288,7 @@ export default async function AdminPackagesPage({
                 invoice={invoiceByPackageId.get(pkg.id) ?? null}
                 declaration={declarationByPackageId.get(pkg.id) ?? null}
                 additionalCharges={additionalChargesByPackageId.get(pkg.id) ?? []}
+                photos={photosByPackageId.get(pkg.id) ?? []}
               />
             ))}
 

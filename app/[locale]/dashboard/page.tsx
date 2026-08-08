@@ -103,6 +103,32 @@ export default async function DashboardPage() {
     additionalChargesByPackageId[charge.package_id] = list
   }
 
+  // Inspection photos the admin attached when the quote was issued (see
+  // resolveMissingPackage() in app/[locale]/admin/packages/actions.ts) --
+  // signed so the customer can view the private "package-photos" bucket.
+  const packageIds = (packages ?? []).map((pkg) => pkg.id)
+  const { data: packagePhotosData } =
+    packageIds.length > 0
+      ? await supabase
+          .from('package_photos')
+          .select('id, package_id, storage_path')
+          .in('package_id', packageIds)
+          .order('created_at', { ascending: true })
+      : { data: [] as { id: string; package_id: string; storage_path: string }[] }
+
+  const photosByPackageId: Record<string, { id: string; url: string }[]> = {}
+  await Promise.all(
+    (packagePhotosData ?? []).map(async (photo) => {
+      const { data: signed } = await supabase.storage
+        .from('package-photos')
+        .createSignedUrl(photo.storage_path, 60 * 60)
+      if (!signed?.signedUrl) return
+      const list = photosByPackageId[photo.package_id] ?? []
+      list.push({ id: photo.id, url: signed.signedUrl })
+      photosByPackageId[photo.package_id] = list
+    })
+  )
+
   return (
     <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-3xl px-6 py-10">
@@ -191,6 +217,7 @@ export default async function DashboardPage() {
                 purchaseRequests={pendingPurchaseRequests.map((r) => ({ kind: 'purchaseRequest' as const, ...r }))}
                 profile={profile ?? null}
                 additionalCharges={additionalChargesByPackageId}
+                photosByPackageId={photosByPackageId}
               />
             </TabsContent>
             <TabsContent value="completed">
@@ -199,6 +226,7 @@ export default async function DashboardPage() {
                 profile={profile ?? null}
                 emptyVariant="completed"
                 additionalCharges={additionalChargesByPackageId}
+                photosByPackageId={photosByPackageId}
               />
             </TabsContent>
           </Tabs>
