@@ -1,7 +1,7 @@
 import { redirect, Link } from '@/i18n/navigation'
 import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from 'next-intl/server'
-import DeclarationForm from "./declaration-form"
+import NewDeclarationToggle from "./new-declaration-toggle"
 import DeclarationList from "./declaration-list"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
@@ -52,7 +52,7 @@ export default async function DeclarationsPage() {
           </Button>
         </div>
         <p className="mb-6 text-sm text-slate-600">{t("pageDescription")}</p>
-        <DeclarationForm />
+        <NewDeclarationToggle />
         <DeclarationList declarations={withSignedUrls} />
       </div>
     </main>

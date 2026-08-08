@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import CarrierTrackLink from "@/components/carrier-track-link"
 import { Loader2 } from "lucide-react"
 
-export default function DeclarationForm() {
+export default function DeclarationForm({ onClose }: { onClose?: () => void }) {
   const t = useTranslations("packageDeclarations")
   const formRef = useRef<HTMLFormElement>(null)
   const [isPending, startTransition] = useTransition()
@@ -36,6 +36,13 @@ export default function DeclarationForm() {
     <Card>
       <CardHeader>
         <CardTitle>{t("formHeading")}</CardTitle>
+        {onClose && (
+          <CardAction>
+            <Button type="button" variant="ghost" size="sm" onClick={onClose}>
+              {t("cancel")}
+            </Button>
+          </CardAction>
+        )}
       </CardHeader>
       <form ref={formRef} action={handleSubmit}>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">

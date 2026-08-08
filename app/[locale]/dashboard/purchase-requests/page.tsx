@@ -1,9 +1,8 @@
 import { redirect, Link } from "@/i18n/navigation"
 import { getLocale, getTranslations } from "next-intl/server"
 import { createClient } from "@/lib/supabase/server"
-import RequestForm from "./request-form"
+import NewRequestToggle from "./new-request-toggle"
 import RequestList from "./request-list"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default async function PurchaseRequestsPage() {
   const locale = await getLocale()
@@ -42,14 +41,7 @@ export default async function PurchaseRequestsPage() {
         </div>
         <p className="mt-1 text-sm text-muted-foreground">{t("description")}</p>
 
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>{t("newRequestTitle")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RequestForm />
-          </CardContent>
-        </Card>
+        <NewRequestToggle />
 
         <div className="mt-10">
           <h2 className="text-lg font-semibold text-slate-900">
