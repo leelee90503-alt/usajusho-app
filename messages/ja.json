@@ -175,6 +175,8 @@
     "notifications": "通知",
     "welcome": "ようこそ、{name}さん",
     "myPackages": "届いた荷物",
+    "tabPending": "保留中",
+    "tabCompleted": "完了",
     "addressNote": "この住所を米国のオンラインショップでの配送先として使用してください。",
     "invoicesLink": "請求書",
     "declarationsLink": "パッケージを申告する",
@@ -194,6 +196,8 @@
   "packageList": {
     "empty": "まだ届いた荷物はありません。",
     "emptyHint": "上記の米国住所に商品を発送すると、ここに表示されます。",
+    "emptyCompleted": "まだ完了した注文はありません。",
+    "emptyCompletedHint": "荷物が発送されると、ここに表示されます。",
     "paySuccess": "お支払いが完了しました。",
     "trackingNumber": "追跡番号：",
     "weight": "重量：",

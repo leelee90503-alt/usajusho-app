@@ -175,6 +175,8 @@
     "notifications": "Notifications",
     "welcome": "Welcome, {name}",
     "myPackages": "My Packages",
+    "tabPending": "Pending",
+    "tabCompleted": "Completed",
     "addressNote": "Use this address as your shipping destination at US online stores.",
     "invoicesLink": "Invoices",
     "declarationsLink": "Declare a Package",
@@ -194,6 +196,8 @@
   "packageList": {
     "empty": "No packages have arrived yet.",
     "emptyHint": "Once you ship items to your US address above, they'll appear here.",
+    "emptyCompleted": "No completed orders yet.",
+    "emptyCompletedHint": "Once a package ships, it will appear here.",
     "paySuccess": "Payment complete.",
     "trackingNumber": "Tracking number: ",
     "weight": "Weight: ",

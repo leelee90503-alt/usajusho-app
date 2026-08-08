@@ -5,6 +5,7 @@ import SignOutButton from './sign-out-button'
 import PackageList from './package-list'
 import NotificationBell from './notification-bell'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { MapPin, Receipt, PackagePlus, ShoppingCart, UserRound } from 'lucide-react'
 
 export default async function DashboardPage() {
@@ -39,6 +40,9 @@ export default async function DashboardPage() {
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
+
+  const pendingPackages = (packages ?? []).filter((pkg) => pkg.status !== 'shipped')
+  const completedPackages = (packages ?? []).filter((pkg) => pkg.status === 'shipped')
 
   const { data: notifications } = await supabase
     .from('notifications')
@@ -119,7 +123,26 @@ export default async function DashboardPage() {
           <h3 className="text-lg font-semibold text-slate-900">
             {t("myPackages")}
           </h3>
-          <PackageList packages={packages ?? []} profile={profile ?? null} />
+          <Tabs defaultValue="pending" className="mt-3">
+            <TabsList>
+              <TabsTrigger value="pending">
+                {t("tabPending")} ({pendingPackages.length})
+              </TabsTrigger>
+              <TabsTrigger value="completed">
+                {t("tabCompleted")} ({completedPackages.length})
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="pending">
+              <PackageList packages={pendingPackages} profile={profile ?? null} />
+            </TabsContent>
+            <TabsContent value="completed">
+              <PackageList
+                packages={completedPackages}
+                profile={profile ?? null}
+                emptyVariant="completed"
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </main>

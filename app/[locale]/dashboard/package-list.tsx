@@ -50,9 +50,11 @@ const STATUS_BADGE_VARIANT: Record<string, "default" | "secondary" | "destructiv
 export default function PackageList({
   packages,
   profile = null,
+  emptyVariant = "default",
 }: {
   packages: Package[]
   profile?: Profile | null
+  emptyVariant?: "default" | "completed"
 }) {
   const t = useTranslations("packageList")
   const japanAddress = formatJapanAddress(profile)
@@ -83,9 +85,9 @@ export default function PackageList({
     return (
       <Card className="mt-3 border-dashed">
         <CardContent className="py-8 text-center text-sm text-muted-foreground">
-          {t("empty")}
+          {emptyVariant === "completed" ? t("emptyCompleted") : t("empty")}
           <br />
-          {t("emptyHint")}
+          {emptyVariant === "completed" ? t("emptyCompletedHint") : t("emptyHint")}
         </CardContent>
       </Card>
     )
