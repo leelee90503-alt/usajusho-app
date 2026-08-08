@@ -221,7 +221,7 @@ export default function PackageRow({
             )}
             {pkg.quote_amount != null && (
               <p className="mt-2 text-xs font-semibold text-accent">
-                {t("quoteAmountLabel")}${formatUSD(pkg.quote_amount)}
+                {t("quoteAmountLabel")}{formatUSD(pkg.quote_amount)}
                 {pkg.shipping_prepaid && (
                   <span className="ml-1 font-normal text-accent">({tAdmin("prepaidBadge")})</span>
                 )}
