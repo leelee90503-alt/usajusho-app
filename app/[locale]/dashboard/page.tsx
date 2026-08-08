@@ -3,6 +3,7 @@ import { redirect, Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/server'
 import SignOutButton from './sign-out-button'
 import PackageList from './package-list'
+import PendingOrderList from './pending-order-list'
 import NotificationBell from './notification-bell'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -41,8 +42,33 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
+  const { data: declarations } = await supabase
+    .from('package_declarations')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  const { data: purchaseRequests } = await supabase
+    .from('purchase_requests')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  // A declaration that has been matched, or a purchase request that has
+  // been purchased, continues its lifecycle as a row in the packages
+  // table -- it already shows up there, so excluding those statuses here
+  // avoids listing the same order twice. Cancelled/refunded requests are
+  // a closed dead end, not an order still in progress, so they are
+  // excluded too.
   const pendingPackages = (packages ?? []).filter((pkg) => pkg.status !== 'shipped')
   const completedPackages = (packages ?? []).filter((pkg) => pkg.status === 'shipped')
+  const pendingDeclarations = (declarations ?? []).filter((d) => d.status === 'pending')
+  const pendingPurchaseRequests = (purchaseRequests ?? []).filter(
+    (r) => !['purchased', 'cancelled', 'refunded'].includes(r.status)
+  )
+
+  const pendingOrderCount =
+    pendingPackages.length + pendingDeclarations.length + pendingPurchaseRequests.length
 
   const { data: notifications } = await supabase
     .from('notifications')
@@ -126,14 +152,19 @@ export default async function DashboardPage() {
           <Tabs defaultValue="pending" className="mt-3">
             <TabsList>
               <TabsTrigger value="pending">
-                {t("tabPending")} ({pendingPackages.length})
+                {t("tabPending")} ({pendingOrderCount})
               </TabsTrigger>
               <TabsTrigger value="completed">
                 {t("tabCompleted")} ({completedPackages.length})
               </TabsTrigger>
             </TabsList>
             <TabsContent value="pending">
-              <PackageList packages={pendingPackages} profile={profile ?? null} />
+              <PendingOrderList
+                packages={pendingPackages.map((pkg) => ({ kind: 'package' as const, ...pkg }))}
+                declarations={pendingDeclarations.map((d) => ({ kind: 'declaration' as const, ...d }))}
+                purchaseRequests={pendingPurchaseRequests.map((r) => ({ kind: 'purchaseRequest' as const, ...r }))}
+                profile={profile ?? null}
+              />
             </TabsContent>
             <TabsContent value="completed">
               <PackageList

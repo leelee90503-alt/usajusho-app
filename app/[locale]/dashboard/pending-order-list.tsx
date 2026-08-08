@@ -1,0 +1,272 @@
+'use client'
+
+import { useState, useTransition } from "react"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
+import { payForShipment } from "./actions"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Package as PackageIcon, PackagePlus, ShoppingCart } from "lucide-react"
+import { formatUSD } from "@/lib/format"
+
+type PackageOrder = {
+  kind: "package"
+  id: string
+  created_at: string
+  item_name: string
+  tracking_number: string | null
+  weight_lbs: number | null
+  admin_note: string | null
+  status: string
+  quote_amount: number | null
+  quote_note: string | null
+}
+
+type DeclarationOrder = {
+  kind: "declaration"
+  id: string
+  created_at: string
+  item_name: string
+  origin_tracking_number: string | null
+  status: string
+}
+
+type PurchaseRequestOrder = {
+  kind: "purchaseRequest"
+  id: string
+  created_at: string
+  product_description: string
+  status: string
+  quote_total_cents: number | null
+}
+
+type PendingOrder = PackageOrder | DeclarationOrder | PurchaseRequestOrder
+
+type Profile = {
+  full_name: string | null
+  phone_number: string | null
+  japan_postal_code: string | null
+  japan_prefecture: string | null
+  japan_city: string | null
+  japan_address_line1: string | null
+  japan_address_line2: string | null
+}
+
+function formatJapanAddress(profile: Profile | null) {
+  if (!profile) return null
+  const parts = [
+    profile.japan_postal_code ? `〒${profile.japan_postal_code}` : null,
+    profile.japan_prefecture,
+    profile.japan_city,
+    profile.japan_address_line1,
+    profile.japan_address_line2,
+  ].filter(Boolean)
+  return parts.length > 0 ? parts.join(" ") : null
+}
+
+const PACKAGE_STATUS_VARIANT: Record<string, "default" | "secondary" | "outline"> = {
+  quoted: "default",
+  paid: "secondary",
+}
+
+const DECLARATION_STATUS_VARIANT: Record<string, "default" | "secondary" | "outline"> = {
+  pending: "outline",
+}
+
+const REQUEST_STATUS_CLASS: Record<string, string> = {
+  submitted: "bg-slate-100 text-slate-700",
+  quote_sent: "bg-amber-100 text-amber-800",
+  awaiting_payment: "bg-amber-100 text-amber-800",
+  paid: "bg-teal-100 text-teal-800",
+  purchasing: "bg-teal-100 text-teal-800",
+}
+
+export default function PendingOrderList({
+  packages,
+  declarations,
+  purchaseRequests,
+  profile = null,
+}: {
+  packages: PackageOrder[]
+  declarations: DeclarationOrder[]
+  purchaseRequests: PurchaseRequestOrder[]
+  profile?: Profile | null
+}) {
+  const t = useTranslations("packageList")
+  const tDeclarations = useTranslations("packageDeclarations")
+  const tRequests = useTranslations("purchaseRequests")
+  const japanAddress = formatJapanAddress(profile)
+
+  const [isPending, startTransition] = useTransition()
+  const [payingId, setPayingId] = useState<string | null>(null)
+  const [payMessage, setPayMessage] = useState<string | null>(null)
+
+  function handlePay(id: string) {
+    setPayMessage(null)
+    setPayingId(id)
+    startTransition(async () => {
+      const result = await payForShipment(id)
+      if (result?.error) {
+        setPayMessage(result.error)
+      } else {
+        setPayMessage(t("paySuccess"))
+      }
+      setPayingId(null)
+    })
+  }
+
+  const orders: PendingOrder[] = [...packages, ...declarations, ...purchaseRequests].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )
+
+  if (orders.length === 0) {
+    return (
+      <Card className="mt-3 border-dashed">
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
+          {t("empty")}
+          <br />
+          {t("emptyHint")}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <div className="mt-3 space-y-3">
+      {orders.map((order) => {
+        if (order.kind === "package") {
+          return (
+            <Card key={`package-${order.id}`}>
+              <CardContent className="py-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <PackageIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                    <div>
+                      <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                        {t("typePackage")}
+                      </p>
+                      <p className="font-semibold text-slate-900">{order.item_name}</p>
+                      {order.tracking_number && (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {t("trackingNumber")}{order.tracking_number}
+                        </p>
+                      )}
+                      {order.weight_lbs && (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {t("weight")}{order.weight_lbs} {t("weightUnit")}
+                        </p>
+                      )}
+                      {order.admin_note && (
+                        <p className="mt-2 text-xs text-slate-600">{order.admin_note}</p>
+                      )}
+                    </div>
+                  </div>
+                  <Badge variant={PACKAGE_STATUS_VARIANT[order.status] ?? "outline"} className="whitespace-nowrap">
+                    {order.status === "quoted"
+                      ? t("statusQuoted")
+                      : order.status === "paid"
+                        ? t("statusPaid")
+                        : order.status}
+                  </Badge>
+                </div>
+
+                {order.status === "quoted" && order.quote_amount && (
+                  <div className="mt-3 rounded-lg bg-slate-50 p-3">
+                    <p className="text-sm text-slate-700">
+                      {t("quoteLabel")}¥{Number(order.quote_amount).toLocaleString()}
+                    </p>
+                    {order.quote_note && (
+                      <p className="mt-1 text-xs text-muted-foreground">{order.quote_note}</p>
+                    )}
+                    <div className="mt-2 space-y-0.5 border-t border-slate-200 pt-2 text-xs text-slate-600">
+                      <p className="font-semibold text-slate-700">{t("quoteRecipientHeading")}</p>
+                      <p>{t("quoteRecipientName")}{profile?.full_name || "—"}</p>
+                      <p>{t("quoteRecipientPhone")}{profile?.phone_number || t("quoteRecipientNotSet")}</p>
+                      <p>{t("quoteRecipientAddress")}{japanAddress || t("quoteRecipientNotSet")}</p>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={() => handlePay(order.id)}
+                      disabled={isPending && payingId === order.id}
+                      size="sm"
+                      className="mt-2"
+                    >
+                      {t("pay")}
+                    </Button>
+                    {payMessage && payingId === null && (
+                      <p className="mt-2 text-sm text-primary">{payMessage}</p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )
+        }
+
+        if (order.kind === "declaration") {
+          return (
+            <Link key={`declaration-${order.id}`} href="/dashboard/declarations">
+              <Card className="transition-shadow hover:shadow-md">
+                <CardContent className="py-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <PackagePlus className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                      <div>
+                        <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                          {t("typeDeclaration")}
+                        </p>
+                        <p className="font-semibold text-slate-900">{order.item_name}</p>
+                        {order.origin_tracking_number && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {tDeclarations("trackingLabel")}: {order.origin_tracking_number}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <Badge variant={DECLARATION_STATUS_VARIANT[order.status] ?? "outline"} className="whitespace-nowrap">
+                      {tDeclarations(`status.${order.status}`)}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          )
+        }
+
+        return (
+          <Link key={`request-${order.id}`} href={`/dashboard/purchase-requests/${order.id}`}>
+            <Card className="transition-shadow hover:shadow-md">
+              <CardContent className="py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <ShoppingCart className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                    <div>
+                      <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                        {t("typePurchaseRequest")}
+                      </p>
+                      <p className="line-clamp-1 font-semibold text-slate-900">
+                        {order.product_description}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className={`shrink-0 border-transparent ${REQUEST_STATUS_CLASS[order.status] ?? "bg-slate-100 text-slate-700"}`}
+                  >
+                    {tRequests(`status.${order.status}`)}
+                  </Badge>
+                </div>
+                {order.quote_total_cents != null && (
+                  <p className="mt-2 text-sm text-slate-600">
+                    {tRequests("quoteLabel")}: ${formatUSD(order.quote_total_cents / 100)}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </Link>
+        )
+      })}
+    </div>
+  )
+}
