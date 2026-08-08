@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { requireAdmin } from "./actions"
 import { notifyUser } from "@/lib/notifications"
 import { calculateChargeableWeight } from "@/lib/pricing"
+import { formatUSD } from "@/lib/format"
 
 // Primary path for handling a physical package arrival: the admin finds the
 // matching pending pre-declaration, enters the item's actual weight/size/
@@ -98,11 +99,11 @@ export async function matchAndQuoteDeclaration(
     userId: declaration.user_id,
     packageId: newPackage.id,
     title: "送料の見積りが届きました",
-    body: `${itemName} の送料見積り ¥${params.quoteAmount.toLocaleString()} が届きました。${
+    body: `${itemName} の送料見積り $${formatUSD(params.quoteAmount)} が届きました。${
       memo ? `メモ: ${memo} ` : ""
     }ダッシュボードからお支払いください。`,
     titleEn: "Your shipping quote is ready",
-    bodyEn: `Your shipping quote of ¥${params.quoteAmount.toLocaleString()} for "${itemName}" is ready.${
+    bodyEn: `Your shipping quote of $${formatUSD(params.quoteAmount)} for "${itemName}" is ready.${
       memo ? ` Note: ${memo}.` : ""
     } Please pay from your dashboard.`,
   })

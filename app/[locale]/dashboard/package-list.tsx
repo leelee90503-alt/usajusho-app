@@ -2,11 +2,12 @@
 
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
-import { payForShipment } from "./actions"
+import { payForShipment, createAdditionalChargeCheckoutSession } from "./actions"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Package as PackageIcon } from "lucide-react"
+import { formatUSD } from "@/lib/format"
 
 type Package = {
   id: string
@@ -17,6 +18,13 @@ type Package = {
   status: string
   quote_amount: number | null
   quote_note: string | null
+}
+
+type AdditionalCharge = {
+  id: string
+  reason: string
+  amount_cents: number
+  status: string
 }
 
 type Profile = {
@@ -51,10 +59,12 @@ export default function PackageList({
   packages,
   profile = null,
   emptyVariant = "default",
+  additionalCharges = {},
 }: {
   packages: Package[]
   profile?: Profile | null
   emptyVariant?: "default" | "completed"
+  additionalCharges?: Record<string, AdditionalCharge[]>
 }) {
   const t = useTranslations("packageList")
   const japanAddress = formatJapanAddress(profile)
@@ -63,9 +73,18 @@ export default function PackageList({
     paid: t("statusPaid"),
     shipped: t("statusShipped"),
   }
+  const CHARGE_STATUS_LABELS: Record<string, string> = {
+    pending: t("chargeStatusPending"),
+    awaiting_payment: t("chargeStatusAwaitingPayment"),
+    paid: t("chargeStatusPaid"),
+    cancelled: t("chargeStatusCancelled"),
+    refunded: t("chargeStatusRefunded"),
+  }
   const [isPending, startTransition] = useTransition()
   const [payingId, setPayingId] = useState<string | null>(null)
   const [payMessage, setPayMessage] = useState<string | null>(null)
+  const [payingChargeId, setPayingChargeId] = useState<string | null>(null)
+  const [chargeMessage, setChargeMessage] = useState<string | null>(null)
 
   function handlePay(id: string) {
     setPayMessage(null)
@@ -78,6 +97,20 @@ export default function PackageList({
         setPayMessage(t("paySuccess"))
       }
       setPayingId(null)
+    })
+  }
+
+  function handlePayCharge(chargeId: string) {
+    setChargeMessage(null)
+    setPayingChargeId(chargeId)
+    startTransition(async () => {
+      const result = await createAdditionalChargeCheckoutSession(chargeId)
+      if (result?.error) {
+        setChargeMessage(result.error)
+        setPayingChargeId(null)
+      } else if (result?.url) {
+        window.location.href = result.url
+      }
     })
   }
 
@@ -127,7 +160,7 @@ export default function PackageList({
               {pkg.status === "quoted" && pkg.quote_amount && (
                 <div className="mt-3 rounded-lg bg-slate-50 p-3">
                   <p className="text-sm text-slate-700">
-                    {t("quoteLabel")}¥{Number(pkg.quote_amount).toLocaleString()}
+                    {t("quoteLabel")}${formatUSD(pkg.quote_amount)}
                   </p>
                   {pkg.quote_note && (
                     <p className="mt-1 text-xs text-muted-foreground">{pkg.quote_note}</p>
@@ -149,6 +182,38 @@ export default function PackageList({
                   </Button>
                   {payMessage && payingId === null && (
                     <p className="mt-2 text-sm text-primary">{payMessage}</p>
+                  )}
+                </div>
+              )}
+
+              {(additionalCharges[pkg.id] ?? []).length > 0 && (
+                <div className="mt-3 space-y-2 border-t border-slate-200 pt-3">
+                  <p className="text-xs font-semibold text-slate-700">{t("additionalChargesHeading")}</p>
+                  {(additionalCharges[pkg.id] ?? []).map((charge) => (
+                    <div key={charge.id} className="rounded-lg bg-slate-50 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm text-slate-700">
+                          {charge.reason} — ${formatUSD(charge.amount_cents / 100)}
+                        </p>
+                        <Badge variant="outline" className="whitespace-nowrap text-xs">
+                          {CHARGE_STATUS_LABELS[charge.status] || charge.status}
+                        </Badge>
+                      </div>
+                      {charge.status === "pending" && (
+                        <Button
+                          type="button"
+                          onClick={() => handlePayCharge(charge.id)}
+                          disabled={isPending && payingChargeId === charge.id}
+                          size="sm"
+                          className="mt-2"
+                        >
+                          {t("pay")}
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  {chargeMessage && (
+                    <p className="text-sm text-destructive">{chargeMessage}</p>
                   )}
                 </div>
               )}

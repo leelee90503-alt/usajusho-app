@@ -38,18 +38,20 @@ export async function sendQuote(
   requestId: string,
   itemPriceCents: number,
   feeCents: number,
+  shippingCents: number,
   quoteNote: string,
   quoteExpiresAt: string | null,
 ) {
   const supabase = await requireAdmin()
 
-  const totalCents = itemPriceCents + feeCents
+  const totalCents = itemPriceCents + feeCents + shippingCents
 
   const { data: updated, error } = await supabase
     .from("purchase_requests")
     .update({
       quote_item_price_cents: itemPriceCents,
       quote_fee_cents: feeCents,
+      quote_shipping_cents: shippingCents,
       quote_total_cents: totalCents,
       quote_note: quoteNote || null,
       quote_expires_at: quoteExpiresAt,
@@ -110,7 +112,7 @@ export async function markPurchasedAndLinkPackage(
 
   const { data: request, error: fetchError } = await supabase
     .from("purchase_requests")
-    .select("id, user_id, status")
+    .select("id, user_id, status, quote_shipping_cents")
     .eq("id", requestId)
     .single()
 
@@ -124,8 +126,12 @@ export async function markPurchasedAndLinkPackage(
 
   // Created with status "missing" even though the customer is already known:
   // the item hasn't physically arrived at the warehouse yet, so it still
-  // needs an admin to weigh/measure it and send a quote via the Missing
-  // Packages flow on /admin/packages before it can move to "quoted".
+  // needs an admin to weigh/measure it via the Missing Packages flow on
+  // /admin/packages before it can move to "paid". Shipping was already
+  // collected as part of the purchase-agency quote (quote_shipping_cents),
+  // so shipping_prepaid lets resolveMissingPackage() skip the normal
+  // "quoted" payment step and jump straight to "paid" once weighed.
+  const shippingCents = request.quote_shipping_cents ?? 0
   const { data: pkg, error: pkgError } = await supabase
     .from("packages")
     .insert({
@@ -133,6 +139,9 @@ export async function markPurchasedAndLinkPackage(
       item_name: itemName,
       status: "missing",
       admin_note: `購入代行リクエスト ${request.id} 経由で作成`,
+      shipping_prepaid: true,
+      source_purchase_request_id: request.id,
+      quote_amount: shippingCents / 100,
     })
     .select("id")
     .single()

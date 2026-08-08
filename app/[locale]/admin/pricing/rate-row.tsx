@@ -86,7 +86,7 @@ export default function RateRow({ rate }: { rate: Rate }) {
               <Input
                 type="number"
                 name="price_per_kg"
-                step="1"
+                step="0.01"
                 min="0"
                 defaultValue={rate.price_per_kg}
                 required
@@ -94,7 +94,7 @@ export default function RateRow({ rate }: { rate: Rate }) {
             </div>
             <div className="space-y-1">
               <Label className="text-xs font-normal text-teal-800">{t("minChargeField")}</Label>
-              <Input type="number" name="min_charge" step="1" min="0" defaultValue={rate.min_charge} />
+              <Input type="number" name="min_charge" step="0.01" min="0" defaultValue={rate.min_charge} />
             </div>
 
             {message && <p className="text-xs text-destructive sm:col-span-2">{message}</p>}

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
-import { payForShipment } from "./actions"
+import { payForShipment, createAdditionalChargeCheckoutSession } from "./actions"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -42,6 +42,13 @@ type PurchaseRequestOrder = {
 }
 
 type PendingOrder = PackageOrder | DeclarationOrder | PurchaseRequestOrder
+
+type AdditionalCharge = {
+  id: string
+  reason: string
+  amount_cents: number
+  status: string
+}
 
 type Profile = {
   full_name: string | null
@@ -87,20 +94,32 @@ export default function PendingOrderList({
   declarations,
   purchaseRequests,
   profile = null,
+  additionalCharges = {},
 }: {
   packages: PackageOrder[]
   declarations: DeclarationOrder[]
   purchaseRequests: PurchaseRequestOrder[]
   profile?: Profile | null
+  additionalCharges?: Record<string, AdditionalCharge[]>
 }) {
   const t = useTranslations("packageList")
   const tDeclarations = useTranslations("packageDeclarations")
   const tRequests = useTranslations("purchaseRequests")
   const japanAddress = formatJapanAddress(profile)
 
+  const CHARGE_STATUS_LABELS: Record<string, string> = {
+    pending: t("chargeStatusPending"),
+    awaiting_payment: t("chargeStatusAwaitingPayment"),
+    paid: t("chargeStatusPaid"),
+    cancelled: t("chargeStatusCancelled"),
+    refunded: t("chargeStatusRefunded"),
+  }
+
   const [isPending, startTransition] = useTransition()
   const [payingId, setPayingId] = useState<string | null>(null)
   const [payMessage, setPayMessage] = useState<string | null>(null)
+  const [payingChargeId, setPayingChargeId] = useState<string | null>(null)
+  const [chargeMessage, setChargeMessage] = useState<string | null>(null)
 
   function handlePay(id: string) {
     setPayMessage(null)
@@ -113,6 +132,20 @@ export default function PendingOrderList({
         setPayMessage(t("paySuccess"))
       }
       setPayingId(null)
+    })
+  }
+
+  function handlePayCharge(chargeId: string) {
+    setChargeMessage(null)
+    setPayingChargeId(chargeId)
+    startTransition(async () => {
+      const result = await createAdditionalChargeCheckoutSession(chargeId)
+      if (result?.error) {
+        setChargeMessage(result.error)
+        setPayingChargeId(null)
+      } else if (result?.url) {
+        window.location.href = result.url
+      }
     })
   }
 
@@ -174,7 +207,7 @@ export default function PendingOrderList({
                 {order.status === "quoted" && order.quote_amount && (
                   <div className="mt-3 rounded-lg bg-slate-50 p-3">
                     <p className="text-sm text-slate-700">
-                      {t("quoteLabel")}¥{Number(order.quote_amount).toLocaleString()}
+                      {t("quoteLabel")}${formatUSD(order.quote_amount)}
                     </p>
                     {order.quote_note && (
                       <p className="mt-1 text-xs text-muted-foreground">{order.quote_note}</p>
@@ -196,6 +229,38 @@ export default function PendingOrderList({
                     </Button>
                     {payMessage && payingId === null && (
                       <p className="mt-2 text-sm text-primary">{payMessage}</p>
+                    )}
+                  </div>
+                )}
+
+                {(additionalCharges[order.id] ?? []).length > 0 && (
+                  <div className="mt-3 space-y-2 border-t border-slate-200 pt-3">
+                    <p className="text-xs font-semibold text-slate-700">{t("additionalChargesHeading")}</p>
+                    {(additionalCharges[order.id] ?? []).map((charge) => (
+                      <div key={charge.id} className="rounded-lg bg-slate-50 p-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm text-slate-700">
+                            {charge.reason} — ${formatUSD(charge.amount_cents / 100)}
+                          </p>
+                          <Badge variant="outline" className="whitespace-nowrap text-xs">
+                            {CHARGE_STATUS_LABELS[charge.status] || charge.status}
+                          </Badge>
+                        </div>
+                        {charge.status === "pending" && (
+                          <Button
+                            type="button"
+                            onClick={() => handlePayCharge(charge.id)}
+                            disabled={isPending && payingChargeId === charge.id}
+                            size="sm"
+                            className="mt-2"
+                          >
+                            {t("pay")}
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    {chargeMessage && (
+                      <p className="text-sm text-destructive">{chargeMessage}</p>
                     )}
                   </div>
                 )}

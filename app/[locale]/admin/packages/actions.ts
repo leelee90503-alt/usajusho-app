@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { notifyUser } from "@/lib/notifications"
 import { calculateChargeableWeight } from "@/lib/pricing"
+import { formatUSD } from "@/lib/format"
 
 export async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>> {
   const locale = await getLocale()
@@ -105,14 +106,14 @@ export async function resolveMissingPackage(
     heightCm: number | null
     trackingNumber: string
     memo: string
-    quoteAmount: number
+    quoteAmount: number | null
   }
 ) {
   const supabase = await requireAdmin()
 
   const { data: pkg, error: pkgError } = await supabase
     .from("packages")
-    .select("id, user_id, item_name, status")
+    .select("id, user_id, item_name, status, shipping_prepaid, quote_amount")
     .eq("id", packageId)
     .single()
 
@@ -124,7 +125,15 @@ export async function resolveMissingPackage(
     return { error: "この荷物はすでに処理済みです。" }
   }
 
-  if (!params.quoteAmount || params.quoteAmount <= 0) {
+  // Packages linked from a purchase-agency request already had their
+  // shipping cost collected as part of that quote (see
+  // markPurchasedAndLinkPackage() in
+  // app/[locale]/admin/purchase-requests/actions.ts), so they skip the
+  // normal "must enter a positive quote amount" requirement below and go
+  // straight to "paid" instead of "quoted" -- no second payment needed.
+  const isPrepaid = pkg.shipping_prepaid === true
+
+  if (!isPrepaid && (!params.quoteAmount || params.quoteAmount <= 0)) {
     return { error: "正しい見積金額を入力してください。" }
   }
 
@@ -158,6 +167,11 @@ export async function resolveMissingPackage(
 
   const memo = params.memo.trim() || null
 
+  // Prepaid packages keep the quote_amount already set at link time (the
+  // shipping cost collected via the purchase-agency quote) rather than
+  // being overwritten by this form's (typically empty) quote amount field.
+  const quoteAmount = isPrepaid ? pkg.quote_amount : params.quoteAmount
+
   const { error: updateError } = await supabase
     .from("packages")
     .update({
@@ -170,9 +184,9 @@ export async function resolveMissingPackage(
       chargeable_weight_kg: chargeableWeightKg || null,
       tracking_number: params.trackingNumber.trim() || null,
       admin_note: memo,
-      quote_amount: params.quoteAmount,
+      quote_amount: quoteAmount,
       quote_note: memo,
-      status: "quoted",
+      status: isPrepaid ? "paid" : "quoted",
       updated_at: new Date().toISOString(),
     })
     .eq("id", packageId)
@@ -202,18 +216,34 @@ export async function resolveMissingPackage(
       .eq("id", pendingDeclarations[0].id)
   }
 
-  await notifyUser(supabase, {
-    userId: targetUserId,
-    packageId,
-    title: "送料の見積りが届きました",
-    body: `${pkg.item_name} の送料見積り ¥${params.quoteAmount.toLocaleString()} が届きました。${
-      memo ? `メモ: ${memo} ` : ""
-    }ダッシュボードからお支払いください。`,
-    titleEn: "Your shipping quote is ready",
-    bodyEn: `Your shipping quote of ¥${params.quoteAmount.toLocaleString()} for "${pkg.item_name}" is ready.${
-      memo ? ` Note: ${memo}.` : ""
-    } Please pay from your dashboard.`,
-  })
+  if (isPrepaid) {
+    await notifyUser(supabase, {
+      userId: targetUserId,
+      packageId,
+      title: "お荷物の到着が確認できました",
+      body: `${pkg.item_name} の到着と重量を確認しました。送料は購入代行のお見積りでお支払い済みのため、追加のお支払いは不要です。まもなく発送いたします。${
+        memo ? `メモ: ${memo}` : ""
+      }`,
+      titleEn: "Your package has arrived",
+      bodyEn: `We've confirmed the arrival and weight of "${pkg.item_name}". Shipping was already paid as part of your purchase-agency quote, so no further payment is needed. It will ship soon.${
+        memo ? ` Note: ${memo}.` : ""
+      }`,
+    })
+  } else {
+    const amount = formatUSD(quoteAmount ?? 0)
+    await notifyUser(supabase, {
+      userId: targetUserId,
+      packageId,
+      title: "送料の見積りが届きました",
+      body: `${pkg.item_name} の送料見積り $${amount} が届きました。${
+        memo ? `メモ: ${memo} ` : ""
+      }ダッシュボードからお支払いください。`,
+      titleEn: "Your shipping quote is ready",
+      bodyEn: `Your shipping quote of $${amount} for "${pkg.item_name}" is ready.${
+        memo ? ` Note: ${memo}.` : ""
+      } Please pay from your dashboard.`,
+    })
+  }
 
   revalidatePath("/admin/packages")
   revalidatePath("/dashboard")
@@ -330,6 +360,74 @@ export async function markShipped(packageId: string, trackingNumber: string) {
       bodyEn: `"${updated.item_name}" has shipped. Tracking number: ${trimmed}`,
     })
   }
+
+  revalidatePath("/admin/packages")
+  revalidatePath("/dashboard")
+  return { success: true }
+}
+
+// Bills a customer an extra amount against an already-existing package --
+// e.g. the item weighed more than the original estimate. Modeled on the
+// purchase_requests Square payment-link flow (createCheckoutSession() in
+// app/[locale]/dashboard/purchase-requests/actions.ts), since that's the
+// only real (non-placeholder) payment integration in this codebase; the
+// customer pays it from their dashboard via
+// createAdditionalChargeCheckoutSession() in app/[locale]/dashboard/actions.ts,
+// and the Square webhook marks it paid.
+export async function createAdditionalCharge(
+  packageId: string,
+  reason: string,
+  amountCents: number,
+) {
+  const supabase = await requireAdmin()
+
+  const trimmedReason = reason.trim()
+  if (!trimmedReason) {
+    return { error: "理由を入力してください。" }
+  }
+  if (!amountCents || amountCents <= 0) {
+    return { error: "正しい金額を入力してください。" }
+  }
+
+  const {
+    data: { user: admin },
+  } = await supabase.auth.getUser()
+
+  const { data: pkg, error: pkgError } = await supabase
+    .from("packages")
+    .select("id, user_id, item_name")
+    .eq("id", packageId)
+    .single()
+
+  if (pkgError || !pkg || !pkg.user_id) {
+    return { error: "荷物が見つかりません。" }
+  }
+
+  const { error: insertError } = await supabase.from("additional_charges").insert({
+    user_id: pkg.user_id,
+    package_id: packageId,
+    reason: trimmedReason,
+    amount_cents: amountCents,
+    status: "pending",
+    created_by: admin?.id ?? null,
+  })
+
+  if (insertError) {
+    return { error: insertError.message }
+  }
+
+  await notifyUser(supabase, {
+    userId: pkg.user_id,
+    packageId,
+    title: "追加料金のご請求について",
+    body: `${pkg.item_name} について追加料金 $${formatUSD(
+      amountCents / 100,
+    )} をご請求いたします。理由: ${trimmedReason} ダッシュボードからお支払いください。`,
+    titleEn: "Additional charge for your package",
+    bodyEn: `An additional charge of $${formatUSD(
+      amountCents / 100,
+    )} has been issued for "${pkg.item_name}". Reason: ${trimmedReason}. Please pay from your dashboard.`,
+  })
 
   revalidatePath("/admin/packages")
   revalidatePath("/dashboard")

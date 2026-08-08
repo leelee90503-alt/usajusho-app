@@ -77,6 +77,32 @@ export default async function DashboardPage() {
     .order('created_at', { ascending: false })
     .limit(20)
 
+  // Additional charges (e.g. weight-adjustment fees) issued against the
+  // user's packages -- only non-final statuses are worth showing on the
+  // dashboard, since paid/cancelled/refunded ones don't need customer
+  // action. Grouped by package_id so each package card can render its own.
+  const { data: additionalChargesData } = await supabase
+    .from('additional_charges')
+    .select('id, package_id, reason, amount_cents, status')
+    .eq('user_id', user.id)
+    .in('status', ['pending', 'awaiting_payment'])
+    .order('created_at', { ascending: false })
+
+  type AdditionalCharge = {
+    id: string
+    package_id: string
+    reason: string
+    amount_cents: number
+    status: string
+  }
+
+  const additionalChargesByPackageId: Record<string, AdditionalCharge[]> = {}
+  for (const charge of (additionalChargesData ?? []) as AdditionalCharge[]) {
+    const list = additionalChargesByPackageId[charge.package_id] ?? []
+    list.push(charge)
+    additionalChargesByPackageId[charge.package_id] = list
+  }
+
   return (
     <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-3xl px-6 py-10">
@@ -164,6 +190,7 @@ export default async function DashboardPage() {
                 declarations={pendingDeclarations.map((d) => ({ kind: 'declaration' as const, ...d }))}
                 purchaseRequests={pendingPurchaseRequests.map((r) => ({ kind: 'purchaseRequest' as const, ...r }))}
                 profile={profile ?? null}
+                additionalCharges={additionalChargesByPackageId}
               />
             </TabsContent>
             <TabsContent value="completed">
@@ -171,6 +198,7 @@ export default async function DashboardPage() {
                 packages={completedPackages}
                 profile={profile ?? null}
                 emptyVariant="completed"
+                additionalCharges={additionalChargesByPackageId}
               />
             </TabsContent>
           </Tabs>

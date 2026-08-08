@@ -3,6 +3,7 @@ import { redirect, Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent } from '@/components/ui/card'
 import { FileText, ChevronRight } from 'lucide-react'
+import { formatUSD } from '@/lib/format'
 
 export default async function InvoicesPage() {
   const locale = await getLocale()
@@ -57,7 +58,7 @@ export default async function InvoicesPage() {
                   <div className="flex items-center gap-2">
                     {pkg.quote_amount != null && (
                       <p className="text-sm font-semibold text-primary">
-                        {Number(pkg.quote_amount).toLocaleString()} {t("currency")}
+                        ${formatUSD(pkg.quote_amount)}
                       </p>
                     )}
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />

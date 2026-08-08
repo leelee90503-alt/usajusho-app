@@ -105,6 +105,26 @@ export default async function AdminPackagesPage({
 
   const invoiceByPackageId = new Map((allInvoices ?? []).map((inv) => [inv.package_id, inv]))
 
+  const { data: allAdditionalCharges } = await supabase
+    .from("additional_charges")
+    .select("id, package_id, reason, amount_cents, status")
+    .order("created_at", { ascending: false })
+
+  type AdditionalCharge = {
+    id: string
+    package_id: string
+    reason: string
+    amount_cents: number
+    status: string
+  }
+
+  const additionalChargesByPackageId = new Map<string, AdditionalCharge[]>()
+  for (const charge of (allAdditionalCharges ?? []) as AdditionalCharge[]) {
+    const list = additionalChargesByPackageId.get(charge.package_id) ?? []
+    list.push(charge)
+    additionalChargesByPackageId.set(charge.package_id, list)
+  }
+
   const statCounts = {
     total: packages.length,
     missing: packages.filter((p) => p.status === "missing").length,
@@ -118,6 +138,7 @@ export default async function AdminPackagesPage({
     const matchesStatus = !status || pkg.status === status
     const matchesQuery =
       !query ||
+      pkg.id?.toLowerCase() === query ||
       pkg.item_name?.toLowerCase().includes(query) ||
       pkg.tracking_number?.toLowerCase().includes(query) ||
       pkg.profiles?.full_name?.toLowerCase().includes(query) ||
@@ -245,6 +266,7 @@ export default async function AdminPackagesPage({
                 pkg={pkg}
                 invoice={invoiceByPackageId.get(pkg.id) ?? null}
                 declaration={declarationByPackageId.get(pkg.id) ?? null}
+                additionalCharges={additionalChargesByPackageId.get(pkg.id) ?? []}
               />
             ))}
 

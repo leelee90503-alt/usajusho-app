@@ -7,6 +7,7 @@ import InvoiceForm from './invoice-form'
 import { createOrGetDraftInvoice } from './invoice-actions'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft } from 'lucide-react'
+import { formatUSD } from '@/lib/format'
 
 export default async function InvoiceDetailPage({
   params,
@@ -161,8 +162,7 @@ export default async function InvoiceDetailPage({
             <div className="mt-6 flex items-center justify-between border-t border-slate-200 pt-6">
               <p className="text-sm font-semibold text-slate-900">{t("totalLabel")}</p>
               <p className="text-lg font-bold text-primary">
-                {pkg.quote_amount != null ? Number(pkg.quote_amount).toLocaleString() : "-"}{" "}
-                {t("currency")}
+                {pkg.quote_amount != null ? `$${formatUSD(pkg.quote_amount)}` : "-"}
               </p>
             </div>
 

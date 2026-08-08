@@ -56,12 +56,12 @@ export default function AddRateForm() {
 
         <div className="space-y-1.5">
           <Label htmlFor="rate-price">{t("pricePerKgField")}</Label>
-          <Input id="rate-price" type="number" name="price_per_kg" step="1" min="0" required />
+          <Input id="rate-price" type="number" name="price_per_kg" step="0.01" min="0" required />
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="rate-min-charge">{t("minChargeField")}</Label>
-          <Input id="rate-min-charge" type="number" name="min_charge" step="1" min="0" defaultValue={0} />
+          <Input id="rate-min-charge" type="number" name="min_charge" step="0.01" min="0" defaultValue={0} />
         </div>
       </div>
 

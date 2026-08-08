@@ -91,17 +91,37 @@ export async function POST(request: Request) {
       }
 
       if (payment.status === "COMPLETED") {
-        const { error } = await supabase
+        // A given Square order_id belongs to exactly one of these two
+        // tables (purchase_requests or additional_charges) -- Square order
+        // IDs are unique per account, so attempting both updates is safe;
+        // whichever table doesn't have a matching row simply updates 0
+        // rows with no error.
+        const { error, count } = await supabase
           .from("purchase_requests")
           .update({
             status: "paid",
             square_payment_id: payment.id,
             updated_at: new Date().toISOString(),
-          })
+          }, { count: "exact" })
           .eq("square_order_id", payment.order_id)
 
         if (error) {
           console.error("Failed to mark purchase request as paid:", error.message)
+        }
+
+        if (!error && !count) {
+          const { error: chargeError } = await supabase
+            .from("additional_charges")
+            .update({
+              status: "paid",
+              square_payment_id: payment.id,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("square_order_id", payment.order_id)
+
+          if (chargeError) {
+            console.error("Failed to mark additional charge as paid:", chargeError.message)
+          }
         }
       } else if (payment.status === "FAILED" || payment.status === "CANCELED") {
         console.error(
@@ -120,13 +140,24 @@ export async function POST(request: Request) {
         break
       }
 
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from("purchase_requests")
-        .update({ status: "refunded", updated_at: new Date().toISOString() })
+        .update({ status: "refunded", updated_at: new Date().toISOString() }, { count: "exact" })
         .eq("square_payment_id", refund.payment_id)
 
       if (error) {
         console.error("Failed to mark purchase request as refunded:", error.message)
+      }
+
+      if (!error && !count) {
+        const { error: chargeError } = await supabase
+          .from("additional_charges")
+          .update({ status: "refunded", updated_at: new Date().toISOString() })
+          .eq("square_payment_id", refund.payment_id)
+
+        if (chargeError) {
+          console.error("Failed to mark additional charge as refunded:", chargeError.message)
+        }
       }
       break
     }

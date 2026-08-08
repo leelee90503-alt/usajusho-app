@@ -1,8 +1,10 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { randomUUID } from "crypto"
 import { createClient } from "@/lib/supabase/server"
 import { notifyAdmins } from "@/lib/notifications"
+import { getSquare, getSquareLocationId } from "@/lib/square"
 
 export async function payForShipment(packageId: string) {
   const supabase = await createClient()
@@ -41,6 +43,83 @@ export async function payForShipment(packageId: string) {
   revalidatePath("/admin/packages")
 
   return { success: true }
+}
+
+// Mirrors createCheckoutSession() in
+// app/[locale]/dashboard/purchase-requests/actions.ts -- a Square
+// "quickPay" payment link for a single additional charge issued by an
+// admin (see createAdditionalCharge() in app/[locale]/admin/packages/actions.ts).
+// The charge is marked "paid" by the Square webhook, not here.
+export async function createAdditionalChargeCheckoutSession(chargeId: string) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: "ログインしてください。" }
+  }
+
+  const { data: charge, error: fetchError } = await supabase
+    .from("additional_charges")
+    .select("id, user_id, status, amount_cents, reason")
+    .eq("id", chargeId)
+    .eq("user_id", user.id)
+    .single()
+
+  if (fetchError || !charge) {
+    return { error: "追加料金が見つかりません。" }
+  }
+
+  if (charge.status !== "pending") {
+    return { error: "この追加料金はすでに処理されています。" }
+  }
+
+  try {
+    const square = await getSquare()
+    const locationId = await getSquareLocationId()
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL || "https://usajusho-app.vercel.app"
+
+    const { paymentLink } = await square.checkout.paymentLinks.create({
+      idempotencyKey: randomUUID(),
+      quickPay: {
+        name: "USAJUSHO 追加料金",
+        priceMoney: {
+          amount: BigInt(charge.amount_cents),
+          currency: "USD",
+        },
+        locationId,
+      },
+      checkoutOptions: {
+        redirectUrl: `${siteUrl}/dashboard?paid=1`,
+      },
+      prePopulatedData: {
+        buyerEmail: user.email ?? undefined,
+      },
+      paymentNote: charge.reason.slice(0, 500),
+    })
+
+    if (!paymentLink?.url || !paymentLink.orderId) {
+      throw new Error("Square did not return a payment link URL")
+    }
+
+    await supabase
+      .from("additional_charges")
+      .update({
+        status: "awaiting_payment",
+        square_order_id: paymentLink.orderId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", charge.id)
+
+    revalidatePath("/dashboard")
+    return { url: paymentLink.url }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "unknown error"
+    return { error: `Square Checkoutリンクの作成に失敗しました: ${message}` }
+  }
 }
 
 export async function markNotificationRead(notificationId: string) {

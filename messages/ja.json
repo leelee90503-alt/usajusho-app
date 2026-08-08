@@ -214,7 +214,13 @@
     "quoteRecipientName": "氏名：",
     "quoteRecipientPhone": "電話番号：",
     "quoteRecipientAddress": "住所：",
-    "quoteRecipientNotSet": "未設定"
+    "quoteRecipientNotSet": "未設定",
+    "additionalChargesHeading": "追加料金",
+    "chargeStatusPending": "保留中",
+    "chargeStatusAwaitingPayment": "支払い待ち",
+    "chargeStatusPaid": "支払い済み",
+    "chargeStatusCancelled": "キャンセル済み",
+    "chargeStatusRefunded": "返金済み"
   },
   "notificationBell": {
     "title": "通知",
@@ -262,15 +268,33 @@
     "matchHeightLabel": "高さ (cm)",
     "matchTrackingLabel": "追跡番号",
     "matchMemoLabel": "メモ（見積りと共にお客様に届きます）",
-    "matchQuoteAmountLabel": "見積金額（円）",
+    "matchQuoteAmountLabel": "見積金額（ドル）",
     "matchAndQuote": "照合して見積りを送信",
-    "suggestedAmountShort": "目安: {amount}円",
+    "suggestedAmountShort": "目安: ${amount}",
     "matchSuccess": "見積りを送信しました。",
     "matchSuiteLabel": "スイート番号",
     "deletePackage": "削除",
     "confirmDeletePackage": "この荷物を削除しますか？この操作は取り消せません。",
     "missingPackages": "行方不明の荷物（{count}件）",
-    "missingPackagesHint": "事前申告と一致しなかった荷物です。スイート番号を入力して顧客と紐づけ、見積りを送信してください。"
+    "missingPackagesHint": "事前申告と一致しなかった荷物です。スイート番号を入力して顧客と紐づけ、見積りを送信してください。",
+    "prepaidNotice": "送料は購入代行の見積りですでにお支払い済みです：${amount}",
+    "confirmPrepaidButton": "確認して発送準備へ",
+    "prepaidBadge": "送料支払い済み",
+    "additionalChargeButton": "追加料金を請求",
+    "additionalChargeReasonLabel": "理由",
+    "additionalChargeAmountLabel": "金額（ドル）",
+    "additionalChargeSubmit": "請求する",
+    "additionalChargeCancel": "キャンセル",
+    "additionalChargeInvalid": "理由と正しい金額を入力してください。",
+    "additionalChargeSuccess": "追加料金を発行しました。",
+    "additionalChargeLine": "{reason}：${amount}",
+    "additionalChargeStatus": {
+      "pending": "保留中",
+      "awaiting_payment": "支払い待ち",
+      "paid": "支払い済み",
+      "cancelled": "キャンセル済み",
+      "refunded": "返金済み"
+    }
   },
   "packageStatus": {
     "missing": "不明",
@@ -283,11 +307,11 @@
     "trackingNumber": "追跡番号：",
     "weight": "重量：",
     "weightUnit": "kg",
-    "quoteAmountLabel": "見積金額：¥",
+    "quoteAmountLabel": "見積金額：$",
     "delete": "削除",
     "deleteConfirm": "{name}を削除しますか？",
-    "quoteAmountFieldLabel": "見積金額（円）",
-    "quoteAmountPlaceholder": "3000",
+    "quoteAmountFieldLabel": "見積金額（ドル）",
+    "quoteAmountPlaceholder": "30.00",
     "quoteNoteFieldLabel": "メモ（任意）",
     "submitQuote": "見積を送信",
     "quoteInvalidAmount": "正しい金額を入力してください。",
@@ -295,7 +319,7 @@
     "dimensions": "サイズ: ",
     "dimensionsUnit": "cm",
     "chargeableWeight": "請求重量: ",
-    "suggestedAmount": "料金表による目安: {amount}円",
+    "suggestedAmount": "料金表による目安: ${amount}",
     "linkedDeclarationHeading": "事前申告情報",
     "commercialInvoiceLabel": "商業インボイス：",
     "preparingShipmentHeading": "発送準備",
@@ -350,8 +374,8 @@
     "minWeightField": "最小重量 (kg)",
     "maxWeightField": "最大重量 (kg)",
     "maxWeightPlaceholder": "上限なしの場合は空欄",
-    "pricePerKgField": "kgあたりの単価 (円)",
-    "minChargeField": "最低料金 (円)",
+    "pricePerKgField": "kgあたりの単価 (ドル)",
+    "minChargeField": "最低料金 (ドル)",
     "addSubmit": "追加",
     "addSuccess": "料金区分を追加しました。",
     "submitting": "保存中...",
@@ -359,8 +383,8 @@
     "empty": "まだ料金区分がありません。上のフォームから追加してください。",
     "rangeLabel": "{min} - {max} kg",
     "andAbove": "以上",
-    "priceLabel": "{price}円/kg",
-    "minChargeLabel": "最低{amount}円",
+    "priceLabel": "${price}/kg",
+    "minChargeLabel": "最低${amount}",
     "edit": "編集",
     "save": "保存",
     "cancel": "キャンセル",
@@ -374,7 +398,7 @@
     "backToDashboard": "ダッシュボードに戻る",
     "description": "支払い済みの発送とその請求書です。",
     "paidOn": "支払日: ",
-    "currency": "円",
+    "currency": "ドル",
     "empty": "まだ請求書はありません。"
   },
   "invoiceDetail": {
@@ -391,7 +415,7 @@
     "chargeableWeightLabel": "請求重量",
     "paidOnLabel": "支払日",
     "totalLabel": "合計",
-    "currency": "円"
+    "currency": "ドル"
   },
   "invoiceForm": {
     "title": "商業送り状（インボイス）",
@@ -551,7 +575,8 @@
       "cancelled": "キャンセル済み",
       "refunded": "返金済み"
     },
-    "productUrlNotWhitelisted": "現在、商品URLとしてご利用いただけるのは次のストアのみです：{stores}。これらのストアのリンクをご利用いただくか、URLを空欄にして商品の説明欄に詳細をご記入ください。"
+    "productUrlNotWhitelisted": "現在、商品URLとしてご利用いただけるのは次のストアのみです：{stores}。これらのストアのリンクをご利用いただくか、URLを空欄にして商品の説明欄に詳細をご記入ください。",
+    "quoteShipping": "米国→日本 送料"
   },
   "adminPurchaseRequests": {
     "title": "管理者：購入代行リクエスト",
@@ -630,7 +655,10 @@
     "whitelistDisabled": "無効",
     "whitelistRemove": "削除",
     "whitelistRemoveConfirm": "{label}（{domain}）を削除しますか？",
-    "whitelistEmpty": "まだ登録されたストアがありません。下のフォームから追加してください。"
+    "whitelistEmpty": "まだ登録されたストアがありません。下のフォームから追加してください。",
+    "shippingLabel": "米国→日本 送料（USD）",
+    "viewPackageLink": "パッケージを見る",
+    "viewInvoiceLink": "商業インボイス"
   },
   "footer": {
     "terms": "利用規約",

@@ -32,6 +32,7 @@ type PurchaseRequest = {
   status: string
   quote_item_price_cents: number | null
   quote_fee_cents: number | null
+  quote_shipping_cents: number | null
   quote_total_cents: number | null
   quote_note: string | null
   quote_expires_at: string | null
@@ -69,6 +70,11 @@ export default function RequestRow({
   const [fee, setFee] = useState(() =>
     request.quote_fee_cents != null ? String(request.quote_fee_cents / 100) : "",
   )
+  const [shipping, setShipping] = useState(() =>
+    request.quote_shipping_cents != null
+      ? String(request.quote_shipping_cents / 100)
+      : "",
+  )
   const [note, setNote] = useState(request.quote_note ?? "")
   const [expiresAt, setExpiresAt] = useState(
     request.quote_expires_at ? request.quote_expires_at.slice(0, 10) : "",
@@ -87,7 +93,8 @@ export default function RequestRow({
   function handleSendQuote() {
     const priceCents = Math.round(Number(itemPrice) * 100)
     const feeCents = Math.round(Number(fee) * 100)
-    if (!priceCents || Number.isNaN(feeCents)) {
+    const shippingCents = Math.round(Number(shipping || "0") * 100)
+    if (!priceCents || Number.isNaN(feeCents) || Number.isNaN(shippingCents)) {
       setMessage(t("quoteInvalid"))
       return
     }
@@ -97,6 +104,7 @@ export default function RequestRow({
         request.id,
         priceCents,
         feeCents,
+        shippingCents,
         note,
         expiresAt ? new Date(expiresAt).toISOString() : null,
       )
@@ -216,6 +224,20 @@ export default function RequestRow({
                 {t("suggestFeeButton")}
               </Button>
               <div className="space-y-1">
+                <Label htmlFor={`shipping-${request.id}`} className="text-xs font-normal text-muted-foreground">
+                  {t("shippingLabel")}
+                </Label>
+                <Input
+                  id={`shipping-${request.id}`}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={shipping}
+                  onChange={(e) => setShipping(e.target.value)}
+                  className="w-28"
+                />
+              </div>
+              <div className="space-y-1">
                 <Label htmlFor={`expires-${request.id}`} className="text-xs font-normal text-muted-foreground">
                   {t("expiresAtLabel")}
                 </Label>
@@ -285,10 +307,20 @@ export default function RequestRow({
         )}
 
         {request.linked_package_id && (
-          <p className="mt-3 text-xs text-muted-foreground">
-            {t("linkedPackageLabel")}:{" "}
-            <Link href="/admin/packages" className="text-accent hover:underline">
-              {request.linked_package_id}
+          <p className="mt-3 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+            <span>{t("linkedPackageLabel")}:</span>
+            <Link
+              href={`/admin/packages?q=${request.linked_package_id}`}
+              className="text-accent hover:underline"
+            >
+              {t("viewPackageLink")}
+            </Link>
+            <span>·</span>
+            <Link
+              href={`/admin/invoices/${request.linked_package_id}`}
+              className="text-accent hover:underline"
+            >
+              {t("viewInvoiceLink")}
             </Link>
           </p>
         )}

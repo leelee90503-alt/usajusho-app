@@ -4,6 +4,7 @@ import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { resolveMissingPackage, deletePackage } from "./actions"
 import { estimateQuote, type ShippingRate } from "@/lib/pricing"
+import { formatUSD } from "@/lib/format"
 import CarrierTrackLink from "@/components/carrier-track-link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -21,6 +22,8 @@ type MissingPackage = {
   width_cm: number | null
   height_cm: number | null
   user_id: string | null
+  shipping_prepaid?: boolean
+  quote_amount?: number | null
   profiles?: { full_name: string | null; suite_number: string | null } | null
 }
 
@@ -102,6 +105,7 @@ function MissingPackageCard({
   onDelete: () => void
 }) {
   const t = useTranslations("adminPackages")
+  const isPrepaid = pkg.shipping_prepaid === true
   const [suiteNumber, setSuiteNumber] = useState("")
   const [weightKg, setWeightKg] = useState(pkg.weight_kg != null ? String(pkg.weight_kg) : "")
   const [lengthCm, setLengthCm] = useState(pkg.length_cm != null ? String(pkg.length_cm) : "")
@@ -133,7 +137,7 @@ function MissingPackageCard({
       heightCm: heightCm ? Number(heightCm) : null,
       trackingNumber,
       memo,
-      quoteAmount: Number(quoteAmount),
+      quoteAmount: isPrepaid ? null : Number(quoteAmount),
     })
   }
 
@@ -228,16 +232,27 @@ function MissingPackageCard({
             <Label className="text-xs font-normal text-amber-800">{t("matchMemoLabel")}</Label>
             <Input value={memo} onChange={(e) => setMemo(e.target.value)} className="bg-white" />
           </div>
-          <div className="col-span-2 space-y-1">
-            <Label className="text-xs font-normal text-amber-800">{t("matchQuoteAmountLabel")}</Label>
-            <Input
-              type="number"
-              value={quoteAmount}
-              onChange={(e) => setQuoteAmount(e.target.value)}
-              className="bg-white"
-              placeholder={suggestion?.amount != null ? String(suggestion.amount) : undefined}
-            />
-          </div>
+          {isPrepaid ? (
+            <div className="col-span-2 space-y-1 sm:col-span-4">
+              <p className="rounded-md bg-white px-3 py-2 text-xs text-amber-800">
+                {t("prepaidNotice", {
+                  amount: formatUSD(pkg.quote_amount ?? 0),
+                })}
+              </p>
+            </div>
+          ) : (
+            <div className="col-span-2 space-y-1">
+              <Label className="text-xs font-normal text-amber-800">{t("matchQuoteAmountLabel")}</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={quoteAmount}
+                onChange={(e) => setQuoteAmount(e.target.value)}
+                className="bg-white"
+                placeholder={suggestion?.amount != null ? String(suggestion.amount) : undefined}
+              />
+            </div>
+          )}
           <div className="col-span-2 flex items-end sm:col-span-4">
             <Button
               type="button"
@@ -247,12 +262,12 @@ function MissingPackageCard({
               className="whitespace-nowrap"
             >
               <Check className="h-4 w-4" />
-              {t("matchAndQuote")}
+              {isPrepaid ? t("confirmPrepaidButton") : t("matchAndQuote")}
             </Button>
           </div>
-          {suggestion?.amount != null && (
+          {!isPrepaid && suggestion?.amount != null && (
             <p className="col-span-2 w-full text-xs text-amber-800 sm:col-span-4">
-              {t("suggestedAmountShort", { amount: suggestion.amount.toLocaleString() })}
+              {t("suggestedAmountShort", { amount: formatUSD(suggestion.amount) })}
             </p>
           )}
           {error && <p className="col-span-2 w-full text-xs text-destructive sm:col-span-4">{error}</p>}

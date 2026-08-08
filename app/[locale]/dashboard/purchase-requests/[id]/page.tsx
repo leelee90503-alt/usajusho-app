@@ -132,6 +132,12 @@ export default async function PurchaseRequestDetailPage({
                   <span>{t("quoteFee")}</span>
                   <span>${formatUSD((request.quote_fee_cents ?? 0) / 100)}</span>
                 </div>
+                {request.quote_shipping_cents != null && (
+                  <div className="flex justify-between">
+                    <span>{t("quoteShipping")}</span>
+                    <span>${formatUSD(request.quote_shipping_cents / 100)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-t border-slate-200 pt-1 font-semibold text-slate-900">
                   <span>{t("quoteTotal")}</span>
                   <span>${formatUSD(request.quote_total_cents / 100)}</span>

@@ -214,7 +214,13 @@
     "quoteRecipientName": "Name: ",
     "quoteRecipientPhone": "Phone: ",
     "quoteRecipientAddress": "Address: ",
-    "quoteRecipientNotSet": "Not set"
+    "quoteRecipientNotSet": "Not set",
+    "additionalChargesHeading": "Additional Charges",
+    "chargeStatusPending": "Pending",
+    "chargeStatusAwaitingPayment": "Awaiting Payment",
+    "chargeStatusPaid": "Paid",
+    "chargeStatusCancelled": "Cancelled",
+    "chargeStatusRefunded": "Refunded"
   },
   "notificationBell": {
     "title": "Notifications",
@@ -262,15 +268,33 @@
     "matchHeightLabel": "Height (cm)",
     "matchTrackingLabel": "Tracking number",
     "matchMemoLabel": "Memo (sent to the customer with the quote)",
-    "matchQuoteAmountLabel": "Quote amount (¥)",
+    "matchQuoteAmountLabel": "Quote amount ($)",
     "matchAndQuote": "Match & Send Quote",
-    "suggestedAmountShort": "Suggested: ¥{amount}",
+    "suggestedAmountShort": "Suggested: ${amount}",
     "matchSuccess": "Quote sent.",
     "matchSuiteLabel": "Suite number",
     "deletePackage": "Delete",
     "confirmDeletePackage": "Delete this package? This cannot be undone.",
     "missingPackages": "Missing Packages ({count})",
-    "missingPackagesHint": "Packages that couldn't be matched to a pre-declaration. Enter the customer's suite number to link them and send a quote."
+    "missingPackagesHint": "Packages that couldn't be matched to a pre-declaration. Enter the customer's suite number to link them and send a quote.",
+    "prepaidNotice": "Shipping was already paid as part of the purchase-agency quote: ${amount}.",
+    "confirmPrepaidButton": "Confirm & Prepare Shipment",
+    "prepaidBadge": "Prepaid",
+    "additionalChargeButton": "Issue Additional Charge",
+    "additionalChargeReasonLabel": "Reason",
+    "additionalChargeAmountLabel": "Amount ($)",
+    "additionalChargeSubmit": "Issue Charge",
+    "additionalChargeCancel": "Cancel",
+    "additionalChargeInvalid": "Please enter a reason and a valid amount.",
+    "additionalChargeSuccess": "Additional charge issued.",
+    "additionalChargeLine": "{reason}: ${amount}",
+    "additionalChargeStatus": {
+      "pending": "Pending",
+      "awaiting_payment": "Awaiting Payment",
+      "paid": "Paid",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    }
   },
   "packageStatus": {
     "missing": "Missing",
@@ -283,11 +307,11 @@
     "trackingNumber": "Tracking number: ",
     "weight": "Weight: ",
     "weightUnit": "kg",
-    "quoteAmountLabel": "Quote: ¥",
+    "quoteAmountLabel": "Quote: $",
     "delete": "Delete",
     "deleteConfirm": "Delete {name}?",
-    "quoteAmountFieldLabel": "Quote amount (JPY)",
-    "quoteAmountPlaceholder": "3000",
+    "quoteAmountFieldLabel": "Quote amount (USD)",
+    "quoteAmountPlaceholder": "30.00",
     "quoteNoteFieldLabel": "Note (optional)",
     "submitQuote": "Send Quote",
     "quoteInvalidAmount": "Please enter a valid amount.",
@@ -295,7 +319,7 @@
     "dimensions": "Dimensions: ",
     "dimensionsUnit": "cm",
     "chargeableWeight": "Chargeable weight: ",
-    "suggestedAmount": "Suggested (from rate table): {amount} JPY",
+    "suggestedAmount": "Suggested (from rate table): ${amount}",
     "linkedDeclarationHeading": "Pre-declaration",
     "commercialInvoiceLabel": "Commercial invoice: ",
     "preparingShipmentHeading": "Preparing Shipment",
@@ -350,8 +374,8 @@
     "minWeightField": "Min weight (kg)",
     "maxWeightField": "Max weight (kg)",
     "maxWeightPlaceholder": "Leave blank for no upper limit",
-    "pricePerKgField": "Price per kg (JPY)",
-    "minChargeField": "Minimum charge (JPY)",
+    "pricePerKgField": "Price per kg (USD)",
+    "minChargeField": "Minimum charge (USD)",
     "addSubmit": "Add rate",
     "addSuccess": "Rate added.",
     "submitting": "Saving...",
@@ -359,8 +383,8 @@
     "empty": "No rate tiers yet. Add one above.",
     "rangeLabel": "{min} - {max} kg",
     "andAbove": "and above",
-    "priceLabel": "{price} JPY/kg",
-    "minChargeLabel": "min {amount} JPY",
+    "priceLabel": "${price}/kg",
+    "minChargeLabel": "min ${amount}",
     "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel",
@@ -374,7 +398,7 @@
     "backToDashboard": "Back to Dashboard",
     "description": "Paid shipments and their invoices.",
     "paidOn": "Paid on ",
-    "currency": "JPY",
+    "currency": "USD",
     "empty": "No invoices yet."
   },
   "invoiceDetail": {
@@ -391,7 +415,7 @@
     "chargeableWeightLabel": "Chargeable weight",
     "paidOnLabel": "Paid on",
     "totalLabel": "Total",
-    "currency": "JPY"
+    "currency": "USD"
   },
   "invoiceForm": {
     "title": "Commercial Invoice",
@@ -551,7 +575,8 @@
       "cancelled": "Cancelled",
       "refunded": "Refunded"
     },
-    "productUrlNotWhitelisted": "We currently only support purchases from: {stores}. Please use a link from one of these stores, or leave the URL blank and describe the item in Product Description."
+    "productUrlNotWhitelisted": "We currently only support purchases from: {stores}. Please use a link from one of these stores, or leave the URL blank and describe the item in Product Description.",
+    "quoteShipping": "US → Japan Shipping"
   },
   "adminPurchaseRequests": {
     "title": "Admin: Purchase Requests",
@@ -630,7 +655,10 @@
     "whitelistDisabled": "Disabled",
     "whitelistRemove": "Remove",
     "whitelistRemoveConfirm": "Remove {label} ({domain})?",
-    "whitelistEmpty": "No stores whitelisted yet. Add one below."
+    "whitelistEmpty": "No stores whitelisted yet. Add one below.",
+    "shippingLabel": "US → Japan Shipping (USD)",
+    "viewPackageLink": "View Package",
+    "viewInvoiceLink": "Commercial Invoice"
   },
   "footer": {
     "terms": "Terms of Service",
