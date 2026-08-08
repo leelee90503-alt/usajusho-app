@@ -22,6 +22,8 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/ui/card"
+import { getPurchaseAgencyPublicFeeSettings } from "@/lib/purchase-agency-settings"
+import { formatUSD } from "@/lib/format"
 
 
 export async function generateMetadata({
@@ -39,6 +41,9 @@ export async function generateMetadata({
 
 export default async function PurchaseAgencyPage() {
   const t = await getTranslations("purchaseAgency")
+  const feeSettings = await getPurchaseAgencyPublicFeeSettings()
+  const feePercentDisplay = `${Math.round(feeSettings.feePercent * 100)}%`
+  const flatFeeDisplay = `$${formatUSD(feeSettings.flatFeeCents / 100)}`
 
   const steps: { title: string; description: string; icon: LucideIcon }[] = [
     { title: t("step1Title"), description: t("step1Description"), icon: FileText },
@@ -114,6 +119,29 @@ export default async function PurchaseAgencyPage() {
             )
           })}
         </ol>
+      </section>
+
+      {/* Fee explanation */}
+      <section className="mx-auto max-w-3xl px-4 pb-16 md:pb-20 w-full">
+        <Card className="border-[var(--usj-accent)]/30">
+          <CardHeader>
+            <div className="mb-1 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Receipt className="h-5 w-5 text-primary" aria-hidden="true" />
+            </div>
+            <CardTitle className="text-lg">{t("feeExplanationTitle")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p className="text-sm text-slate-700 leading-relaxed">
+              {t("feeExplanationDescription", {
+                flatFee: flatFeeDisplay,
+                percent: feePercentDisplay,
+              })}
+            </p>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              {t("feeExplanationNote")}
+            </p>
+          </CardContent>
+        </Card>
       </section>
 
       {/* Benefits */}

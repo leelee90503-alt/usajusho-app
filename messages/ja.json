@@ -533,7 +533,10 @@
     "benefit4Title": "シンプルで明確な手数料",
     "benefit4Description": "定額料金に商品代金の一定割合を加えたシンプルな手数料体系。お支払い前の見積りで金額を明示するので、隠れたコストはありません。",
     "finalCtaTitle": "日本で買えない商品、探してみませんか？",
-    "finalCtaDescription": "USAJUSHOに無料登録して、数分で購入代行リクエストを送信できます。"
+    "finalCtaDescription": "USAJUSHOに無料登録して、数分で購入代行リクエストを送信できます。",
+    "feeExplanationTitle": "手数料はどのように決まりますか？",
+    "feeExplanationDescription": "手数料は定額{flatFee}に商品代金の{percent}を加えた金額です。自動的に計算され、お支払い前の見積りで全額をご確認いただけます。隠れたコストはありません。",
+    "feeExplanationNote": "手数料は商品代金にのみ適用されます。米国から日本への送料は別途見積り・請求されます。"
   },
   "purchaseRequests": {
     "title": "購入代行リクエスト",

@@ -533,7 +533,10 @@
     "benefit4Title": "One simple, transparent fee",
     "benefit4Description": "A flat fee plus a small percentage of the item price - clearly shown in your quote before you pay, no hidden costs.",
     "finalCtaTitle": "Ready to get something we can't buy in Japan?",
-    "finalCtaDescription": "Sign up for a free USAJUSHO account and submit your first purchase request in minutes."
+    "finalCtaDescription": "Sign up for a free USAJUSHO account and submit your first purchase request in minutes.",
+    "feeExplanationTitle": "How is the fee calculated?",
+    "feeExplanationDescription": "Our fee is a flat {flatFee} plus {percent} of the item price. It's calculated automatically and shown in full in your quote before you pay - no hidden costs.",
+    "feeExplanationNote": "The fee applies only to the item price. Shipping from the US to Japan is quoted and charged separately."
   },
   "purchaseRequests": {
     "title": "Purchase Requests",
