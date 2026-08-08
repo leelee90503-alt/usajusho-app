@@ -844,8 +844,8 @@
     "japanPostalCode": "郵便番号",
     "japanPrefecture": "都道府県",
     "japanCity": "市区町村",
-    "japanAddressLine1": "住所1",
-    "japanAddressLine2": "住所2（任意）"
+    "japanAddressLine1": "丁目・番地",
+    "japanAddressLine2": "マンション名・号室等（任意）"
   },
   "profileForm": {
     "backLink": "ダッシュボードに戻る",
