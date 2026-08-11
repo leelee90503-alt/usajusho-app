@@ -268,13 +268,26 @@ function MissingPackageCard({
           ) : (
             <div className="col-span-2 space-y-1">
               <Label className="text-xs font-normal text-amber-800">{t("matchQuoteAmountLabel")}</Label>
+              {!isPrepaid && suggestion?.amount != null && (
+                <p className="text-xs text-amber-800">
+                  {t("suggestedAmountShort", { amount: formatUSD(suggestion.amount) })}
+                  {" "}
+                  <button
+                    type="button"
+                    onClick={() => setQuoteAmount(String(suggestion.amount))}
+                    className="underline underline-offset-2"
+                  >
+                    {t("useSuggestedAmount")}
+                  </button>
+                </p>
+              )}
               <Input
                 type="number"
                 step="0.01"
                 value={quoteAmount}
                 onChange={(e) => setQuoteAmount(e.target.value)}
                 className="bg-white"
-                placeholder={suggestion?.amount != null ? String(suggestion.amount) : undefined}
+                placeholder="0.00"
               />
             </div>
           )}
@@ -290,11 +303,6 @@ function MissingPackageCard({
               {isPrepaid ? t("confirmPrepaidButton") : t("matchAndQuote")}
             </Button>
           </div>
-          {!isPrepaid && suggestion?.amount != null && (
-            <p className="col-span-2 w-full text-xs text-amber-800 sm:col-span-4">
-              {t("suggestedAmountShort", { amount: formatUSD(suggestion.amount) })}
-            </p>
-          )}
           {error && <p className="col-span-2 w-full text-xs text-destructive sm:col-span-4">{error}</p>}
         </div>
 

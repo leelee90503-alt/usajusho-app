@@ -234,12 +234,25 @@ function DeclarationCard({
           </div>
           <div className="col-span-2 space-y-1">
             <Label className="text-xs font-normal text-teal-800">{t("matchQuoteAmountLabel")}</Label>
+            {suggestion?.amount != null && (
+              <p className="text-xs text-teal-800">
+                {t("suggestedAmountShort", { amount: suggestion.amount.toLocaleString() })}
+                {" "}
+                <button
+                  type="button"
+                  onClick={() => setQuoteAmount(String(suggestion.amount))}
+                  className="underline underline-offset-2"
+                >
+                  {t("useSuggestedAmount")}
+                </button>
+              </p>
+            )}
             <Input
               type="number"
               value={quoteAmount}
               onChange={(e) => setQuoteAmount(e.target.value)}
               className="bg-white"
-              placeholder={suggestion?.amount != null ? String(suggestion.amount) : undefined}
+              placeholder="0.00"
             />
           </div>
           <div className="col-span-2 flex items-end sm:col-span-4">
@@ -254,11 +267,6 @@ function DeclarationCard({
               {t("matchAndQuote")}
             </Button>
           </div>
-          {suggestion?.amount != null && (
-            <p className="col-span-2 w-full text-xs text-teal-800 sm:col-span-4">
-              {t("suggestedAmountShort", { amount: suggestion.amount.toLocaleString() })}
-            </p>
-          )}
           {error && <p className="col-span-2 w-full text-xs text-destructive sm:col-span-4">{error}</p>}
         </div>
 
