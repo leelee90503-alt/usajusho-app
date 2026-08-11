@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Loader2 } from "lucide-react"
+import type { BillingContact } from "@/lib/square"
 
 // Square's Web Payments SDK (loaded from Square's own CDN below) renders
 // the actual card-number/expiry/CVV inputs inside a small iframe it
@@ -58,10 +59,18 @@ declare global {
         applicationId: string,
         locationId: string,
       ) => Promise<{
+        setLocale: (locale: string) => void
         card: () => Promise<{
           attach: (selector: string | HTMLElement) => Promise<void>
           destroy: () => Promise<void>
-          tokenize: () => Promise<{
+          tokenize: (verificationDetails?: {
+            amount: string
+            currencyCode: string
+            intent: "CHARGE"
+            billingContact?: BillingContact
+            customerInitiated?: boolean
+            sellerKeyedIn?: boolean
+          }) => Promise<{
             status: string
             token?: string
             errors?: { message: string }[]
@@ -80,6 +89,8 @@ export default function SquareCardPayment({
   triggerLabel,
   dialogTitle,
   amountLabel,
+  amount,
+  billingContact,
   submitLabel,
   submittingLabel,
   genericErrorLabel,
@@ -93,6 +104,8 @@ export default function SquareCardPayment({
   triggerLabel: string
   dialogTitle: string
   amountLabel: string
+  amount: string
+  billingContact?: BillingContact
   submitLabel: string
   submittingLabel: string
   genericErrorLabel: string
@@ -121,6 +134,10 @@ export default function SquareCardPayment({
         await loadSquareScript(mode)
         if (cancelled || !window.Square) return
         const payments = await window.Square.payments(applicationId, locationId)
+          // USAJUSHO customers are all in Japan; force the card form's
+          // language rather than relying on navigator.language, which can
+          // be English even for a Japanese cardholder's browser.
+          payments.setLocale("ja-JP")
         const card = await payments.card()
         if (cancelled) return
         if (containerRef.current) {
@@ -151,9 +168,21 @@ export default function SquareCardPayment({
     setStatus("submitting")
     setErrorMessage(null)
 
-    try {
-      const result = await cardRef.current.tokenize()
-      if (result.status !== "OK" || !result.token) {
+      try {
+        // Strong Customer Authentication (3D Secure) has been mandatory for
+        // Japanese-issued cards since April 1, 2025 (see
+        // https://developer.squareup.com/docs/sca-overview). Passing amount +
+        // billingContact lets Square run the 3DS challenge inline during
+        // tokenize() instead of the charge being declined later.
+        const result = await cardRef.current.tokenize({
+          amount,
+          currencyCode: "USD",
+          intent: "CHARGE",
+          billingContact,
+          customerInitiated: true,
+          sellerKeyedIn: false,
+        })
+        if (result.status !== "OK" || !result.token) {
         setStatus("ready")
         setErrorMessage(result.errors?.[0]?.message ?? genericErrorLabel)
         return

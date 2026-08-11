@@ -4,15 +4,20 @@ import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { payPurchaseRequestWithCard } from "../actions"
 import SquareCardPayment from "@/components/square-card-payment"
+import type { BillingContact } from "@/lib/square"
 
 export default function PayButton({
   requestId,
   squareConfig,
   amountLabel,
+  amount,
+  billingContact,
 }: {
   requestId: string
   squareConfig: { mode: "sandbox" | "production"; applicationId: string; locationId: string }
   amountLabel: string
+  amount: string
+  billingContact?: BillingContact
 }) {
   const t = useTranslations("purchaseRequests")
   const router = useRouter()
@@ -26,6 +31,8 @@ export default function PayButton({
       triggerLabel={t("payButton")}
       dialogTitle={t("cardPayDialogTitle")}
       amountLabel={amountLabel}
+      amount={amount}
+      billingContact={billingContact}
       submitLabel={t("cardPaySubmit")}
       submittingLabel={t("cardPaySubmitting")}
       genericErrorLabel={t("cardPayError")}

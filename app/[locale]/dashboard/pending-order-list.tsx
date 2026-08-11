@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Package as PackageIcon, PackagePlus, ShoppingCart } from "lucide-react"
 import { formatUSD } from "@/lib/format"
 import SquareCardPayment from "@/components/square-card-payment"
+import { buildBillingContact } from "@/lib/square"
 
 type SquareConfig = { mode: "sandbox" | "production"; applicationId: string; locationId: string }
 
@@ -59,6 +60,9 @@ type PackagePhoto = {
 
 type Profile = {
   full_name: string | null
+  first_name: string | null
+  last_name: string | null
+  email: string | null
   phone_number: string | null
   japan_postal_code: string | null
   japan_prefecture: string | null
@@ -206,6 +210,8 @@ export default function PendingOrderList({
                           triggerLabel={t("pay")}
                           dialogTitle={t("cardPayDialogTitle")}
                           amountLabel={`$${formatUSD(order.quote_amount)}`}
+                          amount={Number(order.quote_amount).toFixed(2)}
+                          billingContact={buildBillingContact(profile)}
                           submitLabel={t("cardPaySubmit")}
                           submittingLabel={t("cardPaySubmitting")}
                           genericErrorLabel={t("cardPayError")}
@@ -240,6 +246,8 @@ export default function PendingOrderList({
                               triggerLabel={t("pay")}
                               dialogTitle={t("cardPayDialogTitle")}
                               amountLabel={`$${formatUSD(charge.amount_cents / 100)}`}
+                              amount={(charge.amount_cents / 100).toFixed(2)}
+                              billingContact={buildBillingContact(profile)}
                               submitLabel={t("cardPaySubmit")}
                               submittingLabel={t("cardPaySubmitting")}
                               genericErrorLabel={t("cardPayError")}

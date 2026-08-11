@@ -2,7 +2,7 @@ import { redirect, Link } from "@/i18n/navigation"
 import { notFound } from "next/navigation"
 import { getLocale, getTranslations } from "next-intl/server"
 import { createClient } from "@/lib/supabase/server"
-import { getSquareClientConfig } from "@/lib/square"
+import { getSquareClientConfig, buildBillingContact } from "@/lib/square"
 import PayButton from "./pay-button"
 import CancelButton from "./cancel-button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -51,6 +51,8 @@ export default async function PurchaseRequestDetailPage({
   if (!request) {
     notFound()
   }
+
+  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
   const canPay = request.status === "quote_sent" && request.quote_total_cents
   const canCancel = ["submitted", "quote_sent", "awaiting_payment"].includes(
@@ -119,6 +121,8 @@ export default async function PurchaseRequestDetailPage({
                     requestId={request.id}
                     squareConfig={squareConfig}
                     amountLabel={`$${formatUSD(request.quote_total_cents / 100)}`}
+                    amount={(request.quote_total_cents / 100).toFixed(2)}
+                    billingContact={buildBillingContact(profile)}
                   />
                 )}
                 {canPay && !isExpired && !squareConfig && (

@@ -158,3 +158,58 @@ export function getSquareWebhookSignatureKeys(): {
     production: getWebhookSignatureKey("production"),
   }
 }
+
+export type BillingContact = {
+  givenName?: string
+  familyName?: string
+  email?: string
+  phone?: string
+  addressLines?: string[]
+  city?: string
+  state?: string
+  postalCode?: string
+  countryCode?: string
+}
+
+export type BillingContactProfile = {
+  full_name?: string | null
+  first_name?: string | null
+  last_name?: string | null
+  email?: string | null
+  phone_number?: string | null
+  japan_postal_code?: string | null
+  japan_prefecture?: string | null
+  japan_city?: string | null
+  japan_address_line1?: string | null
+  japan_address_line2?: string | null
+}
+
+/**
+ * Builds the Web Payments SDK's BillingContact for Strong Customer
+ * Authentication (3D Secure) from a profiles row. Japanese banks have
+ * required SCA for their cardholders since April 1, 2025 (see
+ * https://developer.squareup.com/docs/sca-overview), so every tokenize()
+ * call in components/square-card-payment.tsx passes this alongside the
+ * charge amount. Every BillingContact field is optional per Square's SDK,
+ * so a profile missing some fields (e.g. a pre-migration signup) still
+ * degrades gracefully instead of blocking payment.
+ */
+export function buildBillingContact(
+  profile: BillingContactProfile | null | undefined,
+): BillingContact | undefined {
+  if (!profile) return undefined
+  const addressLines = [profile.japan_address_line1, profile.japan_address_line2].filter(
+    (line): line is string => Boolean(line),
+  )
+  const contact: BillingContact = { countryCode: "JP" }
+  if (profile.first_name) contact.givenName = profile.first_name
+  else if (profile.full_name) contact.givenName = profile.full_name
+  if (profile.last_name) contact.familyName = profile.last_name
+  if (profile.email) contact.email = profile.email
+  if (profile.phone_number) contact.phone = profile.phone_number
+  if (addressLines.length > 0) contact.addressLines = addressLines
+  if (profile.japan_city) contact.city = profile.japan_city
+  if (profile.japan_prefecture) contact.state = profile.japan_prefecture
+  if (profile.japan_postal_code) contact.postalCode = profile.japan_postal_code
+  return contact
+}
