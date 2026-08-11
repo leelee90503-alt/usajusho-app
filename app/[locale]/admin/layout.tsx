@@ -7,7 +7,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div>
-      <div className="border-b border-border bg-white">
+      <div className="border-b border-border bg-white print:hidden">
         <div className="mx-auto max-w-4xl px-6 py-2">
           <Link
             href="/admin"

@@ -467,7 +467,9 @@
     "certificationStatement": "I certify that the information provided on this invoice is true and correct.",
     "customerSignature": "Type your full name as signature",
     "cancel": "Cancel",
-    "confirmSubmit": "Confirm & Submit"
+    "confirmSubmit": "Confirm & Submit",
+    "printButton": "Print",
+    "invoiceDateLabel": "Invoice Date"
   },
   "adminInvoices": {
     "title": "Commercial Invoices",

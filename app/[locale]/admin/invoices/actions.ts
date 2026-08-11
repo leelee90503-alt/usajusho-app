@@ -102,12 +102,44 @@ type AdminItemInput = {
 
 // Admin-gated "get or create" -- idempotent so re-clicking "Create Invoice"
 // from the list never errors on a row that already exists.
+
+// Fixed company Shipper/Exporter info for Commercial Invoices created in
+// admin -- USAJUSHO ships from this address, so it defaults every new
+// invoice's Shipper fields (still admin-editable afterward).
+const COMPANY_SHIPPER_NAME = "Victoria Tech Innovation"
+const COMPANY_SHIPPER_ADDRESS =
+  "18533 S. Western Ave., Gardena, CA 90248, USA / Tel: 310.325.5000 / Email: info@usajusho.com"
+
+// Mirrors formatJapanAddress() in app/[locale]/admin/packages/package-row.tsx
+// -- formats a customer's Japan address into the single-line free-text
+// format the invoices.consignee_address column expects.
+function formatJapanAddress(profile:
+  | {
+      japan_postal_code: string | null
+      japan_prefecture: string | null
+      japan_city: string | null
+      japan_address_line1: string | null
+      japan_address_line2: string | null
+    }
+  | null
+  | undefined
+): string | null {
+  if (!profile) return null
+  const parts = [
+    profile.japan_postal_code ? `〒${profile.japan_postal_code}` : null,
+    profile.japan_prefecture,
+    profile.japan_city,
+    profile.japan_address_line1,
+    profile.japan_address_line2,
+  ].filter(Boolean)
+  return parts.length > 0 ? parts.join(" ") : null
+}
 export async function adminCreateOrGetInvoice(packageId: string) {
   const supabase = await requireAdmin()
 
   const { data: pkg, error: pkgError } = await supabase
     .from("packages")
-    .select("id, user_id, tracking_number")
+    .select("id, user_id, tracking_number, profiles(full_name, japan_postal_code, japan_prefecture, japan_city, japan_address_line1, japan_address_line2)")
     .eq("id", packageId)
     .single()
 
@@ -130,6 +162,7 @@ export async function adminCreateOrGetInvoice(packageId: string) {
   }
 
   const invoiceNumber = `INV-${(pkg.tracking_number || pkg.id).toString().slice(-8).toUpperCase()}`
+  const profile = Array.isArray(pkg.profiles) ? pkg.profiles[0] : pkg.profiles
 
   const { data: created, error: createError } = await supabase
     .from("invoices")
@@ -140,6 +173,10 @@ export async function adminCreateOrGetInvoice(packageId: string) {
       invoice_number: invoiceNumber,
       invoice_issue_date: new Date().toISOString().slice(0, 10),
       package_reference_number: pkg.tracking_number ?? null,
+      shipper_name: COMPANY_SHIPPER_NAME,
+      shipper_address: COMPANY_SHIPPER_ADDRESS,
+      consignee_name: profile?.full_name ?? null,
+      consignee_address: formatJapanAddress(profile),
     })
     .select("*, invoice_items(*)")
     .single()

@@ -6,7 +6,7 @@ export default async function Footer() {
   const t = await getTranslations("footer")
 
   return (
-    <footer className="mt-auto">
+    <footer className="mt-auto print:hidden">
       <Separator />
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:justify-between">
         <p>{t("copyright")}</p>

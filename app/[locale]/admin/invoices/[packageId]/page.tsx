@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from "next-intl/server"
 import { adminCreateOrGetInvoice } from "../actions"
 import AdminInvoiceForm from "./admin-invoice-form"
+import InvoicePrintView from "./invoice-print-view"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
@@ -57,6 +58,8 @@ export default async function AdminInvoiceDetailPage({
 
   const formLabels = {
     title: ft("title"),
+    printButton: ft("printButton"),
+    invoiceDateLabel: ft("invoiceDateLabel"),
     statusDraft: ft("statusDraft"),
     statusSubmitted: ft("statusSubmitted"),
     statusCorrectionRequired: ft("statusCorrectionRequired"),
@@ -101,11 +104,11 @@ export default async function AdminInvoiceDetailPage({
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
-      <Link href="/admin/invoices" className="text-xs font-semibold text-accent hover:underline">
+      <Link href="/admin/invoices" className="text-xs font-semibold text-accent hover:underline print:hidden">
         {t("backToList")}
       </Link>
 
-      <Card className="mt-4">
+      <Card className="mt-4 print:hidden">
         <CardContent className="py-6">
           <h1 className="text-xl font-bold text-foreground">{pkg.item_name}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -117,7 +120,10 @@ export default async function AdminInvoiceDetailPage({
       </Card>
 
       {existingInvoice ? (
-        <AdminInvoiceForm invoice={existingInvoice} labels={formLabels} />
+        <>
+          <AdminInvoiceForm invoice={existingInvoice} labels={formLabels} />
+          <InvoicePrintView invoice={existingInvoice} labels={formLabels} />
+        </>
       ) : (
         <Card className="mt-8 border-dashed">
           <CardContent className="py-8 text-center">

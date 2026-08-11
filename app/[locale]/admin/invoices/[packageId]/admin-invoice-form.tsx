@@ -240,7 +240,7 @@ export default function AdminInvoiceForm({
   }
 
   return (
-    <Card className="mt-8">
+    <Card className="mt-8 print:hidden">
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">{labels.title}</h2>
@@ -248,9 +248,14 @@ export default function AdminInvoiceForm({
             <p className="mt-1 text-xs text-muted-foreground">{invoice.invoice_number}</p>
           )}
         </div>
-        <Badge className={`shrink-0 ${STATUS_BADGE_CLASS[invoice.status] ?? "bg-slate-100 text-slate-700"}`}>
-          {labels[STATUS_LABEL_KEY[invoice.status]] || invoice.status}
-        </Badge>
+        <div className="flex shrink-0 items-center gap-2">
+          <Badge className={`shrink-0 ${STATUS_BADGE_CLASS[invoice.status] ?? "bg-slate-100 text-slate-700"}`}>
+            {labels[STATUS_LABEL_KEY[invoice.status]] || invoice.status}
+          </Badge>
+          <Button type="button" variant="outline" size="sm" onClick={() => window.print()}>
+            {labels.printButton}
+          </Button>
+        </div>
       </CardHeader>
 
       <CardContent className="pt-6">
