@@ -5,6 +5,7 @@ import { redirect } from "@/i18n/navigation"
 import { getLocale } from "next-intl/server"
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { getSquare, getSquareLocationId } from "@/lib/square"
 import { notifyAdmins } from "@/lib/notifications"
 
@@ -86,7 +87,16 @@ export async function cancelPurchaseRequest(requestId: string) {
   return { success: true }
 }
 
-export async function createCheckoutSession(requestId: string) {
+// Charges the card token (sourceId) the browser's Square Web Payments SDK
+// produced directly via square.payments.create() - no Payment Link / Order
+// is created, so there's no off-site redirect. Because a signed-in user's
+// own Supabase client is not permitted by RLS to set
+// purchase_requests.status to "paid" directly (see purchase-agency-schema.sql -
+// only "cancelled"/"awaiting_payment" are reachable from the user's own
+// client), the final status write below uses the admin/service-role
+// client, exactly like the Square webhook already does - but only after
+// independently confirming Square itself reports the payment COMPLETED.
+export async function payPurchaseRequestWithCard(requestId: string, sourceId: string) {
   const supabase = await createClient()
 
   const {
@@ -112,48 +122,39 @@ export async function createCheckoutSession(requestId: string) {
     return { error: "このリクエストには支払い可能な見積りがありません。" }
   }
 
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://usajusho-app.vercel.app"
-
   try {
     const square = await getSquare()
     const locationId = await getSquareLocationId()
-    const { paymentLink } = await square.checkout.paymentLinks.create({
+    const { payment } = await square.payments.create({
+      sourceId,
       idempotencyKey: randomUUID(),
-      quickPay: {
-        name: "USAJUSHO 購入代行",
-        priceMoney: {
-          amount: BigInt(request.quote_total_cents),
-          currency: "USD",
-        },
-        locationId,
+      amountMoney: {
+        amount: BigInt(request.quote_total_cents),
+        currency: "USD",
       },
-      checkoutOptions: {
-        redirectUrl: `${siteUrl}/dashboard/purchase-requests/${request.id}?paid=1`,
-      },
-      prePopulatedData: {
-        buyerEmail: user.email ?? undefined,
-      },
-      paymentNote: request.product_description.slice(0, 500),
+      locationId,
+      note: request.product_description.slice(0, 500),
     })
 
-    if (!paymentLink?.url || !paymentLink.orderId) {
-      throw new Error("Square did not return a payment link URL")
+    if (payment?.status !== "COMPLETED" || !payment.id) {
+      return {
+        error: "お支払いを完了できませんでした。カード情報をご確認のうえ、再度お試しください。",
+      }
     }
 
-    await supabase
+    await createAdminClient()
       .from("purchase_requests")
       .update({
-        status: "awaiting_payment",
-        square_order_id: paymentLink.orderId,
+        status: "paid",
+        square_payment_id: payment.id,
         updated_at: new Date().toISOString(),
       })
       .eq("id", request.id)
 
     revalidatePath(`/dashboard/purchase-requests/${request.id}`)
-    return { url: paymentLink.url }
+    return { success: true }
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown error"
-    return { error: `Square Checkoutリンクの作成に失敗しました: ${message}` }
+    return { error: `お支払い処理に失敗しました: ${message}` }
   }
 }

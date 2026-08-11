@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { payForShipment, createAdditionalChargeCheckoutSession } from "./actions"
+import { payShipmentWithCard, payAdditionalChargeWithCard } from "./actions"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Package as PackageIcon } from "lucide-react"
 import { formatUSD } from "@/lib/format"
+import SquareCardPayment from "@/components/square-card-payment"
+
+type SquareConfig = { mode: "sandbox" | "production"; applicationId: string; locationId: string }
 
 type Package = {
   id: string
@@ -66,15 +68,18 @@ export default function PackageList({
   emptyVariant = "default",
   additionalCharges = {},
   photosByPackageId = {},
+  squareConfig = null,
 }: {
   packages: Package[]
   profile?: Profile | null
   emptyVariant?: "default" | "completed"
   additionalCharges?: Record<string, AdditionalCharge[]>
   photosByPackageId?: Record<string, PackagePhoto[]>
+  squareConfig?: SquareConfig | null
 }) {
   const t = useTranslations("packageList")
   const japanAddress = formatJapanAddress(profile)
+  const router = useRouter()
   const STATUS_LABELS: Record<string, string> = {
     quoted: t("statusQuoted"),
     paid: t("statusPaid"),
@@ -86,39 +91,6 @@ export default function PackageList({
     paid: t("chargeStatusPaid"),
     cancelled: t("chargeStatusCancelled"),
     refunded: t("chargeStatusRefunded"),
-  }
-  const [isPending, startTransition] = useTransition()
-  const [payingId, setPayingId] = useState<string | null>(null)
-  const [payMessage, setPayMessage] = useState<string | null>(null)
-  const [payingChargeId, setPayingChargeId] = useState<string | null>(null)
-  const [chargeMessage, setChargeMessage] = useState<string | null>(null)
-
-  function handlePay(id: string) {
-    setPayMessage(null)
-    setPayingId(id)
-    startTransition(async () => {
-      const result = await payForShipment(id)
-      if (result?.error) {
-        setPayMessage(result.error)
-      } else {
-        setPayMessage(t("paySuccess"))
-      }
-      setPayingId(null)
-    })
-  }
-
-  function handlePayCharge(chargeId: string) {
-    setChargeMessage(null)
-    setPayingChargeId(chargeId)
-    startTransition(async () => {
-      const result = await createAdditionalChargeCheckoutSession(chargeId)
-      if (result?.error) {
-        setChargeMessage(result.error)
-        setPayingChargeId(null)
-      } else if (result?.url) {
-        window.location.href = result.url
-      }
-    })
   }
 
   if (!packages || packages.length === 0) {
@@ -178,17 +150,23 @@ export default function PackageList({
                     <p>{t("quoteRecipientPhone")}{profile?.phone_number || t("quoteRecipientNotSet")}</p>
                     <p>{t("quoteRecipientAddress")}{japanAddress || t("quoteRecipientNotSet")}</p>
                   </div>
-                  <Button
-                    type="button"
-                    onClick={() => handlePay(pkg.id)}
-                    disabled={isPending && payingId === pkg.id}
-                    size="sm"
-                    className="mt-2"
-                  >
-                    {t("pay")}
-                  </Button>
-                  {payMessage && payingId === null && (
-                    <p className="mt-2 text-sm text-primary">{payMessage}</p>
+                  {squareConfig && (
+                    <div className="mt-2">
+                      <SquareCardPayment
+                        mode={squareConfig.mode}
+                        applicationId={squareConfig.applicationId}
+                        locationId={squareConfig.locationId}
+                        action={(sourceId) => payShipmentWithCard(pkg.id, sourceId)}
+                        triggerLabel={t("pay")}
+                        dialogTitle={t("cardPayDialogTitle")}
+                        amountLabel={`$${formatUSD(pkg.quote_amount)}`}
+                        submitLabel={t("cardPaySubmit")}
+                        submittingLabel={t("cardPaySubmitting")}
+                        genericErrorLabel={t("cardPayError")}
+                        successLabel={t("cardPaySuccess")}
+                        onSuccess={() => router.refresh()}
+                      />
+                    </div>
                   )}
                 </div>
               )}
@@ -206,22 +184,26 @@ export default function PackageList({
                           {CHARGE_STATUS_LABELS[charge.status] || charge.status}
                         </Badge>
                       </div>
-                      {charge.status === "pending" && (
-                        <Button
-                          type="button"
-                          onClick={() => handlePayCharge(charge.id)}
-                          disabled={isPending && payingChargeId === charge.id}
-                          size="sm"
-                          className="mt-2"
-                        >
-                          {t("pay")}
-                        </Button>
+                      {charge.status === "pending" && squareConfig && (
+                        <div className="mt-2">
+                          <SquareCardPayment
+                            mode={squareConfig.mode}
+                            applicationId={squareConfig.applicationId}
+                            locationId={squareConfig.locationId}
+                            action={(sourceId) => payAdditionalChargeWithCard(charge.id, sourceId)}
+                            triggerLabel={t("pay")}
+                            dialogTitle={t("cardPayDialogTitle")}
+                            amountLabel={`$${formatUSD(charge.amount_cents / 100)}`}
+                            submitLabel={t("cardPaySubmit")}
+                            submittingLabel={t("cardPaySubmitting")}
+                            genericErrorLabel={t("cardPayError")}
+                            successLabel={t("cardPaySuccess")}
+                            onSuccess={() => router.refresh()}
+                          />
+                        </div>
                       )}
                     </div>
                   ))}
-                  {chargeMessage && (
-                    <p className="text-sm text-destructive">{chargeMessage}</p>
-                  )}
                 </div>
               )}
 

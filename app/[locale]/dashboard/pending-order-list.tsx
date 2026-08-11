@@ -1,14 +1,16 @@
 'use client'
 
-import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
-import { payForShipment, createAdditionalChargeCheckoutSession } from "./actions"
+import { payShipmentWithCard, payAdditionalChargeWithCard } from "./actions"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Package as PackageIcon, PackagePlus, ShoppingCart } from "lucide-react"
 import { formatUSD } from "@/lib/format"
+import SquareCardPayment from "@/components/square-card-payment"
+
+type SquareConfig = { mode: "sandbox" | "production"; applicationId: string; locationId: string }
 
 type PackageOrder = {
   kind: "package"
@@ -101,6 +103,7 @@ export default function PendingOrderList({
   profile = null,
   additionalCharges = {},
   photosByPackageId = {},
+  squareConfig = null,
 }: {
   packages: PackageOrder[]
   declarations: DeclarationOrder[]
@@ -108,11 +111,13 @@ export default function PendingOrderList({
   profile?: Profile | null
   additionalCharges?: Record<string, AdditionalCharge[]>
   photosByPackageId?: Record<string, PackagePhoto[]>
+  squareConfig?: SquareConfig | null
 }) {
   const t = useTranslations("packageList")
   const tDeclarations = useTranslations("packageDeclarations")
   const tRequests = useTranslations("purchaseRequests")
   const japanAddress = formatJapanAddress(profile)
+  const router = useRouter()
 
   const CHARGE_STATUS_LABELS: Record<string, string> = {
     pending: t("chargeStatusPending"),
@@ -120,40 +125,6 @@ export default function PendingOrderList({
     paid: t("chargeStatusPaid"),
     cancelled: t("chargeStatusCancelled"),
     refunded: t("chargeStatusRefunded"),
-  }
-
-  const [isPending, startTransition] = useTransition()
-  const [payingId, setPayingId] = useState<string | null>(null)
-  const [payMessage, setPayMessage] = useState<string | null>(null)
-  const [payingChargeId, setPayingChargeId] = useState<string | null>(null)
-  const [chargeMessage, setChargeMessage] = useState<string | null>(null)
-
-  function handlePay(id: string) {
-    setPayMessage(null)
-    setPayingId(id)
-    startTransition(async () => {
-      const result = await payForShipment(id)
-      if (result?.error) {
-        setPayMessage(result.error)
-      } else {
-        setPayMessage(t("paySuccess"))
-      }
-      setPayingId(null)
-    })
-  }
-
-  function handlePayCharge(chargeId: string) {
-    setChargeMessage(null)
-    setPayingChargeId(chargeId)
-    startTransition(async () => {
-      const result = await createAdditionalChargeCheckoutSession(chargeId)
-      if (result?.error) {
-        setChargeMessage(result.error)
-        setPayingChargeId(null)
-      } else if (result?.url) {
-        window.location.href = result.url
-      }
-    })
   }
 
   const orders: PendingOrder[] = [...packages, ...declarations, ...purchaseRequests].sort(
@@ -225,17 +196,23 @@ export default function PendingOrderList({
                       <p>{t("quoteRecipientPhone")}{profile?.phone_number || t("quoteRecipientNotSet")}</p>
                       <p>{t("quoteRecipientAddress")}{japanAddress || t("quoteRecipientNotSet")}</p>
                     </div>
-                    <Button
-                      type="button"
-                      onClick={() => handlePay(order.id)}
-                      disabled={isPending && payingId === order.id}
-                      size="sm"
-                      className="mt-2"
-                    >
-                      {t("pay")}
-                    </Button>
-                    {payMessage && payingId === null && (
-                      <p className="mt-2 text-sm text-primary">{payMessage}</p>
+                    {squareConfig && (
+                      <div className="mt-2">
+                        <SquareCardPayment
+                          mode={squareConfig.mode}
+                          applicationId={squareConfig.applicationId}
+                          locationId={squareConfig.locationId}
+                          action={(sourceId) => payShipmentWithCard(order.id, sourceId)}
+                          triggerLabel={t("pay")}
+                          dialogTitle={t("cardPayDialogTitle")}
+                          amountLabel={`$${formatUSD(order.quote_amount)}`}
+                          submitLabel={t("cardPaySubmit")}
+                          submittingLabel={t("cardPaySubmitting")}
+                          genericErrorLabel={t("cardPayError")}
+                          successLabel={t("cardPaySuccess")}
+                          onSuccess={() => router.refresh()}
+                        />
+                      </div>
                     )}
                   </div>
                 )}
@@ -253,22 +230,26 @@ export default function PendingOrderList({
                             {CHARGE_STATUS_LABELS[charge.status] || charge.status}
                           </Badge>
                         </div>
-                        {charge.status === "pending" && (
-                          <Button
-                            type="button"
-                            onClick={() => handlePayCharge(charge.id)}
-                            disabled={isPending && payingChargeId === charge.id}
-                            size="sm"
-                            className="mt-2"
-                          >
-                            {t("pay")}
-                          </Button>
+                        {charge.status === "pending" && squareConfig && (
+                          <div className="mt-2">
+                            <SquareCardPayment
+                              mode={squareConfig.mode}
+                              applicationId={squareConfig.applicationId}
+                              locationId={squareConfig.locationId}
+                              action={(sourceId) => payAdditionalChargeWithCard(charge.id, sourceId)}
+                              triggerLabel={t("pay")}
+                              dialogTitle={t("cardPayDialogTitle")}
+                              amountLabel={`$${formatUSD(charge.amount_cents / 100)}`}
+                              submitLabel={t("cardPaySubmit")}
+                              submittingLabel={t("cardPaySubmitting")}
+                              genericErrorLabel={t("cardPayError")}
+                              successLabel={t("cardPaySuccess")}
+                              onSuccess={() => router.refresh()}
+                            />
+                          </div>
                         )}
                       </div>
                     ))}
-                    {chargeMessage && (
-                      <p className="text-sm text-destructive">{chargeMessage}</p>
-                    )}
                   </div>
                 )}
 
@@ -317,10 +298,10 @@ export default function PendingOrderList({
                     <Badge variant={DECLARATION_STATUS_VARIANT[order.status] ?? "outline"} className="whitespace-nowrap">
                       {tDeclarations(`status.${order.status}`)}
                     </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+                </div>
+              </CardContent>
+            </Card>
+           </Link>
           )
         }
 

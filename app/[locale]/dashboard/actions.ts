@@ -3,10 +3,23 @@
 import { revalidatePath } from "next/cache"
 import { randomUUID } from "crypto"
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { notifyAdmins } from "@/lib/notifications"
 import { getSquare, getSquareLocationId } from "@/lib/square"
 
-export async function payForShipment(packageId: string) {
+// Charges the shipping quote directly via square.payments.create(), using
+// the card token (sourceId) the browser's Square Web Payments SDK produced.
+// This used to be a stub that marked the package "paid" with no real
+// charge at all - it now performs a real Square payment, the same way
+// payPurchaseRequestWithCard() and payAdditionalChargeWithCard() do.
+// packages.quote_amount is stored in whole dollars (not cents), unlike
+// purchase_requests/additional_charges.
+//
+// The final status write uses the admin/service-role client (matching the
+// other two payment actions and the webhook) rather than the user's own
+// client, so the "paid" write only ever happens right after this action
+// itself independently confirms Square reports the payment COMPLETED.
+export async function payShipmentWithCard(packageId: string, sourceId: string) {
   const supabase = await createClient()
 
   const {
@@ -17,40 +30,80 @@ export async function payForShipment(packageId: string) {
     return { error: "ログインしてください。" }
   }
 
-  // NOTE: Square is not yet connected. This marks the package as paid directly
-  // as a stand-in for a real checkout flow. Swap this for a Square Payment
-  // Link + webhook once payment credentials are available.
-  const { error } = await supabase
+  const { data: pkg, error: fetchError } = await supabase
     .from("packages")
-    .update({ status: "paid", updated_at: new Date().toISOString() })
+    .select("id, user_id, status, quote_amount, item_name")
     .eq("id", packageId)
     .eq("user_id", user.id)
-    .eq("status", "quoted")
+    .single()
 
-  if (error) {
-    return { error: error.message }
+  if (fetchError || !pkg) {
+    return { error: "パッケージが見つかりません。" }
   }
 
-  await notifyAdmins({
-    packageId,
-    title: "配送料のお支払いが完了しました",
-    body: "配送料のお支払いが完了しました。管理画面からご確認ください。",
-    titleEn: "Shipping payment completed",
-    bodyEn: "The customer has completed payment for shipping. Please check the admin dashboard.",
-  })
+  if (pkg.status !== "quoted" || !pkg.quote_amount) {
+    return { error: "このパッケージには支払い可能な見積りがありません。" }
+  }
 
-  revalidatePath("/dashboard")
-  revalidatePath("/admin/packages")
+  try {
+    const square = await getSquare()
+    const locationId = await getSquareLocationId()
+    const { payment } = await square.payments.create({
+      sourceId,
+      idempotencyKey: randomUUID(),
+      amountMoney: {
+        amount: BigInt(Math.round(Number(pkg.quote_amount) * 100)),
+        currency: "USD",
+      },
+      locationId,
+      note: `Shipping: ${pkg.item_name}`.slice(0, 500),
+    })
 
-  return { success: true }
+    if (payment?.status !== "COMPLETED" || !payment.id) {
+      return {
+        error: "お支払いを完了できませんでした。カード情報をご確認のうえ、再度お試しください。",
+      }
+    }
+
+    const { error } = await createAdminClient()
+      .from("packages")
+      .update({
+        status: "paid",
+        square_payment_id: payment.id,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", packageId)
+      .eq("user_id", user.id)
+      .eq("status", "quoted")
+
+    if (error) {
+      return { error: error.message }
+    }
+
+    await notifyAdmins({
+      packageId,
+      title: "配送料のお支払いが完了しました",
+      body: "配送料のお支払いが完了しました。管理画面からご確認ください。",
+      titleEn: "Shipping payment completed",
+      bodyEn: "The customer has completed payment for shipping. Please check the admin dashboard.",
+    })
+
+    revalidatePath("/dashboard")
+    revalidatePath("/admin/packages")
+
+    return { success: true }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "unknown error"
+    return { error: `お支払い処理に失敗しました: ${message}` }
+  }
 }
 
-// Mirrors createCheckoutSession() in
-// app/[locale]/dashboard/purchase-requests/actions.ts -- a Square
-// "quickPay" payment link for a single additional charge issued by an
-// admin (see createAdditionalCharge() in app/[locale]/admin/packages/actions.ts).
-// The charge is marked "paid" by the Square webhook, not here.
-export async function createAdditionalChargeCheckoutSession(chargeId: string) {
+// Charges an admin-issued additional charge directly via
+// square.payments.create() - mirrors payPurchaseRequestWithCard() in
+// app/[locale]/dashboard/purchase-requests/actions.ts (see
+// createAdditionalCharge() in app/[locale]/admin/packages/actions.ts for
+// how a charge gets created in the first place).
+export async function payAdditionalChargeWithCard(chargeId: string, sourceId: string) {
   const supabase = await createClient()
 
   const {
@@ -79,46 +132,37 @@ export async function createAdditionalChargeCheckoutSession(chargeId: string) {
   try {
     const square = await getSquare()
     const locationId = await getSquareLocationId()
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL || "https://usajusho-app.vercel.app"
-
-    const { paymentLink } = await square.checkout.paymentLinks.create({
+    const { payment } = await square.payments.create({
+      sourceId,
       idempotencyKey: randomUUID(),
-      quickPay: {
-        name: "USAJUSHO 追加料金",
-        priceMoney: {
-          amount: BigInt(charge.amount_cents),
-          currency: "USD",
-        },
-        locationId,
+      amountMoney: {
+        amount: BigInt(charge.amount_cents),
+        currency: "USD",
       },
-      checkoutOptions: {
-        redirectUrl: `${siteUrl}/dashboard?paid=1`,
-      },
-      prePopulatedData: {
-        buyerEmail: user.email ?? undefined,
-      },
-      paymentNote: charge.reason.slice(0, 500),
+      locationId,
+      note: charge.reason.slice(0, 500),
     })
 
-    if (!paymentLink?.url || !paymentLink.orderId) {
-      throw new Error("Square did not return a payment link URL")
+    if (payment?.status !== "COMPLETED" || !payment.id) {
+      return {
+        error: "お支払い完了できませんでした。カード情報をご確認のうえ、再度お試しください。",
+      }
     }
 
-    await supabase
+    await createAdminClient()
       .from("additional_charges")
       .update({
-        status: "awaiting_payment",
-        square_order_id: paymentLink.orderId,
+        status: "paid",
+        square_payment_id: payment.id,
         updated_at: new Date().toISOString(),
       })
       .eq("id", charge.id)
 
     revalidatePath("/dashboard")
-    return { url: paymentLink.url }
+    return { success: true }
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown error"
-    return { error: `Square Checkoutリンクの作成に失敗しました: ${message}` }
+    return { error: `お支払い処理に失敗しました: ${message}` }
   }
 }
 

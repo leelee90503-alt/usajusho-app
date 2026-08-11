@@ -2,6 +2,7 @@ import { redirect, Link } from "@/i18n/navigation"
 import { notFound } from "next/navigation"
 import { getLocale, getTranslations } from "next-intl/server"
 import { createClient } from "@/lib/supabase/server"
+import { getSquareClientConfig } from "@/lib/square"
 import PayButton from "./pay-button"
 import CancelButton from "./cancel-button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -55,6 +56,12 @@ export default async function PurchaseRequestDetailPage({
   const canCancel = ["submitted", "quote_sent", "awaiting_payment"].includes(
     request.status,
   )
+  // getSquareClientConfig() throws until SQUARE_APPLICATION_ID_* is set -
+  // only fetch it when actually needed, and degrade gracefully rather than
+  // 500ing the whole page if it isn't configured yet.
+  const squareConfig = canPay
+    ? await getSquareClientConfig().catch(() => null)
+    : null
   const nowIso = new Date().toISOString()
   const isExpired = Boolean(
     request.quote_expires_at && request.quote_expires_at < nowIso,
@@ -107,7 +114,16 @@ export default async function PurchaseRequestDetailPage({
 
             {(canPay || canCancel) && (
               <CardFooter className="flex flex-wrap gap-3">
-                {canPay && !isExpired && <PayButton requestId={request.id} />}
+                {canPay && !isExpired && squareConfig && (
+                  <PayButton
+                    requestId={request.id}
+                    squareConfig={squareConfig}
+                    amountLabel={`$${formatUSD(request.quote_total_cents / 100)}`}
+                  />
+                )}
+                {canPay && !isExpired && !squareConfig && (
+                  <p className="text-sm text-destructive">{t("paymentUnavailable")}</p>
+                )}
                 {canPay && isExpired && (
                   <p className="text-sm text-destructive">{t("quoteExpired")}</p>
                 )}

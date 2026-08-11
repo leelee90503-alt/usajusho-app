@@ -1,6 +1,7 @@
 import { getTranslations, getLocale } from 'next-intl/server'
 import { redirect, Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getSquareClientConfig } from '@/lib/square'
 import SignOutButton from './sign-out-button'
 import PackageList from './package-list'
 import PendingOrderList from './pending-order-list'
@@ -23,6 +24,11 @@ export default async function DashboardPage() {
   }
 
   const t = await getTranslations('dashboard')
+
+  // getSquareClientConfig() throws until SQUARE_APPLICATION_ID_* is set -
+  // degrade gracefully (pay buttons simply don't render their card form)
+  // rather than 500ing the whole dashboard if it isn't configured yet.
+  const squareConfig = await getSquareClientConfig().catch(() => null)
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -218,6 +224,7 @@ export default async function DashboardPage() {
                 profile={profile ?? null}
                 additionalCharges={additionalChargesByPackageId}
                 photosByPackageId={photosByPackageId}
+                squareConfig={squareConfig}
               />
             </TabsContent>
             <TabsContent value="completed">
@@ -227,6 +234,7 @@ export default async function DashboardPage() {
                 emptyVariant="completed"
                 additionalCharges={additionalChargesByPackageId}
                 photosByPackageId={photosByPackageId}
+                squareConfig={squareConfig}
               />
             </TabsContent>
           </Tabs>

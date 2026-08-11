@@ -14,7 +14,16 @@ export type SquareMode = "sandbox" | "production"
 // _SANDBOX / _PRODUCTION:
 //   SQUARE_ACCESS_TOKEN_SANDBOX / SQUARE_ACCESS_TOKEN_PRODUCTION
 //   SQUARE_LOCATION_ID_SANDBOX / SQUARE_LOCATION_ID_PRODUCTION
+//   SQUARE_APPLICATION_ID_SANDBOX / SQUARE_APPLICATION_ID_PRODUCTION
 //   SQUARE_WEBHOOK_SIGNATURE_KEY_SANDBOX / SQUARE_WEBHOOK_SIGNATURE_KEY_PRODUCTION
+//
+// SQUARE_APPLICATION_ID_* is the one value in this list that also needs to
+// reach the browser (the Web Payments SDK's card form runs client-side and
+// needs both applicationId and locationId to initialize). It is NOT a
+// NEXT_PUBLIC_* var - it stays a plain server-only env var, read here, and
+// handed to client components as a prop from a server component (see
+// getSquareClientConfig() below), the same pattern already used for
+// square_mode/SquareModeToggle's initialMode prop.
 
 const clients: Partial<Record<SquareMode, SquareClient>> = {}
 
@@ -28,6 +37,10 @@ function getAccessToken(mode: SquareMode): string | undefined {
 
 function getLocationId(mode: SquareMode): string | undefined {
   return process.env[`SQUARE_LOCATION_ID_${envSuffix(mode)}`]
+}
+
+function getApplicationId(mode: SquareMode): string | undefined {
+  return process.env[`SQUARE_APPLICATION_ID_${envSuffix(mode)}`]
 }
 
 function getWebhookSignatureKey(mode: SquareMode): string | undefined {
@@ -93,6 +106,40 @@ export async function getSquareLocationId(): Promise<string> {
     )
   }
   return locationId
+}
+
+export async function getSquareApplicationId(): Promise<string> {
+  const mode = await getSquareMode()
+  const applicationId = getApplicationId(mode)
+  if (!applicationId) {
+    throw new Error(
+      `SQUARE_APPLICATION_ID_${envSuffix(mode)} is not set. Add it to ` +
+        ".env.local (and to the Vercel project's environment variables) " +
+        `for the currently-selected Square ${mode} environment.`,
+    )
+  }
+  return applicationId
+}
+
+/**
+ * Convenience bundle for server components that need to hand the Web
+ * Payments SDK its client-side config as props - mode/applicationId/
+ * locationId are not secret (the SDK's own JS exposes them to the
+ * browser), but there's no reason to add a NEXT_PUBLIC_* var when a
+ * server component can just fetch this once and pass it down, the same
+ * way SquareModeToggle already receives initialMode as a prop.
+ */
+export async function getSquareClientConfig(): Promise<{
+  mode: SquareMode
+  applicationId: string
+  locationId: string
+}> {
+  const [mode, applicationId, locationId] = await Promise.all([
+    getSquareMode(),
+    getSquareApplicationId(),
+    getSquareLocationId(),
+  ])
+  return { mode, applicationId, locationId }
 }
 
 /**

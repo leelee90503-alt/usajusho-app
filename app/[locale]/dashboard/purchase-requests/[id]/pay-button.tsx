@@ -1,35 +1,36 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { createCheckoutSession } from "../actions"
-import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+import { payPurchaseRequestWithCard } from "../actions"
+import SquareCardPayment from "@/components/square-card-payment"
 
-export default function PayButton({ requestId }: { requestId: string }) {
+export default function PayButton({
+  requestId,
+  squareConfig,
+  amountLabel,
+}: {
+  requestId: string
+  squareConfig: { mode: "sandbox" | "production"; applicationId: string; locationId: string }
+  amountLabel: string
+}) {
   const t = useTranslations("purchaseRequests")
-  const [isPending, startTransition] = useTransition()
-  const [error, setError] = useState<string | null>(null)
-
-  function handlePay() {
-    setError(null)
-    startTransition(async () => {
-      const result = await createCheckoutSession(requestId)
-      if (result?.error) {
-        setError(result.error)
-      } else if (result?.url) {
-        window.location.href = result.url
-      }
-    })
-  }
+  const router = useRouter()
 
   return (
-    <div>
-      <Button type="button" onClick={handlePay} disabled={isPending}>
-        {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-        {isPending ? t("payButtonPending") : t("payButton")}
-      </Button>
-      {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
-    </div>
+    <SquareCardPayment
+      mode={squareConfig.mode}
+      applicationId={squareConfig.applicationId}
+      locationId={squareConfig.locationId}
+      action={(sourceId) => payPurchaseRequestWithCard(requestId, sourceId)}
+      triggerLabel={t("payButton")}
+      dialogTitle={t("cardPayDialogTitle")}
+      amountLabel={amountLabel}
+      submitLabel={t("cardPaySubmit")}
+      submittingLabel={t("cardPaySubmitting")}
+      genericErrorLabel={t("cardPayError")}
+      successLabel={t("cardPaySuccess")}
+      onSuccess={() => router.refresh()}
+    />
   )
 }
