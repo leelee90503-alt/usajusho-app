@@ -469,7 +469,8 @@
     "cancel": "Cancel",
     "confirmSubmit": "Confirm & Submit",
     "printButton": "Print",
-    "invoiceDateLabel": "Invoice Date"
+    "invoiceDateLabel": "Invoice Date",
+    "importFromPackageButton": "Import from Package"
   },
   "adminInvoices": {
     "title": "Commercial Invoices",

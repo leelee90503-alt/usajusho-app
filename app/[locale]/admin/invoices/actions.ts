@@ -288,6 +288,107 @@ export async function adminAddInvoiceItem(invoiceId: string, item: AdminItemInpu
   return { success: true }
 }
 
+// Best-effort machine translation via the free, keyless MyMemory API. Used
+// only by adminImportItemsFromPackage below -- if this fails or times out for
+// any reason, we fall back to the original (Japanese) text rather than
+// blocking the import, since an editable placeholder is more useful to the
+// admin than a failed action.
+async function translateToEnglish(text: string): Promise<string> {
+  const trimmed = text.trim()
+  if (!trimmed) return trimmed
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(trimmed)}&langpair=ja|en`
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) })
+    if (!res.ok) return trimmed
+    const data = await res.json()
+    const translated = data?.responseData?.translatedText
+    return typeof translated === "string" && translated.trim() ? translated.trim() : trimmed
+  } catch {
+    return trimmed
+  }
+}
+
+// Pulls the customer's declared item(s) for this invoice's package into
+// invoice_items, translating each product name to English along the way.
+// Prefers package_declarations rows the customer matched to this package
+// (item_name + their own declared purchase price, order_amount) since that
+// is the customs-declarable value; falls back to the package's own
+// item_name (admin-entered) with no price if no declarations are matched.
+// Imported rows are plain invoice_items rows -- fully editable/deletable
+// afterward just like manually-added ones.
+export async function adminImportItemsFromPackage(invoiceId: string, packageId: string) {
+  const supabase = await requireAdmin()
+
+  const guard = await getInvoiceForItemAction(supabase, invoiceId)
+  if ("error" in guard) return guard
+
+  const { data: pkg, error: pkgError } = await supabase
+    .from("packages")
+    .select("item_name")
+    .eq("id", packageId)
+    .single()
+
+  if (pkgError || !pkg) {
+    return { error: "Package not found." }
+  }
+
+  const { data: declarations, error: declError } = await supabase
+    .from("package_declarations")
+    .select("item_name, order_amount")
+    .eq("matched_package_id", packageId)
+
+  if (declError) {
+    return { error: declError.message }
+  }
+
+  const sources =
+    declarations && declarations.length > 0
+      ? declarations.map((d) => ({ name: d.item_name, amount: d.order_amount }))
+      : [{ name: pkg.item_name, amount: null as number | null }]
+
+  const { data: maxRow } = await supabase
+    .from("invoice_items")
+    .select("sort_order")
+    .eq("invoice_id", invoiceId)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  let nextSortOrder = (maxRow?.sort_order ?? -1) + 1
+  let importedCount = 0
+
+  for (const source of sources) {
+    if (!source.name?.trim()) continue
+    const translatedName = await translateToEnglish(source.name)
+    const unitPrice = source.amount != null ? Number(source.amount) : 0
+
+    const { error: insertError } = await supabase.from("invoice_items").insert({
+      invoice_id: invoiceId,
+      product_name: translatedName,
+      quantity: 1,
+      unit_price: unitPrice,
+      item_total_amount: Math.round(unitPrice * 100) / 100,
+      country_of_origin: null,
+      hs_code: null,
+      sort_order: nextSortOrder,
+    })
+
+    if (insertError) {
+      return { error: insertError.message }
+    }
+
+    nextSortOrder += 1
+    importedCount += 1
+  }
+
+  if (importedCount === 0) {
+    return { error: "No items found on this package to import." }
+  }
+
+  revalidatePath(`/admin/invoices/${guard.invoice.package_id}`)
+  return { success: true, importedCount }
+}
+
 export async function adminDuplicateInvoiceItem(itemId: string) {
   const supabase = await requireAdmin()
 
