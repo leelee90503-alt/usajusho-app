@@ -332,10 +332,17 @@ async function translateToEnglish(text: string): Promise<string> {
 
 // Pulls the customer's declared item(s) for this invoice's package into
 // invoice_items, translating each product name to English along the way.
-// Prefers package_declarations rows the customer matched to this package
-// (item_name + their own declared purchase price, order_amount) since that
-// is the customs-declarable value; falls back to the package's own
-// item_name (admin-entered) with no price if no declarations are matched.
+// Three fallback tiers, most accurate first:
+//   1. package_items -- the actual per-item breakdown of this box (see
+//      package-items-migration.sql), including quantity. Populated
+//      whenever the package went through matchAndQuoteDeclaration() or
+//      markPurchasedAndLinkPackage(), and is the only source that reflects
+//      consolidated (합송배송) packages correctly.
+//   2. package_declarations rows the customer matched to this package
+//      (item_name + their own declared purchase price, order_amount) --
+//      kept for packages created before package_items existed.
+//   3. the package's own item_name (admin-entered) with no price, if
+//      neither of the above has anything.
 // Imported rows are plain invoice_items rows -- fully editable/deletable
 // afterward just like manually-added ones.
 export async function adminImportItemsFromPackage(invoiceId: string, packageId: string) {
@@ -354,19 +361,38 @@ export async function adminImportItemsFromPackage(invoiceId: string, packageId: 
     return { error: "Package not found." }
   }
 
-  const { data: declarations, error: declError } = await supabase
-    .from("package_declarations")
-    .select("item_name, order_amount")
-    .eq("matched_package_id", packageId)
+  // Soft-fail: if package-items-migration.sql hasn't been run yet, this
+  // table won't exist -- fall straight through to the package_declarations
+  // tier below rather than blocking invoice import entirely.
+  const { data: packageItems } = await supabase
+    .from("package_items")
+    .select("product_name, quantity, unit_price")
+    .eq("package_id", packageId)
+    .order("sort_order", { ascending: true })
 
-  if (declError) {
-    return { error: declError.message }
+  let sources: { name: string; amount: number | null; quantity: number }[]
+
+  if (packageItems && packageItems.length > 0) {
+    sources = packageItems.map((pi) => ({
+      name: pi.product_name,
+      amount: pi.unit_price,
+      quantity: pi.quantity ?? 1,
+    }))
+  } else {
+    const { data: declarations, error: declError } = await supabase
+      .from("package_declarations")
+      .select("item_name, order_amount")
+      .eq("matched_package_id", packageId)
+
+    if (declError) {
+      return { error: declError.message }
+    }
+
+    sources =
+      declarations && declarations.length > 0
+        ? declarations.map((d) => ({ name: d.item_name, amount: d.order_amount, quantity: 1 }))
+        : [{ name: pkg.item_name, amount: null, quantity: 1 }]
   }
-
-  const sources =
-    declarations && declarations.length > 0
-      ? declarations.map((d) => ({ name: d.item_name, amount: d.order_amount }))
-      : [{ name: pkg.item_name, amount: null as number | null }]
 
   const { data: maxRow } = await supabase
     .from("invoice_items")
@@ -383,13 +409,14 @@ export async function adminImportItemsFromPackage(invoiceId: string, packageId: 
     if (!source.name?.trim()) continue
     const translatedName = await translateToEnglish(source.name)
     const unitPrice = source.amount != null ? Number(source.amount) : 0
+    const quantity = source.quantity > 0 ? source.quantity : 1
 
     const { error: insertError } = await supabase.from("invoice_items").insert({
       invoice_id: invoiceId,
       product_name: translatedName,
-      quantity: 1,
+      quantity,
       unit_price: unitPrice,
-      item_total_amount: Math.round(unitPrice * 100) / 100,
+      item_total_amount: Math.round(unitPrice * quantity * 100) / 100,
       country_of_origin: null,
       hs_code: null,
       sort_order: nextSortOrder,

@@ -8,6 +8,7 @@ import { randomUUID } from "crypto"
 import { notifyUser } from "@/lib/notifications"
 import { getSquare, getSquareMode, type SquareMode } from "@/lib/square"
 import { purchaseEmailSteps } from "@/lib/email-template"
+import { summarizeItemNames } from "@/lib/package-items"
 
 async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>> {
   const locale = await getLocale()
@@ -117,6 +118,14 @@ export async function markPurchasing(requestId: string) {
 export async function markPurchasedAndLinkPackage(
   requestId: string,
   itemName: string,
+  // Consolidation (합송배송/묶음배송): when set, this request's item joins
+  // an existing not-yet-weighed, shipping-prepaid package for the same
+  // customer (created by an earlier purchase request) instead of creating
+  // a new package. Its prepaid shipping cost is added on top of whatever
+  // the box already has -- since it isn't billed a second time, this box's
+  // total quote_amount must equal the sum of every consolidated request's
+  // shipping cost.
+  existingPackageId?: string | null,
 ) {
   const supabase = await requireAdmin()
 
@@ -142,29 +151,109 @@ export async function markPurchasedAndLinkPackage(
   // so shipping_prepaid lets resolveMissingPackage() skip the normal
   // "quoted" payment step and jump straight to "paid" once weighed.
   const shippingCents = request.quote_shipping_cents ?? 0
-  const { data: pkg, error: pkgError } = await supabase
-    .from("packages")
-    .insert({
-      user_id: request.user_id,
-      item_name: itemName,
-      status: "missing",
-      admin_note: `購入代行リクエスト ${request.id} 経由で作成`,
-      shipping_prepaid: true,
-      source_purchase_request_id: request.id,
-      quote_amount: shippingCents / 100,
-    })
-    .select("id")
-    .single()
 
-  if (pkgError || !pkg) {
-    return { error: pkgError?.message ?? "パッケージの作成に失敗しました。" }
+  let packageId: string
+
+  if (existingPackageId) {
+    const { data: existingPackage, error: existingPackageError } = await supabase
+      .from("packages")
+      .select("id, user_id, status, shipping_prepaid, quote_amount")
+      .eq("id", existingPackageId)
+      .single()
+
+    if (existingPackageError || !existingPackage) {
+      return { error: "合送先の荷物が見つかりません。" }
+    }
+
+    if (existingPackage.user_id !== request.user_id) {
+      return { error: "合送先の荷物の持ち主が一致しません。" }
+    }
+
+    if (existingPackage.status !== "missing" || !existingPackage.shipping_prepaid) {
+      return {
+        error: "この荷物には合送できません（計量待ち・送料前払いの荷物にのみ合送できます）。",
+      }
+    }
+
+    packageId = existingPackage.id
+
+    const { error: updateError } = await supabase
+      .from("packages")
+      .update({
+        quote_amount: Number(existingPackage.quote_amount ?? 0) + shippingCents / 100,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", packageId)
+
+    if (updateError) {
+      return { error: updateError.message }
+    }
+  } else {
+    const { data: pkg, error: pkgError } = await supabase
+      .from("packages")
+      .insert({
+        user_id: request.user_id,
+        item_name: itemName,
+        status: "missing",
+        admin_note: `購入代行リクエスト ${request.id} 経由で作成`,
+        shipping_prepaid: true,
+        source_purchase_request_id: request.id,
+        quote_amount: shippingCents / 100,
+      })
+      .select("id")
+      .single()
+
+    if (pkgError || !pkg) {
+      return { error: pkgError?.message ?? "パッケージの作成に失敗しました。" }
+    }
+
+    packageId = pkg.id
+  }
+
+  // Best-effort: records this request's line item for the package's item
+  // breakdown (customer dashboard, admin package view, invoice import).
+  // Never blocks the purchase/link itself on this -- see the identical
+  // comment in matchAndQuoteDeclaration() in
+  // app/[locale]/admin/packages/declarations-actions.ts.
+  const { error: itemInsertError } = await supabase.from("package_items").insert({
+    package_id: packageId,
+    source_purchase_request_id: requestId,
+    product_name: itemName,
+    quantity: 1,
+  })
+
+  if (itemInsertError) {
+    console.warn("markPurchasedAndLinkPackage: could not record package_items row:", itemInsertError.message)
+  }
+
+  // Keep packages.item_name (the headline shown everywhere) an accurate
+  // summary of everything now inside the box once more than one request is
+  // consolidated into it.
+  if (existingPackageId) {
+    const { data: allItems } = await supabase
+      .from("package_items")
+      .select("product_name")
+      .eq("package_id", packageId)
+      .order("created_at", { ascending: true })
+
+    const summarized = summarizeItemNames((allItems ?? []).map((i) => i.product_name))
+    if (summarized) {
+      const { error: nameUpdateError } = await supabase
+        .from("packages")
+        .update({ item_name: summarized })
+        .eq("id", packageId)
+
+      if (nameUpdateError) {
+        return { error: nameUpdateError.message }
+      }
+    }
   }
 
   const { error: updateError } = await supabase
     .from("purchase_requests")
     .update({
       status: "purchased",
-      linked_package_id: pkg.id,
+      linked_package_id: packageId,
       updated_at: new Date().toISOString(),
     })
     .eq("id", requestId)
@@ -175,7 +264,7 @@ export async function markPurchasedAndLinkPackage(
 
   await notifyUser(supabase, {
     userId: request.user_id,
-    packageId: pkg.id,
+    packageId,
     title: "商品の購入が完了しました",
     body: "ご依頼いただいておりました商品の購入が完了いたしました。倉庫への到着後、通常の配送フローにてお届けいたします。",
     titleEn: "Your item has been purchased",
@@ -189,7 +278,7 @@ export async function markPurchasedAndLinkPackage(
   revalidatePath("/admin/purchase-requests")
   revalidatePath(`/admin/purchase-requests/${requestId}`)
   revalidatePath("/admin/packages")
-  return { success: true, packageId: pkg.id }
+  return { success: true, packageId }
 }
 
 export async function refundPurchaseRequest(requestId: string) {

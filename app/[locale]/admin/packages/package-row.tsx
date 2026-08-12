@@ -95,18 +95,26 @@ type PackagePhoto = {
   url: string
 }
 
+type PackageItem = {
+  id: string
+  product_name: string
+  quantity: number
+}
+
 export default function PackageRow({
   pkg,
   invoice,
   declaration,
   additionalCharges = [],
   photos = [],
+  items = [],
 }: {
   pkg: PackageWithProfile
   invoice: PackageInvoice | null
   declaration: LinkedDeclaration | null
   additionalCharges?: AdditionalCharge[]
   photos?: PackagePhoto[]
+  items?: PackageItem[]
 }) {
   const t = useTranslations("packageRow")
   const tStatus = useTranslations("packageStatus")
@@ -194,6 +202,16 @@ export default function PackageRow({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="font-semibold text-slate-900">{pkg.item_name}</p>
+            {items.length > 1 && (
+              <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-muted-foreground">
+                {items.map((item) => (
+                  <li key={item.id}>
+                    {item.product_name}
+                    {item.quantity > 1 ? ` × ${item.quantity}` : ""}
+                  </li>
+                ))}
+              </ul>
+            )}
             <p className="mt-1 text-xs text-muted-foreground">
               {pkg.profiles?.full_name} {t("suiteSeparator")} {pkg.profiles?.suite_number}
             </p>

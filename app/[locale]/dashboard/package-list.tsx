@@ -38,6 +38,12 @@ type PackagePhoto = {
   url: string
 }
 
+type PackageItem = {
+  id: string
+  product_name: string
+  quantity: number
+}
+
 type Profile = {
   full_name: string | null
   first_name: string | null
@@ -76,6 +82,7 @@ export default function PackageList({
   additionalCharges = {},
   photosByPackageId = {},
   invoiceStatusByPackageId = {},
+  itemsByPackageId = {},
   squareConfig = null,
 }: {
   packages: Package[]
@@ -84,6 +91,7 @@ export default function PackageList({
   additionalCharges?: Record<string, AdditionalCharge[]>
   photosByPackageId?: Record<string, PackagePhoto[]>
   invoiceStatusByPackageId?: Record<string, string>
+  itemsByPackageId?: Record<string, PackageItem[]>
   squareConfig?: SquareConfig | null
 }) {
   const t = useTranslations("packageList")
@@ -142,6 +150,21 @@ export default function PackageList({
                   <PackageIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                   <div>
                     <p className="font-semibold text-slate-900">{pkg.item_name}</p>
+                    {(itemsByPackageId[pkg.id] ?? []).length > 1 && (
+                      <div className="mt-1">
+                        <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                          {t("itemsHeading")}
+                        </p>
+                        <ul className="mt-0.5 list-disc space-y-0.5 pl-4 text-xs text-muted-foreground">
+                          {(itemsByPackageId[pkg.id] ?? []).map((item) => (
+                            <li key={item.id}>
+                              {item.product_name}
+                              {item.quantity > 1 ? ` × ${item.quantity}` : ""}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     {pkg.tracking_number && (
                       <p className="mt-1 text-xs text-muted-foreground">
                         {t("trackingNumber")}{pkg.tracking_number}

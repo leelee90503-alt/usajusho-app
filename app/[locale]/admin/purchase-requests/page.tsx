@@ -49,6 +49,29 @@ export default async function AdminPurchaseRequestsPage({
     .order("created_at", { ascending: false })
 
   const requests = allRequests ?? []
+
+  // Consolidation (합송배송/묶음배송): once a request reaches "purchasing",
+  // the admin can fold it into an existing not-yet-weighed, shipping-prepaid
+  // package for the same customer (created by an earlier purchase request)
+  // instead of always creating a new package -- see the "existing package"
+  // dropdown in request-row.tsx.
+  const { data: attachablePackages } = await supabase
+    .from("packages")
+    .select("id, user_id, item_name")
+    .eq("status", "missing")
+    .eq("shipping_prepaid", true)
+
+  const attachableCandidatesByUserId = new Map<
+    string,
+    { id: string; item_name: string }[]
+  >()
+  for (const pkg of attachablePackages ?? []) {
+    if (!pkg.user_id) continue
+    const list = attachableCandidatesByUserId.get(pkg.user_id) ?? []
+    list.push({ id: pkg.id, item_name: pkg.item_name })
+    attachableCandidatesByUserId.set(pkg.user_id, list)
+  }
+
   const statCounts = {
     total: requests.length,
     submitted: requests.filter((r) => r.status === "submitted").length,
@@ -147,7 +170,14 @@ export default async function AdminPurchaseRequestsPage({
 
         <div className="mt-6 space-y-3">
           {filtered.map((request) => (
-            <RequestRow key={request.id} request={request} feeSettings={feeSettings} />
+            <RequestRow
+              key={request.id}
+              request={{
+                ...request,
+                candidatePackages: attachableCandidatesByUserId.get(request.user_id) ?? [],
+              }}
+              feeSettings={feeSettings}
+            />
           ))}
 
           {filtered.length === 0 && (

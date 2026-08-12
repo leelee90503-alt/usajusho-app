@@ -11,8 +11,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Check, Trash2 } from "lucide-react"
 
+type CandidatePackage = { id: string; item_name: string; status: string }
+
 type Declaration = {
   id: string
+  user_id: string
   item_name: string
   order_amount: number | null
   origin_tracking_number: string | null
@@ -20,6 +23,7 @@ type Declaration = {
   receipt_url: string | null
   created_at: string
   profiles: { full_name: string | null; suite_number: string | null } | null
+  candidatePackages?: CandidatePackage[]
 }
 
 export default function PendingDeclarations({
@@ -108,6 +112,8 @@ function DeclarationCard({
   const [trackingNumber, setTrackingNumber] = useState("")
   const [memo, setMemo] = useState("")
   const [quoteAmount, setQuoteAmount] = useState("")
+  const [existingPackageId, setExistingPackageId] = useState("")
+  const candidatePackages = d.candidatePackages ?? []
 
   const suggestion =
     rates.length > 0
@@ -132,6 +138,7 @@ function DeclarationCard({
       trackingNumber,
       memo,
       quoteAmount: Number(quoteAmount),
+      existingPackageId: existingPackageId || undefined,
     })
   }
 
@@ -176,6 +183,24 @@ function DeclarationCard({
         </div>
 
         <div className="grid grid-cols-2 gap-3 rounded-lg border border-teal-200 bg-teal-50 p-3 sm:grid-cols-4">
+          {candidatePackages.length > 0 && (
+            <div className="col-span-2 space-y-1 sm:col-span-4">
+              <Label className="text-xs font-normal text-teal-800">{t("attachExistingLabel")}</Label>
+              <select
+                value={existingPackageId}
+                onChange={(e) => setExistingPackageId(e.target.value)}
+                className="h-9 w-full rounded-lg border border-input bg-white px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                <option value="">{t("attachExistingNone")}</option>
+                {candidatePackages.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.item_name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-teal-800">{t("attachExistingHint")}</p>
+            </div>
+          )}
           <div className="col-span-2 space-y-1 sm:col-span-4">
             <Label className="text-xs font-normal text-teal-800">{t("matchItemNameLabel")}</Label>
             <Input value={itemName} onChange={(e) => setItemName(e.target.value)} className="bg-white" />

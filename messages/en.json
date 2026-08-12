@@ -237,7 +237,8 @@
     "stepQuoteSent": "Quote Sent",
     "stepAwaitingPayment": "Awaiting Payment",
     "stepPaidAwaitingArrival": "Paid, Awaiting Arrival",
-    "stepActionNeeded": "Action Needed"
+    "stepActionNeeded": "Action Needed",
+    "itemsHeading": "Contents"
   },
   "notificationBell": {
     "title": "Notifications",
@@ -316,7 +317,10 @@
     "photosHint": "Attach photos taken during inspection.",
     "photosCountLabel": "{count} selected",
     "photosRequiredError": "Please attach between 3 and 5 photos.",
-    "photosHeading": "Photos"
+    "photosHeading": "Photos",
+    "attachExistingLabel": "Add to existing package (consolidate)",
+    "attachExistingNone": "Register as a new package",
+    "attachExistingHint": "Combine this item with an existing not-yet-finalized package for this customer. Re-weigh/re-measure the combined box and send one quote for it."
   },
   "packageStatus": {
     "missing": "Missing",
@@ -561,10 +565,7 @@
     "benefit4Title": "One simple, transparent fee",
     "benefit4Description": "A flat fee plus a small percentage of the item price - clearly shown in your quote before you pay, no hidden costs.",
     "finalCtaTitle": "Ready to get something we can't buy in Japan?",
-    "finalCtaDescription": "Sign up for a free USAJUSHO account and submit your first purchase request in minutes.",
-    "feeExplanationTitle": "How is the fee calculated?",
-    "feeExplanationDescription": "Our fee is a flat {flatFee} plus {percent} of the item price. It's calculated automatically and shown in full in your quote before you pay - no hidden costs.",
-    "feeExplanationNote": "The fee applies only to the item price. Shipping from the US to Japan is quoted and charged separately."
+    "finalCtaDescription": "Sign up for a free USAJUSHO account and submit your first purchase request in minutes."
   },
   "purchaseRequests": {
     "title": "Purchase Requests",
@@ -696,7 +697,10 @@
     "whitelistDisabled": "Disabled",
     "whitelistRemove": "Remove",
     "whitelistRemoveConfirm": "Remove {label} ({domain})?",
-    "whitelistEmpty": "No stores whitelisted yet. Add one below."
+    "whitelistEmpty": "No stores whitelisted yet. Add one below.",
+    "attachExistingLabel": "Add to existing package (consolidate)",
+    "attachExistingNone": "Create a new package",
+    "attachExistingHint": "Combine this item into an existing not-yet-weighed, shipping-prepaid package for this customer. The customer won't be charged shipping twice."
   },
   "footer": {
     "terms": "Terms of Service",

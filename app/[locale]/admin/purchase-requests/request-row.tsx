@@ -24,6 +24,8 @@ import { formatUSD } from "@/lib/format"
 
 type Profile = { full_name: string | null; suite_number: string | null } | null
 
+type CandidatePackage = { id: string; item_name: string }
+
 type PurchaseRequest = {
   id: string
   product_url: string | null
@@ -38,6 +40,7 @@ type PurchaseRequest = {
   quote_expires_at: string | null
   linked_package_id: string | null
   profiles: Profile
+  candidatePackages?: CandidatePackage[]
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -82,6 +85,8 @@ export default function RequestRow({
   const [itemName, setItemName] = useState(
     request.product_description.slice(0, 80),
   )
+  const [existingPackageId, setExistingPackageId] = useState("")
+  const candidatePackages = request.candidatePackages ?? []
 
   function handleSuggestFee() {
     const priceCents = Math.round(Number(itemPrice || "0") * 100)
@@ -123,7 +128,11 @@ export default function RequestRow({
   function handleMarkPurchased() {
     setMessage(null)
     startTransition(async () => {
-      const result = await markPurchasedAndLinkPackage(request.id, itemName)
+      const result = await markPurchasedAndLinkPackage(
+        request.id,
+        itemName,
+        existingPackageId || undefined,
+      )
       setMessage(result?.error ?? t("purchasedSuccess"))
     })
   }
@@ -300,9 +309,32 @@ export default function RequestRow({
                 className="w-64"
               />
             </div>
+            {candidatePackages.length > 0 && (
+              <div className="space-y-1">
+                <Label htmlFor={`existing-package-${request.id}`} className="text-xs font-normal text-muted-foreground">
+                  {t("attachExistingLabel")}
+                </Label>
+                <select
+                  id={`existing-package-${request.id}`}
+                  value={existingPackageId}
+                  onChange={(e) => setExistingPackageId(e.target.value)}
+                  className="h-9 w-64 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <option value="">{t("attachExistingNone")}</option>
+                  {candidatePackages.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.item_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <Button type="button" size="sm" disabled={isPending} onClick={handleMarkPurchased}>
               {t("markPurchasedButton")}
             </Button>
+            {candidatePackages.length > 0 && (
+              <p className="w-full text-xs text-muted-foreground">{t("attachExistingHint")}</p>
+            )}
           </div>
         )}
 

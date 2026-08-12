@@ -149,6 +149,25 @@ export default async function DashboardPage() {
     invoiceStatusByPackageId[invoice.package_id] = invoice.status
   }
 
+  // Per-item breakdown for consolidated (합송배송/묶음배송) packages -- see
+  // package-items-migration.sql. Only rendered by PackageList/
+  // PendingOrderList when a package has more than one item.
+  const { data: packageItemsData } =
+    packageIds.length > 0
+      ? await supabase
+          .from('package_items')
+          .select('id, package_id, product_name, quantity')
+          .in('package_id', packageIds)
+          .order('sort_order', { ascending: true })
+      : { data: [] as { id: string; package_id: string; product_name: string; quantity: number }[] }
+
+  const itemsByPackageId: Record<string, { id: string; product_name: string; quantity: number }[]> = {}
+  for (const item of packageItemsData ?? []) {
+    const list = itemsByPackageId[item.package_id] ?? []
+    list.push(item)
+    itemsByPackageId[item.package_id] = list
+  }
+
   return (
     <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-3xl px-6 py-10">
@@ -239,6 +258,7 @@ export default async function DashboardPage() {
                 additionalCharges={additionalChargesByPackageId}
                 photosByPackageId={photosByPackageId}
                 invoiceStatusByPackageId={invoiceStatusByPackageId}
+                itemsByPackageId={itemsByPackageId}
                 squareConfig={squareConfig}
               />
             </TabsContent>
@@ -250,6 +270,7 @@ export default async function DashboardPage() {
                 additionalCharges={additionalChargesByPackageId}
                 photosByPackageId={photosByPackageId}
                 invoiceStatusByPackageId={invoiceStatusByPackageId}
+                itemsByPackageId={itemsByPackageId}
                 squareConfig={squareConfig}
               />
             </TabsContent>

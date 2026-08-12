@@ -75,6 +75,24 @@ export default async function AdminPackagesPage({
 
   const missingPackages = packages.filter((p) => p.status === "missing")
 
+  // Consolidation (합송배송/묶음배송): a pending declaration can be matched
+  // straight into an existing not-yet-paid package for the same customer
+  // instead of always creating a new one -- see the "existing package"
+  // dropdown in pending-declarations.tsx. Candidates are that customer's
+  // packages still open for changes (missing = not yet weighed/quoted,
+  // quoted = weighed but not yet paid).
+  const attachableCandidatesByUserId = new Map<
+    string,
+    { id: string; item_name: string; status: string }[]
+  >()
+  for (const pkg of packages) {
+    if (!pkg.user_id) continue
+    if (pkg.status !== "missing" && pkg.status !== "quoted") continue
+    const list = attachableCandidatesByUserId.get(pkg.user_id) ?? []
+    list.push({ id: pkg.id, item_name: pkg.item_name, status: pkg.status })
+    attachableCandidatesByUserId.set(pkg.user_id, list)
+  }
+
   const declarationsWithUrls = await Promise.all(
     pendingDeclarationsRaw.map(async (d) => {
       let receipt_url: string | null = null
@@ -84,7 +102,11 @@ export default async function AdminPackagesPage({
           .createSignedUrl(d.receipt_path, 60 * 60)
         receipt_url = signed?.signedUrl ?? null
       }
-      return { ...d, receipt_url }
+      return {
+        ...d,
+        receipt_url,
+        candidatePackages: attachableCandidatesByUserId.get(d.user_id) ?? [],
+      }
     })
   )
 
@@ -145,6 +167,23 @@ export default async function AdminPackagesPage({
       photosByPackageId.set(photo.package_id, list)
     })
   )
+
+  // Per-item breakdown for consolidated (합송배송) packages -- see
+  // package-items-migration.sql. Only rendered when a package has more
+  // than one item; a single-item package's item_name already says it all.
+  const { data: allPackageItems } = await supabase
+    .from("package_items")
+    .select("id, package_id, product_name, quantity")
+    .order("sort_order", { ascending: true })
+
+  type PackageItemRow = { id: string; package_id: string; product_name: string; quantity: number }
+
+  const itemsByPackageId = new Map<string, PackageItemRow[]>()
+  for (const item of (allPackageItems ?? []) as PackageItemRow[]) {
+    const list = itemsByPackageId.get(item.package_id) ?? []
+    list.push(item)
+    itemsByPackageId.set(item.package_id, list)
+  }
 
   const statCounts = {
     total: packages.length,
@@ -289,6 +328,7 @@ export default async function AdminPackagesPage({
                 declaration={declarationByPackageId.get(pkg.id) ?? null}
                 additionalCharges={additionalChargesByPackageId.get(pkg.id) ?? []}
                 photos={photosByPackageId.get(pkg.id) ?? []}
+                items={itemsByPackageId.get(pkg.id) ?? []}
               />
             ))}
 
