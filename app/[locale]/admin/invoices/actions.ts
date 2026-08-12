@@ -132,7 +132,8 @@ function formatJapanAddress(profile:
     profile.japan_address_line1,
     profile.japan_address_line2,
   ].filter(Boolean)
-  return parts.length > 0 ? parts.join(" ") : null
+  if (parts.length === 0) return null
+  return [...parts, "JAPAN"].join(" ")
 }
 export async function adminCreateOrGetInvoice(packageId: string) {
   const supabase = await requireAdmin()
