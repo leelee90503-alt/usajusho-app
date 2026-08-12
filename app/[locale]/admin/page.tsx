@@ -40,14 +40,15 @@ export default async function AdminHomePage() {
 
   const [
     { count: userCount },
-    { data: packageStatuses },
+    { data: packageRows },
     { count: pendingDeclarationsCount },
     { data: purchaseRequestStatuses },
     { count: invoicesNeedReviewCount },
+    { data: invoicedPackageRows },
     { data: notifications },
   ] = await Promise.all([
     supabase.from("profiles").select("*", { count: "exact", head: true }),
-    supabase.from("packages").select("status"),
+    supabase.from("packages").select("id, status, source_purchase_request_id"),
     supabase
       .from("package_declarations")
       .select("*", { count: "exact", head: true })
@@ -57,6 +58,7 @@ export default async function AdminHomePage() {
       .from("invoices")
       .select("*", { count: "exact", head: true })
       .eq("status", "customer_submitted"),
+    supabase.from("invoices").select("package_id"),
     supabase
       .from("notifications")
       .select("*")
@@ -64,7 +66,7 @@ export default async function AdminHomePage() {
       .limit(20),
   ])
 
-  const packages = packageStatuses ?? []
+  const packages = packageRows ?? []
   const purchaseRequests = purchaseRequestStatuses ?? []
   const newPurchaseRequestsCount = purchaseRequests.filter((r) => r.status === "submitted").length
   const quoteSentPurchaseRequestsCount = purchaseRequests.filter((r) => r.status === "quote_sent").length
@@ -74,6 +76,23 @@ export default async function AdminHomePage() {
   const quotedCount = packages.filter((p) => p.status === "quoted").length
   const paidCount = packages.filter((p) => p.status === "paid").length
   const shippedCount = packages.filter((p) => p.status === "shipped").length
+
+  // Packages created from a purchased purchase-agency request (see
+  // markPurchasedAndLinkPackage() in admin/purchase-requests/actions.ts)
+  // keep going after the request itself reaches "purchased" -- they join
+  // the normal packages pipeline (missing -> paid -> shipped, skipping
+  // "quoted" since shipping was already collected). These three counts
+  // extend the purchase-agency row past "purchased" so that downstream
+  // progress is visible on this dashboard too, not just on /admin/packages.
+  const purchaseAgencyPackages = packages.filter((p) => p.source_purchase_request_id)
+  const paidAwaitingArrivalCount =
+    purchaseRequests.filter((r) => r.status === "paid" || r.status === "purchasing").length +
+    purchaseAgencyPackages.filter((p) => p.status === "missing").length
+  const invoicedPackageIds = new Set((invoicedPackageRows ?? []).map((i) => i.package_id))
+  const purchaseAgencyInvoiceNeededCount = purchaseAgencyPackages.filter(
+    (p) => p.status === "paid" && !invoicedPackageIds.has(p.id)
+  ).length
+  const purchaseAgencyShippedCount = purchaseAgencyPackages.filter((p) => p.status === "shipped").length
 
   // Package + invoice lifecycle, in the order a package actually moves
   // through: a customer's pre-declaration comes in, an admin links/creates
@@ -119,7 +138,9 @@ export default async function AdminHomePage() {
   ]
 
   // Purchase-agency request lifecycle, in order: a new request comes in, we
-  // send a quote, then wait for the customer to pay.
+  // send a quote, the customer pays, we buy the item and wait for it to
+  // reach our warehouse, then it needs a commercial invoice before it can
+  // ship out to the customer like any other package.
   const purchaseFlow: FlowStep[] = [
     {
       value: newPurchaseRequestsCount,
@@ -138,6 +159,24 @@ export default async function AdminHomePage() {
       label: t("statAwaitingPaymentPurchaseRequests"),
       href: "/admin/purchase-requests?status=awaiting_payment",
       accent: true,
+    },
+    {
+      value: paidAwaitingArrivalCount,
+      label: t("statPaidAwaitingArrival"),
+      href: "/admin/purchase-requests?status=paid",
+      accent: true,
+    },
+    {
+      value: purchaseAgencyInvoiceNeededCount,
+      label: t("statPurchaseAgencyInvoiceNeeded"),
+      href: "/admin/invoices",
+      accent: true,
+    },
+    {
+      value: purchaseAgencyShippedCount,
+      label: t("statPurchaseAgencyShipped"),
+      href: "/admin/packages?status=shipped",
+      accent: false,
     },
   ]
 
