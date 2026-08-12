@@ -7,6 +7,7 @@ import {
   adminUpdateInvoiceItem,
   adminDeleteInvoiceItem,
   adminDuplicateInvoiceItem,
+  adminImportItemsFromPackage,
   adminSubmitOnBehalf,
   adminRequestCorrection,
   adminApproveAndComplete,
@@ -67,6 +68,7 @@ type Invoice = {
   total_declared_value: number
   correction_note: string | null
   invoice_items: InvoiceItem[]
+  package_id: string
 }
 
 type Labels = Record<string, string>
@@ -173,6 +175,19 @@ export default function AdminInvoiceForm({
       const res = await adminDuplicateInvoiceItem(itemId)
       if (res?.error) setError(res.error)
       else window.location.reload()
+    })
+  }
+
+  function handleImportFromPackage() {
+    if (!guardEditWhenComplete()) return
+    setError(null)
+    startTransition(async () => {
+      const res = await adminImportItemsFromPackage(invoice.id, invoice.package_id)
+      if (res?.error) {
+        setError(res.error)
+        return
+      }
+      window.location.reload()
     })
   }
 
@@ -319,7 +334,18 @@ export default function AdminInvoiceForm({
         </div>
 
         <div className="mt-8">
-          <h3 className="text-sm font-semibold text-foreground">{labels.lineItemsTitle}</h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold text-foreground">{labels.lineItemsTitle}</h3>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isPending}
+              onClick={handleImportFromPackage}
+            >
+              {labels.importFromPackageButton}
+            </Button>
+          </div>
           <div className="mt-3 overflow-x-auto">
             <Table>
               <TableHeader>
