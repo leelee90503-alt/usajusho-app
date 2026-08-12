@@ -1,5 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { createAdminClient } from "@/lib/supabase/admin"
+import {
+  renderCustomerEmailHtml,
+  DASHBOARD_URL,
+  type EmailPackageDetails,
+  type EmailStep,
+} from "@/lib/email-template"
 
 type NotifyParams = {
   userId: string
@@ -15,6 +21,16 @@ type NotifyParams = {
   // showing Japanese regardless of locale, exactly like before.
   titleEn?: string
   bodyEn?: string
+  // Optional richer content for the outgoing EMAIL only (never the in-app
+  // notification row, which stays a plain title/body pair). When present,
+  // sendEmailNotification() renders the full letterhead template from
+  // lib/email-template.ts -- a "package details" box and/or the same
+  // arrow-and-circle progress stepper shown on the dashboard -- instead of
+  // a bare paragraph. Omit both to keep the plain-paragraph email (e.g. for
+  // events with no package/request to show details for).
+  emailDetails?: EmailPackageDetails
+  emailSteps?: EmailStep[]
+  emailCtaLabel?: string
 }
 
 // Creates an in-app notification row for the user, and sends a real email
@@ -23,7 +39,7 @@ type NotifyParams = {
 // entered, this silently falls back to in-app notifications only - no code
 // changes or redeploys are needed once the admin fills in the settings form.
 export async function notifyUser(supabase: SupabaseClient, params: NotifyParams) {
-  const { userId, packageId, title, body, titleEn, bodyEn } = params
+  const { userId, packageId, title, body, titleEn, bodyEn, emailDetails, emailSteps, emailCtaLabel } = params
 
   const { error } = await supabase.from("notifications").insert({
     user_id: userId,
@@ -37,20 +53,36 @@ export async function notifyUser(supabase: SupabaseClient, params: NotifyParams)
     console.error("Failed to create notification:", error.message)
   }
 
-  await sendEmailNotification(supabase, userId, title, body)
+  await sendEmailNotification(supabase, userId, title, body, undefined, {
+    details: emailDetails,
+    steps: emailSteps,
+    ctaLabel: emailCtaLabel,
+  })
 }
 
 // Optional bilingual override for the outgoing email only - the in-app
 // notification row (title/body) is left as-is (Japanese), only the email
-// subject/HTML sent via Resend is swapped for this when present.
+// subject/HTML sent via Resend is swapped for this when present. Used only
+// by notifyAdmins() below - customer emails use the richer template instead
+// (see RichEmailContext).
 type EmailOverride = { subject: string; bodyHtml: string }
+
+// Optional richer content for a customer email - a "package details" box
+// and/or the dashboard's progress stepper. See NotifyParams above for why
+// this only ever applies to notifyUser(), never notifyAdmins().
+type RichEmailContext = {
+  details?: EmailPackageDetails
+  steps?: EmailStep[]
+  ctaLabel?: string
+}
 
 async function sendEmailNotification(
   supabase: SupabaseClient,
   userId: string,
   title: string,
   body: string,
-  emailOverride?: EmailOverride
+  emailOverride?: EmailOverride,
+  richContext?: RichEmailContext
 ) {
   try {
     const { data: settings } = await supabase
@@ -75,12 +107,23 @@ async function sendEmailNotification(
       return
     }
 
-    const greeting = profile.full_name ? `${profile.full_name} 様,<br/><br/>` : ""
-
     const subject = emailOverride?.subject ?? title
-    const html = emailOverride
-      ? `<p>${greeting}${emailOverride.bodyHtml}</p>`
-      : `<p>${greeting}${body}</p>`
+    let html: string
+    if (emailOverride) {
+      // notifyAdmins() path - unchanged plain bilingual paragraph.
+      const greeting = profile.full_name ? `${profile.full_name} 様,<br/><br/>` : ""
+      html = `<p>${greeting}${emailOverride.bodyHtml}</p>`
+    } else {
+      // notifyUser() path - full letterhead template.
+      html = renderCustomerEmailHtml({
+        recipientName: profile.full_name,
+        bodyParagraphs: ["いつもUSAJUSHOをご利用いただき、誠にありがとうございます。", body],
+        details: richContext?.details,
+        steps: richContext?.steps,
+        ctaUrl: DASHBOARD_URL,
+        ctaLabel: richContext?.ctaLabel,
+      })
+    }
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

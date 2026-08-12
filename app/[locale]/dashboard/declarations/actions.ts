@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { notifyAdmins, notifyUser } from "@/lib/notifications"
+import { shippingEmailSteps } from "@/lib/email-template"
 
 export async function createDeclaration(formData: FormData) {
   const supabase = await createClient()
@@ -66,9 +67,12 @@ export async function createDeclaration(formData: FormData) {
   await notifyUser(supabase, {
     userId: user.id,
     title: "事前申告を受け付けました",
-    body: `"${item_name}" の事前申告を受け付けました。商品が倉庫に到着次第、担当者が確認いたします。`,
+    body: `"${item_name}" の事前申告を受け付けました。商品が倉庫に到着次第、担当者が確認のうえあらためてご連絡いたします。`,
     titleEn: "Your package declaration has been received",
     bodyEn: `We've received your pre-declaration for "${item_name}". Our team will confirm it once the item arrives at our warehouse.`,
+    emailDetails: { itemName: item_name },
+    emailSteps: shippingEmailSteps({ hasPackage: false }),
+    emailCtaLabel: "ダッシュボードで確認する",
   })
 
   revalidatePath("/dashboard/declarations")

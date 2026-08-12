@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server"
 import { randomUUID } from "crypto"
 import { notifyUser } from "@/lib/notifications"
 import { getSquare, getSquareMode, type SquareMode } from "@/lib/square"
+import { purchaseEmailSteps } from "@/lib/email-template"
 
 async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>> {
   const locale = await getLocale()
@@ -67,17 +68,26 @@ export async function sendQuote(
   }
 
   if (updated) {
+    const shortDescription = updated.product_description.slice(0, 50)
     await notifyUser(supabase, {
       userId: updated.user_id,
       title: "購入代行の見積りが届きました",
-      body: `${updated.product_description.slice(0, 50)} の見積り $${(
+      body: `${shortDescription} のお見積りをお送りいたします。お見積り金額は $${(
         totalCents / 100
-      ).toLocaleString()} が届きました。ダッシュボードからお支払いください。`,
+      ).toLocaleString()} です。内容をご確認のうえ、ダッシュボードよりお支払いのお手続きをお願いいたします。`,
       titleEn: "Your purchase-agency quote is ready",
       bodyEn: `Your quote of $${(totalCents / 100).toLocaleString()} for "${updated.product_description.slice(
         0,
         50
       )}" is ready. Please pay from your dashboard.`,
+      emailDetails: {
+        itemName: shortDescription,
+        amountCaption: "お見積り合計金額",
+        amountLabel: `$${(totalCents / 100).toLocaleString()} USD`,
+        statusBadge: "お支払いをお待ちしております",
+      },
+      emailSteps: purchaseEmailSteps({ requestStatus: "quote_sent" }),
+      emailCtaLabel: "ダッシュボードでお支払い手続きへ",
     })
   }
 
@@ -167,10 +177,13 @@ export async function markPurchasedAndLinkPackage(
     userId: request.user_id,
     packageId: pkg.id,
     title: "商品の購入が完了しました",
-    body: "ご依頼の商品を購入しました。倉庫への到着後、通常の配送フローでお届けします。",
+    body: "ご依頼いただいておりました商品の購入が完了いたしました。倉庫への到着後、通常の配送フローにてお届けいたします。",
     titleEn: "Your item has been purchased",
     bodyEn:
       "We've purchased the item you requested. It will be delivered through our normal shipping process once it arrives at our warehouse.",
+    emailDetails: { itemName },
+    emailSteps: purchaseEmailSteps({ linkedPackageStatus: "missing" }),
+    emailCtaLabel: "ダッシュボードで確認する",
   })
 
   revalidatePath("/admin/purchase-requests")
@@ -224,9 +237,16 @@ export async function refundPurchaseRequest(requestId: string) {
   await notifyUser(supabase, {
     userId: request.user_id,
     title: "返金処理が完了しました",
-    body: `${request.product_description.slice(0, 50)} のご依頼について返金処理を行いました。`,
+    body: `${request.product_description.slice(0, 50)} のご依頼につきまして、返金処理が完了いたしました。ご入金の確認まで数営業日を要する場合がございますので、あらかじめご了承ください。`,
     titleEn: "Your refund has been processed",
     bodyEn: `We've processed a refund for your request "${request.product_description.slice(0, 50)}".`,
+    emailDetails: {
+      itemName: request.product_description.slice(0, 50),
+      amountCaption: "返金金額",
+      amountLabel: `$${(request.quote_total_cents / 100).toLocaleString()} USD`,
+      statusBadge: "返金済み",
+    },
+    emailCtaLabel: "ダッシュボードで確認する",
   })
 
   revalidatePath("/admin/purchase-requests")
@@ -259,12 +279,17 @@ export async function cancelRequestAsAdmin(requestId: string) {
   await notifyUser(supabase, {
     userId: request.user_id,
     title: "購入代行のご依頼がキャンセルされました",
-    body: `${request.product_description.slice(0, 50)} のご依頼はキャンセルされました。ご不明な点がございましたらサポートまでお問い合わせください。`,
+    body: `${request.product_description.slice(0, 50)} のご依頼につきまして、キャンセルのお手続きが完了いたしました。ご不明な点がございましたら、サポートまでお問い合わせください。`,
     titleEn: "Your purchase-agency request has been cancelled",
     bodyEn: `Your request "${request.product_description.slice(
       0,
       50
     )}" has been cancelled. Please contact support if you have any questions.`,
+    emailDetails: {
+      itemName: request.product_description.slice(0, 50),
+      statusBadge: "キャンセル済み",
+    },
+    emailCtaLabel: "ダッシュボードで確認する",
   })
 
   revalidatePath("/admin/purchase-requests")

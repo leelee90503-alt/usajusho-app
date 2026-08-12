@@ -6,6 +6,27 @@ import { getLocale } from "next-intl/server"
 import { redirect } from "@/i18n/navigation"
 import { revalidatePath } from "next/cache"
 import { notifyUser } from "@/lib/notifications"
+import { shippingEmailSteps, purchaseEmailSteps, type EmailStep } from "@/lib/email-template"
+
+// Builds the email progress-stepper for an invoice-related notification,
+// given the linked package's status/source (fetched alongside the invoice
+// row via the "packages(...)" embedded select below). Returns undefined
+// when the package couldn't be resolved, so the email simply omits the
+// stepper rather than showing a misleading default.
+function invoiceEmailSteps(
+  pkg:
+    | { status: string; source_purchase_request_id: string | null }
+    | { status: string; source_purchase_request_id: string | null }[]
+    | null
+    | undefined,
+  invoiceStatus: string
+): EmailStep[] | undefined {
+  const resolved = Array.isArray(pkg) ? pkg[0] : pkg
+  if (!resolved) return undefined
+  return resolved.source_purchase_request_id
+    ? purchaseEmailSteps({ linkedPackageStatus: resolved.status, hasInvoice: true, invoiceStatus })
+    : shippingEmailSteps({ hasPackage: true, packageStatus: resolved.status, hasInvoice: true, invoiceStatus })
+}
 
 // Mirrors the requireAdmin() helper already used by app/[locale]/admin/packages/actions.ts:
 // redirects non-admins away and returns an authenticated, admin-verified Supabase client.
@@ -516,7 +537,7 @@ export async function adminSubmitOnBehalf(invoiceId: string) {
 
   const { data: invoice, error: fetchError } = await supabase
     .from("invoices")
-    .select("*, invoice_items(*)")
+    .select("*, invoice_items(*), packages(status, source_purchase_request_id)")
     .eq("id", invoiceId)
     .single()
 
@@ -545,9 +566,16 @@ export async function adminSubmitOnBehalf(invoiceId: string) {
     userId: invoice.user_id,
     packageId: invoice.package_id,
     title: "インボイスが提出されました",
-    body: `商業インボイス${invoice.invoice_number ?? ""}がレビューのため提出されました。`,
+    body: `商業インボイス${invoice.invoice_number ?? ""}をレビューのため提出いたしました。内容を確認のうえ、担当者より改めてご連絡いたします。`,
     titleEn: "Invoice submitted",
     bodyEn: `Your commercial invoice ${invoice.invoice_number ?? ""} has been submitted for review.`,
+    emailDetails: {
+      invoiceNumber: invoice.invoice_number,
+      weightKg: invoice.package_weight_kg,
+      statusBadge: "審査中",
+    },
+    emailSteps: invoiceEmailSteps(invoice.packages, "customer_submitted"),
+    emailCtaLabel: "ダッシュボードで確認する",
   })
 
   revalidatePath(`/admin/invoices/${invoice.package_id}`)
@@ -564,7 +592,7 @@ export async function adminRequestCorrection(invoiceId: string, correctionNote: 
 
   const { data: invoice, error: fetchError } = await supabase
     .from("invoices")
-    .select("id, package_id, user_id, status, invoice_number")
+    .select("id, package_id, user_id, status, invoice_number, package_weight_kg, packages(status, source_purchase_request_id)")
     .eq("id", invoiceId)
     .single()
 
@@ -589,9 +617,16 @@ export async function adminRequestCorrection(invoiceId: string, correctionNote: 
     userId: invoice.user_id,
     packageId: invoice.package_id,
     title: "インボイスの修正が必要です",
-    body: `商業インボイス${invoice.invoice_number ?? ""}に修正が必要です: ${correctionNote.trim()}`,
+    body: `商業インボイス${invoice.invoice_number ?? ""}につきまして、恐れ入りますが修正をお願いいたします。修正内容：${correctionNote.trim()}`,
     titleEn: "Invoice correction needed",
     bodyEn: `Your commercial invoice ${invoice.invoice_number ?? ""} needs a correction: ${correctionNote.trim()}`,
+    emailDetails: {
+      invoiceNumber: invoice.invoice_number,
+      weightKg: invoice.package_weight_kg,
+      statusBadge: "修正をお願いしております",
+    },
+    emailSteps: invoiceEmailSteps(invoice.packages, "correction_required"),
+    emailCtaLabel: "ダッシュボードでインボイスを修正する",
   })
 
   revalidatePath(`/admin/invoices/${invoice.package_id}`)
@@ -608,7 +643,7 @@ export async function adminApproveAndComplete(invoiceId: string) {
 
   const { data: invoice, error: fetchError } = await supabase
     .from("invoices")
-    .select("id, package_id, user_id, invoice_number")
+    .select("id, package_id, user_id, invoice_number, package_weight_kg, packages(status, source_purchase_request_id)")
     .eq("id", invoiceId)
     .single()
 
@@ -640,9 +675,16 @@ export async function adminApproveAndComplete(invoiceId: string) {
     userId: invoice.user_id,
     packageId: invoice.package_id,
     title: "インボイスが承認されました",
-    body: `商業インボイス${invoice.invoice_number ?? ""}が承認され、完了しました。`,
+    body: `商業インボイス${invoice.invoice_number ?? ""}が承認され、手続きが完了いたしました。発送に向けて準備を進めてまいります。`,
     titleEn: "Invoice approved",
     bodyEn: `Your commercial invoice ${invoice.invoice_number ?? ""} has been approved and is now complete.`,
+    emailDetails: {
+      invoiceNumber: invoice.invoice_number,
+      weightKg: invoice.package_weight_kg,
+      statusBadge: "承認済み",
+    },
+    emailSteps: invoiceEmailSteps(invoice.packages, "complete"),
+    emailCtaLabel: "ダッシュボードで確認する",
   })
 
   revalidatePath(`/admin/invoices/${invoice.package_id}`)

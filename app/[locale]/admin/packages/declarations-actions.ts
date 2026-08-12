@@ -7,6 +7,7 @@ import { requireAdmin } from "./actions"
 import { notifyUser } from "@/lib/notifications"
 import { calculateChargeableWeight } from "@/lib/pricing"
 import { formatUSD } from "@/lib/format"
+import { shippingEmailSteps } from "@/lib/email-template"
 
 // Primary path for handling a physical package arrival: the admin finds the
 // matching pending pre-declaration, enters the item's actual weight/size/
@@ -99,13 +100,23 @@ export async function matchAndQuoteDeclaration(
     userId: declaration.user_id,
     packageId: newPackage.id,
     title: "送料の見積りが届きました",
-    body: `${itemName} の送料見積り $${formatUSD(params.quoteAmount)} が届きました。${
-      memo ? `メモ: ${memo} ` : ""
-    }ダッシュボードからお支払いください。`,
+    body: `${itemName} の送料お見積りをお送りいたします。お見積り金額は $${formatUSD(params.quoteAmount)} です。${
+      memo ? `担当者より一言：${memo} ` : ""
+    }内容をご確認のうえ、ダッシュボードよりお支払いのお手続きをお願いいたします。`,
     titleEn: "Your shipping quote is ready",
     bodyEn: `Your shipping quote of $${formatUSD(params.quoteAmount)} for "${itemName}" is ready.${
       memo ? ` Note: ${memo}.` : ""
     } Please pay from your dashboard.`,
+    emailDetails: {
+      itemName,
+      trackingNumber: params.trackingNumber.trim() || null,
+      weightKg: params.weightKg,
+      amountCaption: "送料お見積り金額",
+      amountLabel: `$${formatUSD(params.quoteAmount)} USD`,
+      statusBadge: "お支払いをお待ちしております",
+    },
+    emailSteps: shippingEmailSteps({ hasPackage: true, packageStatus: "quoted" }),
+    emailCtaLabel: "ダッシュボードでお支払い手続きへ",
   })
 
   revalidatePath("/admin/packages")

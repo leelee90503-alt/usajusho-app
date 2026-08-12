@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server"
 import { notifyUser } from "@/lib/notifications"
 import { calculateChargeableWeight } from "@/lib/pricing"
 import { formatUSD } from "@/lib/format"
+import { shippingEmailSteps, purchaseEmailSteps } from "@/lib/email-template"
 
 export async function requireAdmin(): Promise<Awaited<ReturnType<typeof createClient>>> {
   const locale = await getLocale()
@@ -117,7 +118,7 @@ export async function resolveMissingPackage(
 
   const { data: pkg, error: pkgError } = await supabase
     .from("packages")
-    .select("id, user_id, item_name, status, shipping_prepaid, quote_amount")
+    .select("id, user_id, item_name, status, shipping_prepaid, quote_amount, source_purchase_request_id")
     .eq("id", packageId)
     .single()
 
@@ -256,17 +257,28 @@ export async function resolveMissingPackage(
   }
 
   if (isPrepaid) {
+    const flowSteps = pkg.source_purchase_request_id
+      ? purchaseEmailSteps({ linkedPackageStatus: "paid" })
+      : shippingEmailSteps({ hasPackage: true, packageStatus: "paid" })
     await notifyUser(supabase, {
       userId: targetUserId,
       packageId,
       title: "お荷物の到着が確認できました",
-      body: `${pkg.item_name} の到着と重量を確認しました。送料は購入代行のお見積りでお支払い済みのため、追加のお支払いは不要です。まもなく発送いたします。${
-        memo ? `メモ: ${memo}` : ""
+      body: `${pkg.item_name} の到着と重量を確認いたしました。送料は購入代行のお見積りの際にすでにお支払いいただいておりますので、追加のお支払いは不要です。まもなく日本へ発送いたします。${
+        memo ? `担当者より一言：${memo}` : ""
       }`,
       titleEn: "Your package has arrived",
       bodyEn: `We've confirmed the arrival and weight of "${pkg.item_name}". Shipping was already paid as part of your purchase-agency quote, so no further payment is needed. It will ship soon.${
         memo ? ` Note: ${memo}.` : ""
       }`,
+      emailDetails: {
+        itemName: pkg.item_name,
+        trackingNumber: params.trackingNumber.trim() || null,
+        weightKg: params.weightKg,
+        statusBadge: "発送準備中",
+      },
+      emailSteps: flowSteps,
+      emailCtaLabel: "ダッシュボードで確認する",
     })
   } else {
     const amount = formatUSD(quoteAmount ?? 0)
@@ -274,13 +286,23 @@ export async function resolveMissingPackage(
       userId: targetUserId,
       packageId,
       title: "送料の見積りが届きました",
-      body: `${pkg.item_name} の送料見積り $${amount} が届きました。${
-        memo ? `メモ: ${memo} ` : ""
-      }ダッシュボードからお支払いください。`,
+      body: `${pkg.item_name} の送料お見積りをお送りいたします。お見積り金額は $${amount} です。${
+        memo ? `担当者より一言：${memo} ` : ""
+      }内容をご確認のうえ、ダッシュボードよりお支払いのお手続きをお願いいたします。`,
       titleEn: "Your shipping quote is ready",
       bodyEn: `Your shipping quote of $${amount} for "${pkg.item_name}" is ready.${
         memo ? ` Note: ${memo}.` : ""
       } Please pay from your dashboard.`,
+      emailDetails: {
+        itemName: pkg.item_name,
+        trackingNumber: params.trackingNumber.trim() || null,
+        weightKg: params.weightKg,
+        amountCaption: "送料お見積り金額",
+        amountLabel: `$${amount} USD`,
+        statusBadge: "お支払いをお待ちしております",
+      },
+      emailSteps: shippingEmailSteps({ hasPackage: true, packageStatus: "quoted" }),
+      emailCtaLabel: "ダッシュボードでお支払い手続きへ",
     })
   }
 
@@ -339,7 +361,7 @@ export async function updatePackageStatus(packageId: string, status: string) {
     .from("packages")
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", packageId)
-    .select("user_id, item_name, tracking_number")
+    .select("user_id, item_name, tracking_number, weight_kg, source_purchase_request_id")
     .single()
 
   if (error) {
@@ -347,13 +369,24 @@ export async function updatePackageStatus(packageId: string, status: string) {
   }
 
   if (status === "shipped" && updated) {
+    const flowSteps = updated.source_purchase_request_id
+      ? purchaseEmailSteps({ linkedPackageStatus: "shipped" })
+      : shippingEmailSteps({ hasPackage: true, packageStatus: "shipped" })
     await notifyUser(supabase, {
       userId: updated.user_id,
       packageId,
       title: "発送が完了しました",
-      body: `${updated.item_name} の発送が完了しました。追跡番号: ${updated.tracking_number}`,
+      body: `${updated.item_name} の発送が完了いたしました。追跡番号は ${updated.tracking_number} です。到着まで今しばらくお待ちくださいませ。`,
       titleEn: "Your package has shipped",
       bodyEn: `"${updated.item_name}" has shipped. Tracking number: ${updated.tracking_number}`,
+      emailDetails: {
+        itemName: updated.item_name,
+        trackingNumber: updated.tracking_number,
+        weightKg: updated.weight_kg,
+        statusBadge: "発送完了",
+      },
+      emailSteps: flowSteps,
+      emailCtaLabel: "ダッシュボードで確認する",
     })
   }
 
@@ -382,7 +415,7 @@ export async function markShipped(packageId: string, trackingNumber: string) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", packageId)
-    .select("user_id, item_name")
+    .select("user_id, item_name, weight_kg, source_purchase_request_id")
     .single()
 
   if (error) {
@@ -390,13 +423,24 @@ export async function markShipped(packageId: string, trackingNumber: string) {
   }
 
   if (updated) {
+    const flowSteps = updated.source_purchase_request_id
+      ? purchaseEmailSteps({ linkedPackageStatus: "shipped" })
+      : shippingEmailSteps({ hasPackage: true, packageStatus: "shipped" })
     await notifyUser(supabase, {
       userId: updated.user_id,
       packageId,
       title: "発送が完了しました",
-      body: `${updated.item_name} の発送が完了しました。追跡番号: ${trimmed}`,
+      body: `${updated.item_name} の発送が完了いたしました。追跡番号は ${trimmed} です。到着まで今しばらくお待ちくださいませ。`,
       titleEn: "Your package has shipped",
       bodyEn: `"${updated.item_name}" has shipped. Tracking number: ${trimmed}`,
+      emailDetails: {
+        itemName: updated.item_name,
+        trackingNumber: trimmed,
+        weightKg: updated.weight_kg,
+        statusBadge: "発送完了",
+      },
+      emailSteps: flowSteps,
+      emailCtaLabel: "ダッシュボードで確認する",
     })
   }
 
@@ -434,7 +478,7 @@ export async function createAdditionalCharge(
 
   const { data: pkg, error: pkgError } = await supabase
     .from("packages")
-    .select("id, user_id, item_name")
+    .select("id, user_id, item_name, tracking_number, weight_kg, status, source_purchase_request_id")
     .eq("id", packageId)
     .single()
 
@@ -455,17 +499,31 @@ export async function createAdditionalCharge(
     return { error: insertError.message }
   }
 
+  const flowSteps = pkg.source_purchase_request_id
+    ? purchaseEmailSteps({ linkedPackageStatus: pkg.status })
+    : shippingEmailSteps({ hasPackage: true, packageStatus: pkg.status })
+
   await notifyUser(supabase, {
     userId: pkg.user_id,
     packageId,
     title: "追加料金のご請求について",
-    body: `${pkg.item_name} について追加料金 $${formatUSD(
+    body: `${pkg.item_name} につきまして、追加料金 $${formatUSD(
       amountCents / 100,
-    )} をご請求いたします。理由: ${trimmedReason} ダッシュボードからお支払いください。`,
+    )} をご請求申し上げます。理由：${trimmedReason}。お手数をおかけいたしますが、ダッシュボードよりお支払いのお手続きをお願いいたします。`,
     titleEn: "Additional charge for your package",
     bodyEn: `An additional charge of $${formatUSD(
       amountCents / 100,
     )} has been issued for "${pkg.item_name}". Reason: ${trimmedReason}. Please pay from your dashboard.`,
+    emailDetails: {
+      itemName: pkg.item_name,
+      trackingNumber: pkg.tracking_number,
+      weightKg: pkg.weight_kg,
+      amountCaption: "追加請求金額",
+      amountLabel: `$${formatUSD(amountCents / 100)} USD`,
+      statusBadge: "お支払いをお待ちしております",
+    },
+    emailSteps: flowSteps,
+    emailCtaLabel: "ダッシュボードでお支払い手続きへ",
   })
 
   revalidatePath("/admin/packages")
