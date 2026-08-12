@@ -9,6 +9,7 @@ import { getPurchaseAgencyFeeSettings } from "@/lib/purchase-agency-settings"
 import { getWhitelistDomains } from "@/lib/purchase-agency-whitelist"
 import { getSquareMode } from "@/lib/square"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 
 export default async function AdminPurchaseRequestsPage({
   searchParams,
@@ -48,6 +49,17 @@ export default async function AdminPurchaseRequestsPage({
     .order("created_at", { ascending: false })
 
   const requests = allRequests ?? []
+  const statCounts = {
+    total: requests.length,
+    submitted: requests.filter((r) => r.status === "submitted").length,
+    quote_sent: requests.filter((r) => r.status === "quote_sent").length,
+    awaiting_payment: requests.filter((r) => r.status === "awaiting_payment").length,
+    paid: requests.filter((r) => r.status === "paid").length,
+    purchasing: requests.filter((r) => r.status === "purchasing").length,
+    purchased: requests.filter((r) => r.status === "purchased").length,
+    cancelled: requests.filter((r) => r.status === "cancelled").length,
+    refunded: requests.filter((r) => r.status === "refunded").length,
+  }
   const feeSettings = await getPurchaseAgencyFeeSettings()
   const whitelistDomains = await getWhitelistDomains()
   const squareMode = await getSquareMode()
@@ -67,6 +79,18 @@ export default async function AdminPurchaseRequestsPage({
     { value: "refunded", label: t("filterRefunded") },
   ]
 
+  const STAT_CARDS = [
+    { value: statCounts.total, label: t("statTotal"), href: "/admin/purchase-requests" },
+    { value: statCounts.submitted, label: t("status.submitted"), href: "/admin/purchase-requests?status=submitted" },
+    { value: statCounts.quote_sent, label: t("status.quote_sent"), href: "/admin/purchase-requests?status=quote_sent" },
+    { value: statCounts.awaiting_payment, label: t("status.awaiting_payment"), href: "/admin/purchase-requests?status=awaiting_payment" },
+    { value: statCounts.paid, label: t("status.paid"), href: "/admin/purchase-requests?status=paid" },
+    { value: statCounts.purchasing, label: t("status.purchasing"), href: "/admin/purchase-requests?status=purchasing" },
+    { value: statCounts.purchased, label: t("status.purchased"), href: "/admin/purchase-requests?status=purchased" },
+    { value: statCounts.cancelled, label: t("status.cancelled"), href: "/admin/purchase-requests?status=cancelled" },
+    { value: statCounts.refunded, label: t("status.refunded"), href: "/admin/purchase-requests?status=refunded" },
+  ]
+
   return (
     <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-4xl px-6 py-10">
@@ -78,6 +102,19 @@ export default async function AdminPurchaseRequestsPage({
           <Button asChild variant="ghost" size="sm">
             <Link href="/admin/packages">{t("packagesLink")}</Link>
           </Button>
+        </div>
+
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {STAT_CARDS.map((card) => (
+            <Link key={card.label} href={card.href}>
+              <Card className="h-full transition-colors hover:border-primary/40">
+                <CardContent className="py-3 text-center">
+                  <p className="text-xl font-bold text-foreground">{card.value}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{card.label}</p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
 
         <FeeSettingsForm

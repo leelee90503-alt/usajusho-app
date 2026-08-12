@@ -34,7 +34,7 @@ export default async function AdminHomePage() {
     { count: userCount },
     { data: packageStatuses },
     { count: pendingDeclarationsCount },
-    { count: newPurchaseRequestsCount },
+    { data: purchaseRequestStatuses },
     { count: invoicesNeedReviewCount },
     { data: notifications },
   ] = await Promise.all([
@@ -44,10 +44,7 @@ export default async function AdminHomePage() {
       .from("package_declarations")
       .select("*", { count: "exact", head: true })
       .eq("status", "pending"),
-    supabase
-      .from("purchase_requests")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "submitted"),
+    supabase.from("purchase_requests").select("status"),
     supabase
       .from("invoices")
       .select("*", { count: "exact", head: true })
@@ -60,6 +57,10 @@ export default async function AdminHomePage() {
   ])
 
   const packages = packageStatuses ?? []
+  const purchaseRequests = purchaseRequestStatuses ?? []
+  const newPurchaseRequestsCount = purchaseRequests.filter((r) => r.status === "submitted").length
+  const quoteSentPurchaseRequestsCount = purchaseRequests.filter((r) => r.status === "quote_sent").length
+  const awaitingPaymentPurchaseRequestsCount = purchaseRequests.filter((r) => r.status === "awaiting_payment").length
   const totalPackages = packages.length
   const needsActionCount = packages.filter((p) => p.status === "missing").length
   const quotedCount = packages.filter((p) => p.status === "quoted").length
@@ -98,9 +99,21 @@ export default async function AdminHomePage() {
       accent: true,
     },
     {
-      value: newPurchaseRequestsCount ?? 0,
+      value: newPurchaseRequestsCount,
       label: t("statNewPurchaseRequests"),
       href: "/admin/purchase-requests?status=submitted",
+      accent: true,
+    },
+    {
+      value: quoteSentPurchaseRequestsCount,
+      label: t("statQuoteSentPurchaseRequests"),
+      href: "/admin/purchase-requests?status=quote_sent",
+      accent: true,
+    },
+    {
+      value: awaitingPaymentPurchaseRequestsCount,
+      label: t("statAwaitingPaymentPurchaseRequests"),
+      href: "/admin/purchase-requests?status=awaiting_payment",
       accent: true,
     },
     {
