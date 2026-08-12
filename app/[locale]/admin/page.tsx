@@ -1,8 +1,16 @@
 import { redirect, Link } from '@/i18n/navigation'
 import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from 'next-intl/server'
+import { ChevronRight } from 'lucide-react'
 import NotificationPanel from "./notification-panel"
 import { Card, CardContent } from "@/components/ui/card"
+
+type FlowStep = {
+  value: number
+  label: string
+  href: string
+  accent: boolean
+}
 
 export default async function AdminHomePage() {
   const locale = await getLocale()
@@ -67,7 +75,17 @@ export default async function AdminHomePage() {
   const paidCount = packages.filter((p) => p.status === "paid").length
   const shippedCount = packages.filter((p) => p.status === "shipped").length
 
-  const statCards = [
+  // Package + invoice lifecycle, in the order a package actually moves
+  // through: a customer's pre-declaration comes in, an admin links/creates
+  // the package, quotes it, collects payment, gets the commercial invoice
+  // reviewed, then ships it.
+  const shippingFlow: FlowStep[] = [
+    {
+      value: pendingDeclarationsCount ?? 0,
+      label: t("statPendingDeclarations"),
+      href: "/admin/packages",
+      accent: true,
+    },
     {
       value: needsActionCount,
       label: t("statNeedsAction"),
@@ -87,17 +105,22 @@ export default async function AdminHomePage() {
       accent: true,
     },
     {
+      value: invoicesNeedReviewCount ?? 0,
+      label: t("statInvoicesNeedReview"),
+      href: "/admin/invoices",
+      accent: true,
+    },
+    {
       value: shippedCount,
       label: t("statShipped"),
       href: "/admin/packages?status=shipped",
       accent: false,
     },
-    {
-      value: pendingDeclarationsCount ?? 0,
-      label: t("statPendingDeclarations"),
-      href: "/admin/packages",
-      accent: true,
-    },
+  ]
+
+  // Purchase-agency request lifecycle, in order: a new request comes in, we
+  // send a quote, then wait for the customer to pay.
+  const purchaseFlow: FlowStep[] = [
     {
       value: newPurchaseRequestsCount,
       label: t("statNewPurchaseRequests"),
@@ -116,12 +139,9 @@ export default async function AdminHomePage() {
       href: "/admin/purchase-requests?status=awaiting_payment",
       accent: true,
     },
-    {
-      value: invoicesNeedReviewCount ?? 0,
-      label: t("statInvoicesNeedReview"),
-      href: "/admin/invoices",
-      accent: true,
-    },
+  ]
+
+  const overviewCards: FlowStep[] = [
     {
       value: totalPackages,
       label: t("statTotalPackages"),
@@ -156,21 +176,27 @@ export default async function AdminHomePage() {
           <NotificationPanel notifications={notifications ?? []} />
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {statCards.map((card) => (
-            <Link key={card.label} href={card.href}>
-              <Card className="h-full transition-colors hover:border-primary/40">
-                <CardContent className="py-4 text-center">
-                  <p
-                    className={`text-2xl font-bold ${card.accent ? "text-accent" : "text-foreground"}`}
-                  >
-                    {card.value}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">{card.label}</p>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+        <div className="mt-6 space-y-6">
+          <WorkflowRow heading={t("statShippingFlowHeading")} steps={shippingFlow} />
+          <WorkflowRow heading={t("statPurchaseFlowHeading")} steps={purchaseFlow} />
+        </div>
+
+        <div className="mt-6">
+          <h2 className="text-sm font-semibold text-muted-foreground">
+            {t("statOverviewHeading")}
+          </h2>
+          <div className="mt-2 grid grid-cols-2 gap-3 sm:max-w-xs">
+            {overviewCards.map((card) => (
+              <Link key={card.label} href={card.href}>
+                <Card className="h-full transition-colors hover:border-primary/40">
+                  <CardContent className="py-4 text-center">
+                    <p className="text-2xl font-bold text-foreground">{card.value}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{card.label}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
         </div>
 
         <div className="mt-10">
@@ -191,5 +217,34 @@ export default async function AdminHomePage() {
         </div>
       </div>
     </main>
+  )
+}
+
+function WorkflowRow({ heading, steps }: { heading: string; steps: FlowStep[] }) {
+  return (
+    <div>
+      <h2 className="text-sm font-semibold text-muted-foreground">{heading}</h2>
+      <div className="mt-2 flex items-center overflow-x-auto pb-2">
+        {steps.map((step, index) => (
+          <div key={step.label} className="flex flex-shrink-0 items-center">
+            <Link href={step.href} className="block flex-shrink-0">
+              <Card className="h-full w-[128px] transition-colors hover:border-primary/40">
+                <CardContent className="py-4 text-center">
+                  <p
+                    className={`text-2xl font-bold ${step.accent ? "text-accent" : "text-foreground"}`}
+                  >
+                    {step.value}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{step.label}</p>
+                </CardContent>
+              </Card>
+            </Link>
+            {index < steps.length - 1 && (
+              <ChevronRight className="mx-1 h-5 w-5 flex-shrink-0 text-muted-foreground/40" />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
