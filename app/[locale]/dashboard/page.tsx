@@ -135,6 +135,20 @@ export default async function DashboardPage() {
     })
   )
 
+  // Commercial invoice status per package, so the per-order progress
+  // stepper (order-stepper.tsx) can light up "customs invoice" as either
+  // waiting on the customer (draft/correction_required) or the admin
+  // (customer_submitted) instead of just showing a generic "in progress".
+  const { data: invoiceStatusRows } =
+    packageIds.length > 0
+      ? await supabase.from('invoices').select('package_id, status').in('package_id', packageIds)
+      : { data: [] as { package_id: string; status: string }[] }
+
+  const invoiceStatusByPackageId: Record<string, string> = {}
+  for (const invoice of invoiceStatusRows ?? []) {
+    invoiceStatusByPackageId[invoice.package_id] = invoice.status
+  }
+
   return (
     <main className="min-h-screen bg-[var(--usj-surface)]">
       <div className="mx-auto max-w-3xl px-6 py-10">
@@ -224,6 +238,7 @@ export default async function DashboardPage() {
                 profile={profile ?? null}
                 additionalCharges={additionalChargesByPackageId}
                 photosByPackageId={photosByPackageId}
+                invoiceStatusByPackageId={invoiceStatusByPackageId}
                 squareConfig={squareConfig}
               />
             </TabsContent>
@@ -234,6 +249,7 @@ export default async function DashboardPage() {
                 emptyVariant="completed"
                 additionalCharges={additionalChargesByPackageId}
                 photosByPackageId={photosByPackageId}
+                invoiceStatusByPackageId={invoiceStatusByPackageId}
                 squareConfig={squareConfig}
               />
             </TabsContent>

@@ -10,6 +10,8 @@ import { Package as PackageIcon, PackagePlus, ShoppingCart } from "lucide-react"
 import { formatUSD } from "@/lib/format"
 import SquareCardPayment from "@/components/square-card-payment"
 import { buildBillingContact } from "@/lib/square"
+import OrderStepper from "./order-stepper"
+import { computeShippingSteps, computePurchaseSteps } from "./order-progress"
 
 type SquareConfig = { mode: "sandbox" | "production"; applicationId: string; locationId: string }
 
@@ -24,6 +26,7 @@ type PackageOrder = {
   status: string
   quote_amount: number | null
   quote_note: string | null
+  source_purchase_request_id: string | null
 }
 
 type DeclarationOrder = {
@@ -107,6 +110,7 @@ export default function PendingOrderList({
   profile = null,
   additionalCharges = {},
   photosByPackageId = {},
+  invoiceStatusByPackageId = {},
   squareConfig = null,
 }: {
   packages: PackageOrder[]
@@ -115,6 +119,7 @@ export default function PendingOrderList({
   profile?: Profile | null
   additionalCharges?: Record<string, AdditionalCharge[]>
   photosByPackageId?: Record<string, PackagePhoto[]>
+  invoiceStatusByPackageId?: Record<string, string>
   squareConfig?: SquareConfig | null
 }) {
   const t = useTranslations("packageList")
@@ -130,6 +135,23 @@ export default function PendingOrderList({
     cancelled: t("chargeStatusCancelled"),
     refunded: t("chargeStatusRefunded"),
   }
+
+  const shippingStepLabels: [string, string, string, string, string, string] = [
+    t("stepDeclarationReceived"),
+    t("stepArrivalCheck"),
+    t("stepQuoteReady"),
+    t("stepPaymentComplete"),
+    t("stepCustomsInvoice"),
+    t("stepShipped"),
+  ]
+  const purchaseStepLabels: [string, string, string, string, string, string] = [
+    t("stepRequestReceived"),
+    t("stepQuoteSent"),
+    t("stepAwaitingPayment"),
+    t("stepPaidAwaitingArrival"),
+    t("stepCustomsInvoice"),
+    t("stepShipped"),
+  ]
 
   const orders: PendingOrder[] = [...packages, ...declarations, ...purchaseRequests].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -278,6 +300,24 @@ export default function PendingOrderList({
                     </div>
                   </div>
                 )}
+
+                <OrderStepper
+                  steps={
+                    order.source_purchase_request_id
+                      ? computePurchaseSteps(purchaseStepLabels, {
+                          linkedPackageStatus: order.status,
+                          hasInvoice: invoiceStatusByPackageId[order.id] != null,
+                          invoiceStatus: invoiceStatusByPackageId[order.id] ?? null,
+                        })
+                      : computeShippingSteps(shippingStepLabels, {
+                          hasPackage: true,
+                          packageStatus: order.status,
+                          hasInvoice: invoiceStatusByPackageId[order.id] != null,
+                          invoiceStatus: invoiceStatusByPackageId[order.id] ?? null,
+                        })
+                  }
+                  actionLabel={t("stepActionNeeded")}
+                />
               </CardContent>
             </Card>
           )
@@ -307,6 +347,10 @@ export default function PendingOrderList({
                       {tDeclarations(`status.${order.status}`)}
                     </Badge>
                 </div>
+
+                <OrderStepper
+                  steps={computeShippingSteps(shippingStepLabels, { hasPackage: false })}
+                />
               </CardContent>
             </Card>
            </Link>
@@ -341,6 +385,11 @@ export default function PendingOrderList({
                     {tRequests("quoteLabel")}: ${formatUSD(order.quote_total_cents / 100)}
                   </p>
                 )}
+
+                <OrderStepper
+                  steps={computePurchaseSteps(purchaseStepLabels, { requestStatus: order.status })}
+                  actionLabel={t("stepActionNeeded")}
+                />
               </CardContent>
             </Card>
           </Link>

@@ -226,7 +226,18 @@
     "chargeStatusPaid": "Paid",
     "chargeStatusCancelled": "Cancelled",
     "chargeStatusRefunded": "Refunded",
-    "photosHeading": "Package Photos"
+    "photosHeading": "Package Photos",
+    "stepDeclarationReceived": "Declaration Received",
+    "stepArrivalCheck": "Arrival Check",
+    "stepQuoteReady": "Quote Sent",
+    "stepPaymentComplete": "Payment Complete",
+    "stepCustomsInvoice": "Customs Invoice",
+    "stepShipped": "Shipped",
+    "stepRequestReceived": "Request Received",
+    "stepQuoteSent": "Quote Sent",
+    "stepAwaitingPayment": "Awaiting Payment",
+    "stepPaidAwaitingArrival": "Paid, Awaiting Arrival",
+    "stepActionNeeded": "Action Needed"
   },
   "notificationBell": {
     "title": "Notifications",

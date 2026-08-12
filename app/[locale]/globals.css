@@ -62,6 +62,23 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Order progress stepper (customer dashboard) -- "lit up" current-step
+   glow, in the two node colors used by order-stepper.tsx. */
+@keyframes step-pulse-current {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(46, 110, 106, 0.18); }
+  50% { box-shadow: 0 0 0 7px rgba(46, 110, 106, 0.10); }
+}
+@keyframes step-pulse-action {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.20); }
+  50% { box-shadow: 0 0 0 7px rgba(217, 119, 6, 0.12); }
+}
+.step-node-pulse-current {
+  animation: step-pulse-current 2s ease-in-out infinite;
+}
+.step-node-pulse-action {
+  animation: step-pulse-action 2s ease-in-out infinite;
+}
+
 @layer base {
   a {
     color: inherit;

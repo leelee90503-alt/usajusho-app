@@ -9,6 +9,8 @@ import { Package as PackageIcon } from "lucide-react"
 import { formatUSD } from "@/lib/format"
 import SquareCardPayment from "@/components/square-card-payment"
 import { buildBillingContact } from "@/lib/square"
+import OrderStepper from "./order-stepper"
+import { computeShippingSteps, computePurchaseSteps } from "./order-progress"
 
 type SquareConfig = { mode: "sandbox" | "production"; applicationId: string; locationId: string }
 
@@ -21,6 +23,7 @@ type Package = {
   status: string
   quote_amount: number | null
   quote_note: string | null
+  source_purchase_request_id: string | null
 }
 
 type AdditionalCharge = {
@@ -72,6 +75,7 @@ export default function PackageList({
   emptyVariant = "default",
   additionalCharges = {},
   photosByPackageId = {},
+  invoiceStatusByPackageId = {},
   squareConfig = null,
 }: {
   packages: Package[]
@@ -79,6 +83,7 @@ export default function PackageList({
   emptyVariant?: "default" | "completed"
   additionalCharges?: Record<string, AdditionalCharge[]>
   photosByPackageId?: Record<string, PackagePhoto[]>
+  invoiceStatusByPackageId?: Record<string, string>
   squareConfig?: SquareConfig | null
 }) {
   const t = useTranslations("packageList")
@@ -96,6 +101,23 @@ export default function PackageList({
     cancelled: t("chargeStatusCancelled"),
     refunded: t("chargeStatusRefunded"),
   }
+
+  const shippingStepLabels: [string, string, string, string, string, string] = [
+    t("stepDeclarationReceived"),
+    t("stepArrivalCheck"),
+    t("stepQuoteReady"),
+    t("stepPaymentComplete"),
+    t("stepCustomsInvoice"),
+    t("stepShipped"),
+  ]
+  const purchaseStepLabels: [string, string, string, string, string, string] = [
+    t("stepRequestReceived"),
+    t("stepQuoteSent"),
+    t("stepAwaitingPayment"),
+    t("stepPaidAwaitingArrival"),
+    t("stepCustomsInvoice"),
+    t("stepShipped"),
+  ]
 
   if (!packages || packages.length === 0) {
     return (
@@ -232,6 +254,24 @@ export default function PackageList({
                   </div>
                 </div>
               )}
+
+              <OrderStepper
+                steps={
+                  pkg.source_purchase_request_id
+                    ? computePurchaseSteps(purchaseStepLabels, {
+                        linkedPackageStatus: pkg.status,
+                        hasInvoice: invoiceStatusByPackageId[pkg.id] != null,
+                        invoiceStatus: invoiceStatusByPackageId[pkg.id] ?? null,
+                      })
+                    : computeShippingSteps(shippingStepLabels, {
+                        hasPackage: true,
+                        packageStatus: pkg.status,
+                        hasInvoice: invoiceStatusByPackageId[pkg.id] != null,
+                        invoiceStatus: invoiceStatusByPackageId[pkg.id] ?? null,
+                      })
+                }
+                actionLabel={t("stepActionNeeded")}
+              />
             </CardContent>
           </Card>
         ))}
