@@ -60,7 +60,6 @@ export default async function AdminInvoiceDetailPage({
     title: ft("title"),
     printButton: ft("printButton"),
     invoiceDateLabel: ft("invoiceDateLabel"),
-    importFromPackageButton: ft("importFromPackageButton"),
     statusDraft: ft("statusDraft"),
     statusSubmitted: ft("statusSubmitted"),
     statusCorrectionRequired: ft("statusCorrectionRequired"),
