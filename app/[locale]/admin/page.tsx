@@ -12,6 +12,13 @@ type FlowStep = {
   accent: boolean
 }
 
+type OverviewCard = {
+  value: number
+  label: string
+  href?: string
+  accent: boolean
+}
+
 export default async function AdminHomePage() {
   const locale = await getLocale()
   const supabase = await createClient()
@@ -44,7 +51,7 @@ export default async function AdminHomePage() {
     { count: pendingDeclarationsCount },
     { data: purchaseRequestStatuses },
     { count: invoicesNeedReviewCount },
-    { data: invoicedPackageRows },
+    { data: invoiceRows },
     { data: notifications },
   ] = await Promise.all([
     supabase.from("profiles").select("*", { count: "exact", head: true }),
@@ -58,7 +65,7 @@ export default async function AdminHomePage() {
       .from("invoices")
       .select("*", { count: "exact", head: true })
       .eq("status", "customer_submitted"),
-    supabase.from("invoices").select("package_id"),
+    supabase.from("invoices").select("package_id, status"),
     supabase
       .from("notifications")
       .select("*")
@@ -71,11 +78,12 @@ export default async function AdminHomePage() {
   const newPurchaseRequestsCount = purchaseRequests.filter((r) => r.status === "submitted").length
   const quoteSentPurchaseRequestsCount = purchaseRequests.filter((r) => r.status === "quote_sent").length
   const awaitingPaymentPurchaseRequestsCount = purchaseRequests.filter((r) => r.status === "awaiting_payment").length
-  const totalPackages = packages.length
   const needsActionCount = packages.filter((p) => p.status === "missing").length
   const quotedCount = packages.filter((p) => p.status === "quoted").length
   const paidCount = packages.filter((p) => p.status === "paid").length
   const shippedCount = packages.filter((p) => p.status === "shipped").length
+
+  const invoiceStatusByPackageId = new Map((invoiceRows ?? []).map((i) => [i.package_id, i.status]))
 
   // Packages created from a purchased purchase-agency request (see
   // markPurchasedAndLinkPackage() in admin/purchase-requests/actions.ts)
@@ -88,11 +96,53 @@ export default async function AdminHomePage() {
   const paidAwaitingArrivalCount =
     purchaseRequests.filter((r) => r.status === "paid" || r.status === "purchasing").length +
     purchaseAgencyPackages.filter((p) => p.status === "missing").length
-  const invoicedPackageIds = new Set((invoicedPackageRows ?? []).map((i) => i.package_id))
   const purchaseAgencyInvoiceNeededCount = purchaseAgencyPackages.filter(
-    (p) => p.status === "paid" && !invoicedPackageIds.has(p.id)
+    (p) => p.status === "paid" && !invoiceStatusByPackageId.has(p.id)
   ).length
   const purchaseAgencyShippedCount = purchaseAgencyPackages.filter((p) => p.status === "shipped").length
+
+  // Site-wide "not shipped yet" count, combining both the shipping-agency
+  // and purchase-agency flows, and who needs to act next on each one:
+  //  - a package still "missing" needs an admin to weigh/quote it; "quoted"
+  //    needs the customer to pay; "paid" needs either the customer to fill
+  //    in and submit the commercial invoice (draft/correction_required), an
+  //    admin to review a submitted one, or -- once the invoice is done or
+  //    was never required -- an admin to actually ship it.
+  //  - a purchase-agency request not yet linked to a package (i.e. not yet
+  //    "purchased") follows its own request-side actor: admin sends the
+  //    quote and buys the item, the customer reviews the quote and pays.
+  //    "purchased" requests are excluded here since they now have a linked
+  //    package counted in the packages tally above; cancelled/refunded
+  //    requests are dead, not pending.
+  //  - a pending pre-declaration always needs an admin to process it.
+  function isPackageActionOnCustomer(pkg: { status: string; id: string }) {
+    if (pkg.status === "quoted") return true
+    if (pkg.status === "paid") {
+      const invoiceStatus = invoiceStatusByPackageId.get(pkg.id)
+      return invoiceStatus === "draft" || invoiceStatus === "correction_required"
+    }
+    return false
+  }
+
+  const unshippedPackages = packages.filter((p) => p.status !== "shipped")
+  const unshippedPackagesCustomerActionCount = unshippedPackages.filter(isPackageActionOnCustomer).length
+  const unshippedPackagesAdminActionCount = unshippedPackages.length - unshippedPackagesCustomerActionCount
+
+  const pendingPurchaseRequests = purchaseRequests.filter(
+    (r) => r.status !== "purchased" && r.status !== "cancelled" && r.status !== "refunded"
+  )
+  const pendingPurchaseRequestsCustomerActionCount = pendingPurchaseRequests.filter(
+    (r) => r.status === "quote_sent" || r.status === "awaiting_payment"
+  ).length
+  const pendingPurchaseRequestsAdminActionCount =
+    pendingPurchaseRequests.length - pendingPurchaseRequestsCustomerActionCount
+
+  const totalPendingCount =
+    unshippedPackages.length + pendingPurchaseRequests.length + (pendingDeclarationsCount ?? 0)
+  const pendingCustomerActionCount =
+    unshippedPackagesCustomerActionCount + pendingPurchaseRequestsCustomerActionCount
+  const pendingAdminActionCount =
+    unshippedPackagesAdminActionCount + pendingPurchaseRequestsAdminActionCount + (pendingDeclarationsCount ?? 0)
 
   // Package + invoice lifecycle, in the order a package actually moves
   // through: a customer's pre-declaration comes in, an admin links/creates
@@ -180,12 +230,21 @@ export default async function AdminHomePage() {
     },
   ]
 
-  const overviewCards: FlowStep[] = [
+  const overviewCards: OverviewCard[] = [
     {
-      value: totalPackages,
-      label: t("statTotalPackages"),
-      href: "/admin/packages",
+      value: totalPendingCount,
+      label: t("statPendingOrders"),
       accent: false,
+    },
+    {
+      value: pendingCustomerActionCount,
+      label: t("statPendingCustomerAction"),
+      accent: true,
+    },
+    {
+      value: pendingAdminActionCount,
+      label: t("statPendingAdminAction"),
+      accent: true,
     },
     {
       value: userCount ?? 0,
@@ -224,17 +283,28 @@ export default async function AdminHomePage() {
           <h2 className="text-sm font-semibold text-muted-foreground">
             {t("statOverviewHeading")}
           </h2>
-          <div className="mt-2 grid grid-cols-2 gap-3 sm:max-w-xs">
-            {overviewCards.map((card) => (
-              <Link key={card.label} href={card.href}>
-                <Card className="h-full transition-colors hover:border-primary/40">
+          <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:max-w-2xl">
+            {overviewCards.map((card) => {
+              const cardBody = (
+                <Card className={card.href ? "h-full transition-colors hover:border-primary/40" : "h-full"}>
                   <CardContent className="py-4 text-center">
-                    <p className="text-2xl font-bold text-foreground">{card.value}</p>
+                    <p
+                      className={`text-2xl font-bold ${card.accent ? "text-accent" : "text-foreground"}`}
+                    >
+                      {card.value}
+                    </p>
                     <p className="mt-1 text-xs text-muted-foreground">{card.label}</p>
                   </CardContent>
                 </Card>
-              </Link>
-            ))}
+              )
+              return card.href ? (
+                <Link key={card.label} href={card.href}>
+                  {cardBody}
+                </Link>
+              ) : (
+                <div key={card.label}>{cardBody}</div>
+              )
+            })}
           </div>
         </div>
 
