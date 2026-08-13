@@ -9,9 +9,17 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Check, Trash2 } from "lucide-react"
 
 type CandidatePackage = { id: string; item_name: string; status: string }
+
+type DeclarationItem = {
+  product_name: string
+  quantity: number
+  unit_price: number | null
+  sort_order: number
+}
 
 type Declaration = {
   id: string
@@ -24,6 +32,7 @@ type Declaration = {
   created_at: string
   profiles: { full_name: string | null; suite_number: string | null } | null
   candidatePackages?: CandidatePackage[]
+  declaration_items?: DeclarationItem[]
 }
 
 export default function PendingDeclarations({
@@ -159,10 +168,37 @@ function DeclarationCard({
             {d.profiles?.full_name ?? "-"}
           </p>
           <p className="mt-1">{d.item_name}</p>
-          {d.order_amount != null && (
-            <p className="mt-1 text-xs text-muted-foreground">
-              {t("orderAmount")}: ${formatUSD(d.order_amount)}
-            </p>
+          {d.declaration_items && d.declaration_items.length > 0 ? (
+            <div className="mt-2 overflow-hidden rounded-md border border-slate-200">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="h-8 text-xs">{t("itemProductNameLabel")}</TableHead>
+                    <TableHead className="h-8 text-xs">{t("itemQuantityLabel")}</TableHead>
+                    <TableHead className="h-8 text-xs">{t("itemUnitPriceLabel")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[...d.declaration_items]
+                    .sort((a, b) => a.sort_order - b.sort_order)
+                    .map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="py-1.5 text-xs">{item.product_name}</TableCell>
+                        <TableCell className="py-1.5 text-xs">{item.quantity}</TableCell>
+                        <TableCell className="py-1.5 text-xs">
+                          {item.unit_price != null ? `$${formatUSD(item.unit_price)}` : "-"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            d.order_amount != null && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t("orderAmount")}: ${formatUSD(d.order_amount)}
+              </p>
+            )
           )}
           {d.origin_tracking_number && (
             <p className="mt-1 text-xs text-muted-foreground">

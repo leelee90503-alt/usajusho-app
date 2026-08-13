@@ -9,9 +9,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import CarrierTrackLink from "@/components/carrier-track-link"
 import { Pencil } from "lucide-react"
 import { formatUSD } from "@/lib/format"
+
+type DeclarationItem = {
+  product_name: string
+  quantity: number
+  unit_price: number | null
+  sort_order: number
+}
 
 type Declaration = {
   id: string
@@ -22,6 +30,7 @@ type Declaration = {
   receipt_url: string | null
   status: string
   created_at: string
+  declaration_items?: DeclarationItem[]
 }
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "outline"> = {
@@ -74,10 +83,37 @@ function DeclarationCard({ declaration: d }: { declaration: Declaration }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-semibold text-slate-900">{d.item_name}</p>
-            {d.order_amount != null && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                {t("orderAmountLabel")}: ${formatUSD(d.order_amount)}
-              </p>
+            {d.declaration_items && d.declaration_items.length > 0 ? (
+              <div className="mt-2 overflow-hidden rounded-md border border-slate-200">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="h-8 text-xs">{t("itemProductNameLabel")}</TableHead>
+                      <TableHead className="h-8 text-xs">{t("itemQuantityLabel")}</TableHead>
+                      <TableHead className="h-8 text-xs">{t("itemUnitPriceLabel")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[...d.declaration_items]
+                      .sort((a, b) => a.sort_order - b.sort_order)
+                      .map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="py-1.5 text-xs">{item.product_name}</TableCell>
+                          <TableCell className="py-1.5 text-xs">{item.quantity}</TableCell>
+                          <TableCell className="py-1.5 text-xs">
+                            {item.unit_price != null ? `$${formatUSD(item.unit_price)}` : "-"}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              d.order_amount != null && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t("orderAmountLabel")}: ${formatUSD(d.order_amount)}
+                </p>
+              )
             )}
             {d.origin_tracking_number && (
               <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">

@@ -4,6 +4,44 @@ import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { notifyAdmins, notifyUser } from "@/lib/notifications"
 import { shippingEmailSteps } from "@/lib/email-template"
+import { summarizeItemNames } from "@/lib/package-items"
+
+type DeclaredItemInput = { product_name: string; quantity: number; unit_price: number | null }
+
+// Parses the JSON array the client packs into the "items" field (see
+// declaration-form.tsx). Anything malformed/empty is treated the same as
+// "no items" rather than throwing -- the caller turns that into a normal
+// validation error message instead of a 500.
+function parseItems(raw: FormDataEntryValue | null): DeclaredItemInput[] {
+  if (typeof raw !== "string" || !raw.trim()) return []
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    return []
+  }
+  if (!Array.isArray(parsed)) return []
+
+  const items: DeclaredItemInput[] = []
+  for (const entry of parsed) {
+    if (!entry || typeof entry !== "object") continue
+    const productName = String((entry as Record<string, unknown>).product_name ?? "").trim()
+    if (!productName) continue
+    const quantityRaw = Number((entry as Record<string, unknown>).quantity)
+    const quantity = Number.isFinite(quantityRaw) && quantityRaw > 0 ? Math.floor(quantityRaw) : 1
+    const unitPriceRaw = (entry as Record<string, unknown>).unit_price
+    const unitPrice =
+      unitPriceRaw === null || unitPriceRaw === undefined || unitPriceRaw === ""
+        ? null
+        : Number(unitPriceRaw)
+    items.push({
+      product_name: productName,
+      quantity,
+      unit_price: unitPrice !== null && Number.isFinite(unitPrice) ? unitPrice : null,
+    })
+  }
+  return items
+}
 
 export async function createDeclaration(formData: FormData) {
   const supabase = await createClient()
@@ -16,20 +54,25 @@ export async function createDeclaration(formData: FormData) {
     return { error: "ログインしてください。" }
   }
 
-  const item_name = String(formData.get("item_name") || "").trim()
-  const order_amount_raw = String(formData.get("order_amount") || "").trim()
+  const items = parseItems(formData.get("items"))
   const origin_tracking_number = String(formData.get("origin_tracking_number") || "").trim()
   const note = String(formData.get("note") || "").trim()
   const receipt = formData.get("receipt") as File | null
 
-  if (!item_name) {
-    return { error: "Item name is required." }
+  if (items.length === 0) {
+    return { error: "少なくとも1つの品目を入力してください。" }
   }
 
-  const order_amount = order_amount_raw ? Number(order_amount_raw) : null
-  if (order_amount !== null && Number.isNaN(order_amount)) {
-    return { error: "Invalid order amount." }
-  }
+  // package_declarations.item_name/order_amount stay the single source of
+  // truth for every place that only knows about a "one item per
+  // declaration" world (admin lists, notifications, emails) -- they're
+  // derived here as a summary/sum of the itemized rows rather than
+  // removed, so nothing downstream needs to change.
+  const item_name = summarizeItemNames(items.map((i) => i.product_name))
+  const hasAnyPrice = items.some((i) => i.unit_price !== null)
+  const order_amount = hasAnyPrice
+    ? Math.round(items.reduce((sum, i) => sum + i.quantity * (i.unit_price ?? 0), 0) * 100) / 100
+    : null
 
   let receipt_path: string | null = null
   if (receipt && receipt.size > 0) {
@@ -45,17 +88,40 @@ export async function createDeclaration(formData: FormData) {
     receipt_path = path
   }
 
-  const { error } = await supabase.from("package_declarations").insert({
-    user_id: user.id,
-    item_name,
-    order_amount,
-    origin_tracking_number: origin_tracking_number || null,
-    note: note || null,
-    receipt_path,
-  })
+  const { data: declaration, error } = await supabase
+    .from("package_declarations")
+    .insert({
+      user_id: user.id,
+      item_name,
+      order_amount,
+      origin_tracking_number: origin_tracking_number || null,
+      note: note || null,
+      receipt_path,
+    })
+    .select("id")
+    .single()
 
-  if (error) {
-    return { error: error.message }
+  if (error || !declaration) {
+    return { error: error?.message ?? "事前申告の登録に失敗しました。" }
+  }
+
+  // Best-effort, same as package_items in matchAndQuoteDeclaration: never
+  // block the declaration itself on this (e.g. if
+  // declaration-items-migration.sql hasn't been run yet in this
+  // environment) -- it's the itemized breakdown behind item_name/
+  // order_amount above, which are already saved and correct on their own.
+  const { error: itemsError } = await supabase.from("declaration_items").insert(
+    items.map((i, index) => ({
+      declaration_id: declaration.id,
+      product_name: i.product_name,
+      quantity: i.quantity,
+      unit_price: i.unit_price,
+      sort_order: index,
+    }))
+  )
+
+  if (itemsError) {
+    console.warn("createDeclaration: could not save declaration_items:", itemsError.message)
   }
 
   await notifyAdmins({

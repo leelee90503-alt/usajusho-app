@@ -61,7 +61,7 @@ export default async function AdminPackagesPage({
   // admins bill shipping and build the commercial invoice for that package.
   const { data: allDeclarations } = await supabase
     .from("package_declarations")
-    .select("*, profiles(full_name, suite_number)")
+    .select("*, profiles(full_name, suite_number), declaration_items(product_name, quantity, unit_price, sort_order)")
     .order("created_at", { ascending: false })
 
   const declarations = allDeclarations ?? []

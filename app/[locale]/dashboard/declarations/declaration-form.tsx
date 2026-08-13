@@ -8,8 +8,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import CarrierTrackLink from "@/components/carrier-track-link"
-import { Loader2 } from "lucide-react"
+import { Loader2, Plus, Trash2 } from "lucide-react"
+
+type ItemRow = { key: number; product_name: string; quantity: string; unit_price: string }
+
+let rowKeySeq = 0
+function blankRow(): ItemRow {
+  rowKeySeq += 1
+  return { key: rowKeySeq, product_name: "", quantity: "1", unit_price: "" }
+}
 
 export default function DeclarationForm({ onClose }: { onClose?: () => void }) {
   const t = useTranslations("packageDeclarations")
@@ -17,9 +26,38 @@ export default function DeclarationForm({ onClose }: { onClose?: () => void }) {
   const [isPending, startTransition] = useTransition()
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null)
   const [tracking, setTracking] = useState("")
+  const [items, setItems] = useState<ItemRow[]>(() => [blankRow()])
+
+  function updateItem(key: number, field: "product_name" | "quantity" | "unit_price", value: string) {
+    setItems((prev) => prev.map((row) => (row.key === key ? { ...row, [field]: value } : row)))
+  }
+
+  function addItemRow() {
+    setItems((prev) => [...prev, blankRow()])
+  }
+
+  function removeItemRow(key: number) {
+    setItems((prev) => (prev.length > 1 ? prev.filter((row) => row.key !== key) : prev))
+  }
 
   function handleSubmit(formData: FormData) {
     setMessage(null)
+
+    const validItems = items
+      .filter((row) => row.product_name.trim())
+      .map((row) => ({
+        product_name: row.product_name.trim(),
+        quantity: Number(row.quantity) || 1,
+        unit_price: row.unit_price.trim() ? Number(row.unit_price) : null,
+      }))
+
+    if (validItems.length === 0) {
+      setMessage({ type: "error", text: t("itemsRequired") })
+      return
+    }
+
+    formData.set("items", JSON.stringify(validItems))
+
     startTransition(async () => {
       const result = await createDeclaration(formData)
       if (result?.error) {
@@ -28,6 +66,7 @@ export default function DeclarationForm({ onClose }: { onClose?: () => void }) {
         setMessage({ type: "success", text: t("success") })
         formRef.current?.reset()
         setTracking("")
+        setItems([blankRow()])
       }
     })
   }
@@ -47,13 +86,69 @@ export default function DeclarationForm({ onClose }: { onClose?: () => void }) {
       <form ref={formRef} action={handleSubmit}>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5 sm:col-span-2">
-            <Label htmlFor="decl-item-name">{t("itemNameLabel")}</Label>
-            <Input id="decl-item-name" name="item_name" required />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="decl-amount">{t("orderAmountLabel")}</Label>
-            <Input id="decl-amount" name="order_amount" type="number" step="0.01" min="0" />
+            <Label>{t("itemsLabel")}</Label>
+            <div className="rounded-lg border border-slate-200">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("itemProductNameLabel")}</TableHead>
+                    <TableHead>{t("itemQuantityLabel")}</TableHead>
+                    <TableHead>{t("itemUnitPriceLabel")}</TableHead>
+                    <TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((row) => (
+                    <TableRow key={row.key}>
+                      <TableCell>
+                        <Input
+                          value={row.product_name}
+                          onChange={(e) => updateItem(row.key, "product_name", e.target.value)}
+                          placeholder={t("itemProductNameLabel")}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          min="1"
+                          className="w-20"
+                          value={row.quantity}
+                          onChange={(e) => updateItem(row.key, "quantity", e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          className="w-24"
+                          value={row.unit_price}
+                          onChange={(e) => updateItem(row.key, "unit_price", e.target.value)}
+                          placeholder="0.00"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          disabled={items.length === 1}
+                          onClick={() => removeItemRow(row.key)}
+                          aria-label={t("itemRemoveLabel")}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <Button type="button" variant="outline" size="sm" onClick={addItemRow}>
+              <Plus className="h-4 w-4" />
+              {t("itemAddLabel")}
+            </Button>
           </div>
 
           <div className="space-y-1.5">

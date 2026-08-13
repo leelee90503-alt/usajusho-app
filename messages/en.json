@@ -783,7 +783,14 @@
     "addInfo": "Add info",
     "saveInfo": "Save",
     "cancel": "Cancel",
-    "infoUpdated": "Updated. We've notified our staff."
+    "infoUpdated": "Updated. We've notified our staff.",
+    "itemsLabel": "Items",
+    "itemProductNameLabel": "Product Name",
+    "itemQuantityLabel": "Quantity",
+    "itemUnitPriceLabel": "Unit Price (USD)",
+    "itemRemoveLabel": "Remove item",
+    "itemAddLabel": "Add Item",
+    "itemsRequired": "At least one item is required."
   },
   "seo": {
     "home": {

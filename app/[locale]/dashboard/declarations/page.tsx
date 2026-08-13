@@ -21,7 +21,7 @@ export default async function DeclarationsPage() {
 
   const { data: declarations } = await supabase
     .from("package_declarations")
-    .select("*")
+    .select("*, declaration_items(product_name, quantity, unit_price, sort_order)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
 

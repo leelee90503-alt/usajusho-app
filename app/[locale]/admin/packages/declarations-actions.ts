@@ -137,22 +137,49 @@ export async function matchAndQuoteDeclaration(
     packageId = newPackage.id
   }
 
-  // Best-effort: records this declaration's line item for the package's
+  // Best-effort: records this declaration's line item(s) for the package's
   // item breakdown (customer dashboard, admin package view, invoice
   // import). Never blocks the match/quote itself on this -- it's a display
   // enhancement, not something the core shipping flow depends on, so a
   // failure here (e.g. package-items-migration.sql hasn't been run yet)
   // shouldn't stop the admin from quoting the customer.
-  const { error: itemInsertError } = await supabase.from("package_items").insert({
-    package_id: packageId,
-    source_declaration_id: declarationId,
-    product_name: itemName,
-    quantity: 1,
-    unit_price: declaration.order_amount,
-  })
+  //
+  // Declarations submitted through the itemized form (declaration-items-
+  // migration.sql) have one or more declaration_items rows -- copy each of
+  // those over so a multi-product order keeps its per-item quantity/price
+  // breakdown all the way through to the package and, later, the
+  // commercial invoice. Older declarations (submitted before that
+  // migration, or if it hasn't been run yet) have none, so fall back to a
+  // single row summarizing item_name/order_amount as before.
+  const { data: sourceItems } = await supabase
+    .from("declaration_items")
+    .select("product_name, quantity, unit_price, sort_order")
+    .eq("declaration_id", declarationId)
+    .order("sort_order", { ascending: true })
+
+  const packageItemRows =
+    sourceItems && sourceItems.length > 0
+      ? sourceItems.map((item) => ({
+          package_id: packageId,
+          source_declaration_id: declarationId,
+          product_name: item.product_name,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+        }))
+      : [
+          {
+            package_id: packageId,
+            source_declaration_id: declarationId,
+            product_name: itemName,
+            quantity: 1,
+            unit_price: declaration.order_amount,
+          },
+        ]
+
+  const { error: itemInsertError } = await supabase.from("package_items").insert(packageItemRows)
 
   if (itemInsertError) {
-    console.warn("matchAndQuoteDeclaration: could not record package_items row:", itemInsertError.message)
+    console.warn("matchAndQuoteDeclaration: could not record package_items row(s):", itemInsertError.message)
   }
 
   // When consolidating, packages.item_name (the headline shown everywhere)
