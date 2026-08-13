@@ -5,6 +5,7 @@ const NODE_CLASS: Record<Step["state"], string> = {
   done: "bg-accent text-white",
   current: "bg-accent text-white step-node-pulse-current",
   "current-action": "bg-amber-500 text-white step-node-pulse-action",
+  "current-info": "bg-amber-500 text-white step-node-pulse-action",
   upcoming: "border-2 border-slate-300 bg-white text-slate-400",
   locked: "border-2 border-dashed border-slate-300 bg-[var(--usj-surface)] text-slate-300",
 }
@@ -13,6 +14,7 @@ const LABEL_CLASS: Record<Step["state"], string> = {
   done: "text-slate-700",
   current: "text-primary font-semibold",
   "current-action": "text-primary font-semibold",
+  "current-info": "text-primary font-semibold",
   upcoming: "text-muted-foreground",
   locked: "text-slate-300",
 }
@@ -20,9 +22,11 @@ const LABEL_CLASS: Record<Step["state"], string> = {
 export default function OrderStepper({
   steps,
   actionLabel,
+  infoLabel,
 }: {
   steps: Step[]
   actionLabel?: string
+  infoLabel?: string
 }) {
   return (
     <div className="mt-4 flex overflow-x-auto pb-1">
@@ -42,7 +46,7 @@ export default function OrderStepper({
             >
               {step.state === "done" ? (
                 <Check className="h-4 w-4" />
-              ) : step.state === "current-action" ? (
+              ) : step.state === "current-action" || step.state === "current-info" ? (
                 <AlertCircle className="h-4 w-4" />
               ) : (
                 index + 1
@@ -54,6 +58,11 @@ export default function OrderStepper({
             {step.state === "current-action" && actionLabel && (
               <span className="mt-1 whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-bold text-amber-800">
                 {actionLabel}
+              </span>
+            )}
+            {step.state === "current-info" && infoLabel && (
+              <span className="mt-1 whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-bold text-amber-800">
+                {infoLabel}
               </span>
             )}
           </div>

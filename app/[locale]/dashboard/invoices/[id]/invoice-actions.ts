@@ -207,7 +207,7 @@ export async function addInvoiceItem(invoiceId: string, item: InvoiceItemInput) 
   if (!user) return { error: "ログインしてください。" }
 
   const guard = await getMutableInvoiceForItemAction(supabase, user.id, invoiceId)
-  if ("error" in guard) return guard
+  if ("error" in guard) return { error: guard.error }
 
   if (!item.product_name?.trim()) {
     return { error: "商品名を入力してください。" }
@@ -269,7 +269,7 @@ export async function duplicateInvoiceItem(itemId: string) {
   }
 
   const guard = await getMutableInvoiceForItemAction(supabase, user.id, item.invoice_id)
-  if ("error" in guard) return guard
+  if ("error" in guard) return { error: guard.error }
 
   const { error: insertError } = await supabase.from("invoice_items").insert({
     invoice_id: item.invoice_id,
@@ -312,7 +312,7 @@ export async function updateInvoiceItem(
   }
 
   const guard = await getMutableInvoiceForItemAction(supabase, user.id, item.invoice_id)
-  if ("error" in guard) return guard
+  if ("error" in guard) return { error: guard.error }
 
   const quantity = fields.quantity !== undefined ? Number(fields.quantity) : item.quantity
   const unitPrice = fields.unit_price !== undefined ? Number(fields.unit_price) : item.unit_price
@@ -324,7 +324,7 @@ export async function updateInvoiceItem(
     return { error: "単価を正しく入力してください。" }
   }
 
-  const { error: updateError } = await supabase
+  const { data: updatedItem, error: updateError } = await supabase
     .from("invoice_items")
     .update({
       product_name: fields.product_name?.trim() ?? item.product_name,
@@ -336,13 +336,30 @@ export async function updateInvoiceItem(
       updated_at: new Date().toISOString(),
     })
     .eq("id", itemId)
+    .select("*")
+    .single()
 
   if (updateError) {
     return { error: updateError.message }
   }
 
+  // total_declared_value is recomputed server-side (DB trigger) whenever
+  // invoice_items changes, so read it back rather than recomputing it here
+  // -- the caller merges this into local state instead of reloading the
+  // page, which would otherwise interrupt whatever the customer is typing
+  // into another field's box.
+  const { data: freshInvoice } = await supabase
+    .from("invoices")
+    .select("total_declared_value")
+    .eq("id", item.invoice_id)
+    .single()
+
   revalidatePath(`/dashboard/invoices/${guard.invoice.package_id}`)
-  return { success: true }
+  return {
+    success: true,
+    item: updatedItem,
+    total_declared_value: freshInvoice?.total_declared_value ?? null,
+  }
 }
 
 export async function deleteInvoiceItem(itemId: string) {
@@ -364,7 +381,7 @@ export async function deleteInvoiceItem(itemId: string) {
   }
 
   const guard2 = await getMutableInvoiceForItemAction(supabase, user.id, item.invoice_id)
-  if ("error" in guard2) return guard2
+  if ("error" in guard2) return { error: guard2.error }
 
   const { error: deleteError } = await supabase
     .from("invoice_items")

@@ -267,7 +267,7 @@ export async function adminAddInvoiceItem(invoiceId: string, item: AdminItemInpu
   const supabase = await requireAdmin()
 
   const guard = await getInvoiceForItemAction(supabase, invoiceId)
-  if ("error" in guard) return guard
+  if ("error" in guard) return { error: guard.error }
 
   if (!item.product_name?.trim()) {
     return { error: "Product name is required." }
@@ -349,7 +349,7 @@ export async function adminImportItemsFromPackage(invoiceId: string, packageId: 
   const supabase = await requireAdmin()
 
   const guard = await getInvoiceForItemAction(supabase, invoiceId)
-  if ("error" in guard) return guard
+  if ("error" in guard) return { error: guard.error }
 
   const { data: pkg, error: pkgError } = await supabase
     .from("packages")
@@ -452,7 +452,7 @@ export async function adminDuplicateInvoiceItem(itemId: string) {
   }
 
   const guard = await getInvoiceForItemAction(supabase, item.invoice_id)
-  if ("error" in guard) return guard
+  if ("error" in guard) return { error: guard.error }
 
   const { error: insertError } = await supabase.from("invoice_items").insert({
     invoice_id: item.invoice_id,
@@ -490,7 +490,7 @@ export async function adminUpdateInvoiceItem(
   }
 
   const guard = await getInvoiceForItemAction(supabase, item.invoice_id)
-  if ("error" in guard) return guard
+  if ("error" in guard) return { error: guard.error }
 
   const quantity = fields.quantity !== undefined ? Number(fields.quantity) : item.quantity
   const unitPrice = fields.unit_price !== undefined ? Number(fields.unit_price) : item.unit_price
@@ -502,7 +502,7 @@ export async function adminUpdateInvoiceItem(
     return { error: "Enter a valid unit price." }
   }
 
-  const { error: updateError } = await supabase
+  const { data: updatedItem, error: updateError } = await supabase
     .from("invoice_items")
     .update({
       product_name: fields.product_name?.trim() ?? item.product_name,
@@ -514,13 +514,30 @@ export async function adminUpdateInvoiceItem(
       updated_at: new Date().toISOString(),
     })
     .eq("id", itemId)
+    .select("*")
+    .single()
 
   if (updateError) {
     return { error: updateError.message }
   }
 
+  // total_declared_value is recomputed server-side (DB trigger) whenever
+  // invoice_items changes, so read it back rather than recomputing it here
+  // -- the caller merges this into local state instead of reloading the
+  // page, which would otherwise interrupt whatever the admin is typing into
+  // another field's box.
+  const { data: freshInvoice } = await supabase
+    .from("invoices")
+    .select("total_declared_value")
+    .eq("id", item.invoice_id)
+    .single()
+
   revalidatePath(`/admin/invoices/${guard.invoice.package_id}`)
-  return { success: true }
+  return {
+    success: true,
+    item: updatedItem,
+    total_declared_value: freshInvoice?.total_declared_value ?? null,
+  }
 }
 
 export async function adminDeleteInvoiceItem(itemId: string) {
@@ -537,7 +554,7 @@ export async function adminDeleteInvoiceItem(itemId: string) {
   }
 
   const guard = await getInvoiceForItemAction(supabase, item.invoice_id)
-  if ("error" in guard) return guard
+  if ("error" in guard) return { error: guard.error }
 
   const { error: deleteError } = await supabase
     .from("invoice_items")

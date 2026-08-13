@@ -340,6 +340,7 @@ export default function PendingOrderList({
                         })
                   }
                   actionLabel={t("stepActionNeeded")}
+                  infoLabel={t("stepDocsInProgress")}
                 />
               </CardContent>
             </Card>

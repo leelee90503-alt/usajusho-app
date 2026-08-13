@@ -17,7 +17,10 @@
 // itself is done and the very next thing outstanding is payment, so the
 // step that lights up as "the customer needs to act" is Payment, not Quote.
 
-export type StepState = "done" | "current" | "current-action" | "upcoming" | "locked"
+// "current-info" is like "current-action" (the customer's eye should land
+// here) but nothing is actually pending on the customer -- e.g. we haven't
+// started the commercial invoice yet, so it's on us, not them.
+export type StepState = "done" | "current" | "current-action" | "current-info" | "upcoming" | "locked"
 
 export type Step = {
   label: string
@@ -32,7 +35,12 @@ function invoiceStageState(hasInvoice: boolean, invoiceStatus: string | null | u
   invoiceState: StepState
   shippedState: StepState
 } {
-  if (!hasInvoice || invoiceStatus === "draft" || invoiceStatus === "correction_required") {
+  if (!hasInvoice) {
+    // Admin hasn't started the commercial invoice yet -- this is on us, not
+    // the customer, so it's informational rather than an action prompt.
+    return { invoiceState: "current-info", shippedState: "upcoming" }
+  }
+  if (invoiceStatus === "draft" || invoiceStatus === "correction_required") {
     return { invoiceState: "current-action", shippedState: "upcoming" }
   }
   if (invoiceStatus === "customer_submitted") {

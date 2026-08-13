@@ -294,6 +294,7 @@ export default function PackageList({
                       })
                 }
                 actionLabel={t("stepActionNeeded")}
+                infoLabel={t("stepDocsInProgress")}
               />
             </CardContent>
           </Card>

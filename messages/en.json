@@ -238,6 +238,7 @@
     "stepAwaitingPayment": "Awaiting Payment",
     "stepPaidAwaitingArrival": "Paid, Awaiting Arrival",
     "stepActionNeeded": "Action Needed",
+    "stepDocsInProgress": "Preparing Customs Documents",
     "itemsHeading": "Contents"
   },
   "notificationBell": {

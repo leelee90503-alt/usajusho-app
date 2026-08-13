@@ -171,8 +171,22 @@ export default function InvoiceForm({
       const payload: Record<string, string | number> =
         field === "quantity" || field === "unit_price" ? { [field]: Number(value) } : { [field]: value }
       const res = await updateInvoiceItem(itemId, payload)
-      if (res?.error) setError(res.error)
-      else window.location.reload()
+      if (res.error) {
+        setError(res.error)
+        return
+      }
+      setError(null)
+      // Merge the server's saved values back in instead of reloading the
+      // whole page -- a full reload here would wipe out whatever the
+      // customer has already started typing into another item's fields
+      // while this save was in flight.
+      setInvoice((prev) => ({
+        ...prev,
+        total_declared_value: res.total_declared_value ?? prev.total_declared_value,
+        invoice_items: prev.invoice_items.map((it) =>
+          it.id === itemId && res.item ? { ...it, ...res.item } : it
+        ),
+      }))
     })
   }
 

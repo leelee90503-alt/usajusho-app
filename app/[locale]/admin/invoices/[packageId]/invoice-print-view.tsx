@@ -44,11 +44,11 @@ export default function InvoicePrintView({
     <div className="hidden print:block print:p-8 print:text-black">
       <div className="flex items-start justify-between border-b border-black pb-4">
         <div>
-          <h1 className="text-2xl font-bold">{labels.title}</h1>
-          {invoice.invoice_number && <p className="mt-1 text-sm">{invoice.invoice_number}</p>}
+          <h1 className="text-xl font-bold">{labels.title}</h1>
+          {invoice.invoice_number && <p className="mt-1 text-xs">{invoice.invoice_number}</p>}
         </div>
         {invoice.invoice_issue_date && (
-          <p className="text-sm">
+          <p className="text-xs">
             {labels.invoiceDateLabel}: {invoice.invoice_issue_date}
           </p>
         )}
@@ -56,18 +56,18 @@ export default function InvoicePrintView({
 
       <div className="mt-6 grid grid-cols-2 gap-8">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide">{labels.shipperName}</p>
-          <p className="mt-1 whitespace-pre-line text-sm">{invoice.shipper_name}</p>
-          <p className="mt-1 whitespace-pre-line text-sm">{invoice.shipper_address}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide">{labels.shipperName}</p>
+          <p className="mt-1 whitespace-pre-line text-xs">{invoice.shipper_name}</p>
+          <p className="mt-1 whitespace-pre-line text-xs">{invoice.shipper_address}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide">{labels.consigneeName}</p>
-          <p className="mt-1 whitespace-pre-line text-sm">{invoice.consignee_name}</p>
-          <p className="mt-1 whitespace-pre-line text-sm">{invoice.consignee_address}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide">{labels.consigneeName}</p>
+          <p className="mt-1 whitespace-pre-line text-xs">{invoice.consignee_name}</p>
+          <p className="mt-1 whitespace-pre-line text-xs">{invoice.consignee_address}</p>
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-8 text-sm">
+      <div className="mt-6 grid grid-cols-2 gap-8 text-xs">
         <p>
           <span className="font-semibold">{labels.reasonForExport}: </span>
           {invoice.reason_for_export}
@@ -78,7 +78,7 @@ export default function InvoicePrintView({
         </p>
       </div>
 
-      <table className="mt-6 w-full border-collapse text-sm">
+      <table className="mt-6 w-full border-collapse text-xs">
         <thead>
           <tr className="border-b-2 border-black">
             <th className="py-1.5 text-left font-semibold">{labels.productName}</th>
@@ -111,8 +111,8 @@ export default function InvoicePrintView({
 
       <div className="mt-6 flex justify-end border-t-2 border-black pt-3">
         <div className="text-right">
-          <p className="text-sm font-semibold">{labels.totalDeclaredValue}</p>
-          <p className="text-xl font-bold">
+          <p className="text-xs font-semibold">{labels.totalDeclaredValue}</p>
+          <p className="text-lg font-bold">
             {labels.currencySymbol}
             {formatUSD(invoice.total_declared_value)}
           </p>
