@@ -89,6 +89,7 @@ export default async function AdminInvoiceDetailPage({
     cancel: ft("cancel"),
     confirm: t("confirm"),
     editCompleteConfirm: t("editCompleteConfirm"),
+    editCancelledError: t("editCancelledError"),
     submitOnBehalf: t("submitOnBehalf"),
     submitOnBehalfConfirmTitle: t("submitOnBehalfConfirmTitle"),
     submitOnBehalfConfirmBody: t("submitOnBehalfConfirmBody"),

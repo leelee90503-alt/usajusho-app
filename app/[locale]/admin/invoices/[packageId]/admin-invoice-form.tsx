@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useRef } from "react"
 import {
   adminUpdateInvoiceHeader,
   adminAddInvoiceItem,
@@ -97,6 +97,7 @@ export default function AdminInvoiceForm({
   labels: Labels
 }) {
   const [invoice, setInvoice] = useState(initialInvoice)
+  const savedInvoiceRef = useRef(initialInvoice)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
@@ -132,11 +133,18 @@ export default function AdminInvoiceForm({
   }
 
   function handleHeaderBlur(field: string, value: string) {
-    if (!guardEditWhenComplete()) return
+    if (!guardEditWhenComplete()) {
+      setInvoice((prev) => ({ ...prev, [field]: (savedInvoiceRef.current as any)[field] }))
+      setError(labels.editCancelledError)
+      return
+    }
     startTransition(async () => {
       const res = await adminUpdateInvoiceHeader(invoice.id, { [field]: value })
       if (res?.error) setError(res.error)
-      else setError(null)
+      else {
+        setError(null)
+        savedInvoiceRef.current = { ...savedInvoiceRef.current, [field]: value }
+      }
     })
   }
 
@@ -201,7 +209,18 @@ export default function AdminInvoiceForm({
   }
 
   function handleItemBlur(itemId: string, field: string, value: string) {
-    if (!guardEditWhenComplete()) return
+    if (!guardEditWhenComplete()) {
+      setInvoice((prev) => ({
+        ...prev,
+        invoice_items: prev.invoice_items.map((it) => {
+          if (it.id !== itemId) return it
+          const savedItem = savedInvoiceRef.current.invoice_items.find((si) => si.id === itemId)
+          return savedItem ? { ...it, [field]: (savedItem as any)[field] } : it
+        }),
+      }))
+      setError(labels.editCancelledError)
+      return
+    }
     startTransition(async () => {
       const payload: Record<string, string | number> =
         field === "quantity" || field === "unit_price" ? { [field]: Number(value) } : { [field]: value }
@@ -223,6 +242,13 @@ export default function AdminInvoiceForm({
           it.id === itemId && res.item ? { ...it, ...res.item } : it
         ),
       }))
+      savedInvoiceRef.current = {
+        ...savedInvoiceRef.current,
+        total_declared_value: res.total_declared_value ?? savedInvoiceRef.current.total_declared_value,
+        invoice_items: savedInvoiceRef.current.invoice_items.map((it) =>
+          it.id === itemId && res.item ? { ...it, ...res.item } : it
+        ),
+      }
     })
   }
 

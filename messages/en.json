@@ -516,6 +516,7 @@
     "createInvoiceButton": "Create Invoice",
     "confirm": "Confirm",
     "editCompleteConfirm": "This invoice is already marked complete. Are you sure you want to edit it?",
+    "editCancelledError": "Your change was not saved because the confirmation was cancelled. Please try again.",
     "submitOnBehalf": "Submit on Customer's Behalf",
     "submitOnBehalfConfirmTitle": "Submit this invoice?",
     "submitOnBehalfConfirmBody": "This will submit the invoice for review on the customer's behalf, without requiring their confirmation.",
