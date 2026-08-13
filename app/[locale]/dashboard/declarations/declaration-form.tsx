@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useTransition } from "react"
+import { useRef, useState, useTransition, type KeyboardEvent } from "react"
 import { useTranslations } from "next-intl"
 import { createDeclaration } from "./actions"
 import { Button } from "@/components/ui/button"
@@ -30,6 +30,13 @@ export default function DeclarationForm({ onClose }: { onClose?: () => void }) {
 
   function updateItem(key: number, field: "product_name" | "quantity" | "unit_price", value: string) {
     setItems((prev) => prev.map((row) => (row.key === key ? { ...row, [field]: value } : row)))
+  }
+
+  function preventEnterSubmit(e: KeyboardEvent<HTMLFormElement>) {
+    if (e.key !== "Enter") return
+    const target = e.target as HTMLElement
+    if (target.tagName === "TEXTAREA" || target.tagName === "BUTTON") return
+    e.preventDefault()
   }
 
   function addItemRow() {
@@ -83,7 +90,7 @@ export default function DeclarationForm({ onClose }: { onClose?: () => void }) {
           </CardAction>
         )}
       </CardHeader>
-      <form ref={formRef} action={handleSubmit}>
+      <form ref={formRef} action={handleSubmit} onKeyDown={preventEnterSubmit}>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1.5 sm:col-span-2">
             <Label>{t("itemsLabel")}</Label>
