@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/server"
 import { getLocale, getTranslations } from "next-intl/server"
 import { adminCreateOrGetInvoice } from "../actions"
 import AdminInvoiceForm from "./admin-invoice-form"
-import InvoicePrintView from "./invoice-print-view"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
@@ -122,10 +121,7 @@ export default async function AdminInvoiceDetailPage({
       </Card>
 
       {existingInvoice ? (
-        <>
-          <AdminInvoiceForm invoice={existingInvoice} labels={formLabels} />
-          <InvoicePrintView invoice={existingInvoice} labels={formLabels} />
-        </>
+        <AdminInvoiceForm invoice={existingInvoice} labels={formLabels} />
       ) : (
         <Card className="mt-8 border-dashed">
           <CardContent className="py-8 text-center">

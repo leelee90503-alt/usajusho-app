@@ -37,6 +37,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Trash2, Copy } from "lucide-react"
+import InvoicePrintView from "./invoice-print-view"
 
 type InvoiceItem = {
   id: string
@@ -296,6 +297,7 @@ export default function AdminInvoiceForm({
   }
 
   return (
+    <>
     <Card className="mt-8 print:hidden">
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
         <div>
@@ -612,6 +614,8 @@ export default function AdminInvoiceForm({
         </DialogContent>
       </Dialog>
     </Card>
+    <InvoicePrintView invoice={invoice} labels={labels} />
+    </>
   )
 }
 
