@@ -91,6 +91,7 @@ export default function SquareCardPayment({
   amountLabel,
   amount,
   billingContact,
+  postalCodeHint,
   submitLabel,
   submittingLabel,
   genericErrorLabel,
@@ -106,6 +107,7 @@ export default function SquareCardPayment({
   amountLabel: string
   amount: string
   billingContact?: BillingContact
+  postalCodeHint?: string
   submitLabel: string
   submittingLabel: string
   genericErrorLabel: string
@@ -238,6 +240,9 @@ export default function SquareCardPayment({
         ) : (
           <>
             <div ref={containerRef} className="min-h-[90px] py-2" />
+            {postalCodeHint && (
+              <p className="mt-1 text-xs text-muted-foreground">{postalCodeHint}</p>
+            )}
             {status === "loading" && (
               <p className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />

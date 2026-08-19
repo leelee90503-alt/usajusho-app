@@ -257,6 +257,7 @@ export default function PendingOrderList({
                           amountLabel={`$${formatUSD(order.quote_amount)}`}
                           amount={Number(order.quote_amount).toFixed(2)}
                           billingContact={buildBillingContact(profile)}
+                          postalCodeHint={t("cardPayPostalCodeHint")}
                           submitLabel={t("cardPaySubmit")}
                           submittingLabel={t("cardPaySubmitting")}
                           genericErrorLabel={t("cardPayError")}
@@ -293,6 +294,7 @@ export default function PendingOrderList({
                               amountLabel={`$${formatUSD(charge.amount_cents / 100)}`}
                               amount={(charge.amount_cents / 100).toFixed(2)}
                               billingContact={buildBillingContact(profile)}
+                              postalCodeHint={t("cardPayPostalCodeHint")}
                               submitLabel={t("cardPaySubmit")}
                               submittingLabel={t("cardPaySubmitting")}
                               genericErrorLabel={t("cardPayError")}

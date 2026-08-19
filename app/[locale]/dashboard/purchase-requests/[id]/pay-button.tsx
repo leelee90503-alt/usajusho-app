@@ -33,6 +33,7 @@ export default function PayButton({
       amountLabel={amountLabel}
       amount={amount}
       billingContact={billingContact}
+      postalCodeHint={t("cardPayPostalCodeHint")}
       submitLabel={t("cardPaySubmit")}
       submittingLabel={t("cardPaySubmitting")}
       genericErrorLabel={t("cardPayError")}

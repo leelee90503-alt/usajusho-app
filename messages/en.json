@@ -239,7 +239,8 @@
     "stepPaidAwaitingArrival": "Paid, Awaiting Arrival",
     "stepActionNeeded": "Action Needed",
     "stepDocsInProgress": "Preparing Customs Documents",
-    "itemsHeading": "Contents"
+    "itemsHeading": "Contents",
+    "cardPayPostalCodeHint": "Enter your Japan postal code (no hyphen) in the \"ZIP CODE\" field above."
   },
   "notificationBell": {
     "title": "Notifications",
@@ -616,7 +617,8 @@
       "cancelled": "Cancelled",
       "refunded": "Refunded"
     },
-    "productUrlNotWhitelisted": "We currently only support purchases from: {stores}. Please use a link from one of these stores, or leave the URL blank and describe the item in Product Description."
+    "productUrlNotWhitelisted": "We currently only support purchases from: {stores}. Please use a link from one of these stores, or leave the URL blank and describe the item in Product Description.",
+    "cardPayPostalCodeHint": "Enter your Japan postal code (no hyphen) in the \"ZIP CODE\" field above."
   },
   "adminPurchaseRequests": {
     "title": "Admin: Purchase Requests",
