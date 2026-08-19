@@ -60,7 +60,7 @@ declare global {
         locationId: string,
       ) => Promise<{
         setLocale: (locale: string) => void
-        card: () => Promise<{
+        card: (options?: { postalCode?: string }) => Promise<{
           attach: (selector: string | HTMLElement) => Promise<void>
           destroy: () => Promise<void>
           tokenize: (verificationDetails?: {
@@ -138,7 +138,13 @@ export default function SquareCardPayment({
           // language rather than relying on navigator.language, which can
           // be English even for a Japanese cardholder's browser.
           payments.setLocale("ja-JP")
-        const card = await payments.card()
+        // Prefill the visible postal-code box with the customer's own
+      // Japan postal code (already on file from their profile) so
+      // Japanese cardholders are not stuck guessing what to type into
+      // a field that reads like a US ZIP code.
+      const card = await payments.card(
+        billingContact?.postalCode ? { postalCode: billingContact.postalCode } : undefined
+      )
         if (cancelled) return
         if (containerRef.current) {
           await card.attach(containerRef.current)
@@ -161,7 +167,7 @@ export default function SquareCardPayment({
       cardRef.current = null
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, mode, applicationId, locationId])
+  }, [open, mode, applicationId, locationId, billingContact?.postalCode])
 
   async function handleSubmit() {
     if (!cardRef.current) return
