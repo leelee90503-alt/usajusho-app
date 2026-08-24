@@ -559,3 +559,99 @@ export async function deletePackage(packageId: string) {
   return { success: true }
 }
 
+// Lets an admin attach additional photos to a package after it has already
+// been matched (or even after it has shipped) -- resolveMissingPackage()
+// above only captures the required MIN_PACKAGE_PHOTOS..MAX_PACKAGE_PHOTOS
+// inspection photos once, at match time. This covers photos taken later
+// (e.g. a customer reports a discrepancy after the fact). No minimum is
+// enforced here, and the cap only bounds a single add -- there is no cap
+// on the running total for a package.
+export async function addPackagePhotos(packageId: string, photos: File[]) {
+  const supabase = await requireAdmin()
+
+  const { data: pkg, error: pkgError } = await supabase
+    .from("packages")
+    .select("id")
+    .eq("id", packageId)
+    .single()
+
+  if (pkgError || !pkg) {
+    return { error: "荷物が見つかりません。" }
+  }
+
+  const validPhotos = (photos || []).filter((f) => f && f.size > 0)
+  if (validPhotos.length === 0) {
+    return { error: "写真を1枚以上選択してください。" }
+  }
+  if (validPhotos.length > MAX_PACKAGE_PHOTOS) {
+    return { error: `一度に追加できる写真は${MAX_PACKAGE_PHOTOS}枚までです。` }
+  }
+
+  // Same "{packageId}/{uuid}.{ext}" storage layout as resolveMissingPackage
+  // above, so storage RLS keeps granting the owning customer read access
+  // by package_id without needing the admin's own uid in the path.
+  for (const photo of validPhotos) {
+    const ext = photo.name.includes(".") ? photo.name.split(".").pop() : "jpg"
+    const path = `${packageId}/${crypto.randomUUID()}.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from("package-photos")
+      .upload(path, photo, { contentType: photo.type || undefined })
+
+    if (uploadError) {
+      return { error: uploadError.message }
+    }
+
+    const { error: photoInsertError } = await supabase
+      .from("package_photos")
+      .insert({ package_id: packageId, storage_path: path })
+
+    if (photoInsertError) {
+      return { error: photoInsertError.message }
+    }
+  }
+
+  revalidatePath("/admin/packages")
+  revalidatePath("/dashboard")
+  return { success: true }
+}
+
+// Removes a single photo an admin added in error (wrong package, blurry
+// shot, duplicate). The storage object is deleted first so a failed row
+// delete doesn't leave an orphaned file; if the storage delete succeeds
+// but the row delete then fails, the object is gone but the row (and its
+// now-broken signed URL) remains -- surfaced as an error so the admin can
+// retry rather than being left with a silently inconsistent state.
+export async function deletePackagePhoto(photoId: string) {
+  const supabase = await requireAdmin()
+
+  const { data: photo, error: photoError } = await supabase
+    .from("package_photos")
+    .select("id, package_id, storage_path")
+    .eq("id", photoId)
+    .single()
+
+  if (photoError || !photo) {
+    return { error: "写真が見つかりません。" }
+  }
+
+  const { error: removeError } = await supabase.storage
+    .from("package-photos")
+    .remove([photo.storage_path])
+
+  if (removeError) {
+    return { error: removeError.message }
+  }
+
+  const { error: deleteError } = await supabase
+    .from("package_photos")
+    .delete()
+    .eq("id", photoId)
+
+  if (deleteError) {
+    return { error: deleteError.message }
+  }
+
+  revalidatePath("/admin/packages")
+  revalidatePath("/dashboard")
+  return { success: true }
+}

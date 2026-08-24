@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
-import { updatePackageStatus, deletePackage, markShipped, createAdditionalCharge } from "./actions"
+import { updatePackageStatus, deletePackage, markShipped, createAdditionalCharge, addPackagePhotos, deletePackagePhoto } from "./actions"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -135,6 +135,10 @@ export default function PackageRow({
   const [chargeAmount, setChargeAmount] = useState("")
   const [chargeMessage, setChargeMessage] = useState<string | null>(null)
   const [showChargeForm, setShowChargeForm] = useState(false)
+  const [showPhotoForm, setShowPhotoForm] = useState(false)
+  const [photoFiles, setPhotoFiles] = useState<File[]>([])
+  const [photoMessage, setPhotoMessage] = useState<string | null>(null)
+  const [photoInputKey, setPhotoInputKey] = useState(0)
 
   function handleCreateCharge() {
     const amountCents = Math.round(Number(chargeAmount) * 100)
@@ -192,6 +196,35 @@ export default function PackageRow({
         setShipMessage(result.error)
       } else {
         setShipMessage(t("markShippedSuccess"))
+      }
+    })
+  }
+
+  function handleAddPhotos() {
+    if (photoFiles.length === 0) {
+      setPhotoMessage(tAdmin("addPhotosMissingError"))
+      return
+    }
+    setPhotoMessage(null)
+    startTransition(async () => {
+      const result = await addPackagePhotos(pkg.id, photoFiles)
+      if (result?.error) {
+        setPhotoMessage(result.error)
+      } else {
+        setPhotoFiles([])
+        setPhotoInputKey((key) => key + 1)
+        setShowPhotoForm(false)
+      }
+    })
+  }
+
+  function handleDeletePhoto(photoId: string) {
+    const ok = confirm(tAdmin("deletePhotoConfirm"))
+    if (!ok) return
+    startTransition(async () => {
+      const result = await deletePackagePhoto(photoId)
+      if (result?.error) {
+        setPhotoMessage(result.error)
       }
     })
   }
@@ -290,18 +323,81 @@ export default function PackageRow({
                 <p className="text-xs font-semibold text-slate-700">{tAdmin("photosHeading")}</p>
                 <div className="mt-1 flex flex-wrap gap-2">
                   {photos.map((photo) => (
-                    <a key={photo.id} href={photo.url} target="_blank" rel="noopener noreferrer">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={photo.url}
-                        alt=""
-                        className="h-16 w-16 rounded-md border border-slate-200 object-cover"
-                      />
-                    </a>
+                    <div key={photo.id} className="relative">
+                      <a href={photo.url} target="_blank" rel="noopener noreferrer">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photo.url}
+                          alt=""
+                          className="h-16 w-16 rounded-md border border-slate-200 object-cover"
+                        />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => handleDeletePhoto(photo.id)}
+                        disabled={isPending}
+                        aria-label={tAdmin("deletePhotoButton")}
+                        className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:text-destructive disabled:opacity-50"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
                   ))}
                 </div>
               </div>
             )}
+
+            <div className="mt-2">
+              {!showPhotoForm ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPhotoForm(true)}
+                >
+                  {tAdmin("addPhotosButton")}
+                </Button>
+              ) : (
+                <div className="space-y-1.5 rounded-lg border border-border bg-muted/40 p-3">
+                  <p className="text-xs text-muted-foreground">{tAdmin("addPhotosHint")}</p>
+                  <input
+                    key={photoInputKey}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => setPhotoFiles(Array.from(e.target.files ?? []))}
+                    className="block w-full text-xs"
+                  />
+                  {photoFiles.length > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      {tAdmin("photosCountLabel", { count: photoFiles.length })}
+                    </p>
+                  )}
+                  <div className="flex gap-2 pt-1">
+                    <Button type="button" size="sm" disabled={isPending} onClick={handleAddPhotos}>
+                      {tAdmin("addPhotosSubmit")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={isPending}
+                      onClick={() => {
+                        setShowPhotoForm(false)
+                        setPhotoMessage(null)
+                        setPhotoFiles([])
+                        setPhotoInputKey((key) => key + 1)
+                      }}
+                    >
+                      {tAdmin("additionalChargeCancel")}
+                    </Button>
+                  </div>
+                  {photoMessage && (
+                    <p className="w-full text-xs text-muted-foreground">{photoMessage}</p>
+                  )}
+                </div>
+              )}
+            </div>
             <p className="mt-2 text-xs text-muted-foreground">
               {t("commercialInvoiceLabel")}
               {invoice ? tInvoices(INVOICE_STATUS_LABEL_KEY[invoice.status] ?? "statusDraft") : tInvoices("statusNotStarted")}

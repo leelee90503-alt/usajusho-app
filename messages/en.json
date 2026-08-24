@@ -322,7 +322,13 @@
     "photosHeading": "Photos",
     "attachExistingLabel": "Add to existing package (consolidate)",
     "attachExistingNone": "Register as a new package",
-    "attachExistingHint": "Combine this item with an existing not-yet-finalized package for this customer. Re-weigh/re-measure the combined box and send one quote for it."
+    "attachExistingHint": "Combine this item with an existing not-yet-finalized package for this customer. Re-weigh/re-measure the combined box and send one quote for it.",
+    "addPhotosButton": "Add Photos",
+    "addPhotosHint": "You can add more photos to this package even after it has been matched.",
+    "addPhotosSubmit": "Add",
+    "addPhotosMissingError": "Please select at least one photo.",
+    "deletePhotoButton": "Delete photo",
+    "deletePhotoConfirm": "Delete this photo? This cannot be undone."
   },
   "packageStatus": {
     "missing": "Missing",
