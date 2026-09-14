@@ -120,11 +120,18 @@ export default function SquareCardPayment({
   >("loading")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const cardRef = useRef<Awaited<
     ReturnType<
       Awaited<ReturnType<NonNullable<Window["Square"]>["payments"]>>["card"]
     >
   > | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -205,6 +212,11 @@ export default function SquareCardPayment({
 
       setStatus("success")
       onSuccess?.()
+      // Auto-close the dialog a few seconds after showing the success
+      // message, instead of leaving it up to the customer to close it
+      // themselves - reassures them the payment really went through
+      // without requiring an extra click.
+      closeTimeoutRef.current = setTimeout(() => setOpen(false), 3500)
     } catch {
       setStatus("ready")
       setErrorMessage(genericErrorLabel)
@@ -217,6 +229,10 @@ export default function SquareCardPayment({
       onOpenChange={(next) => {
         setOpen(next)
         if (!next) {
+          if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current)
+            closeTimeoutRef.current = null
+          }
           // Reset so re-opening mounts a fresh card element instead of
           // showing a stale success/error state from the last attempt.
           setStatus("loading")
