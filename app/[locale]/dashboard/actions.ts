@@ -116,7 +116,7 @@ export async function payAdditionalChargeWithCard(chargeId: string, sourceId: st
 
   const { data: charge, error: fetchError } = await supabase
     .from("additional_charges")
-    .select("id, user_id, status, amount_cents, reason")
+    .select("id, user_id, status, amount_cents, reason, package_id")
     .eq("id", chargeId)
     .eq("user_id", user.id)
     .single()
@@ -158,7 +158,17 @@ export async function payAdditionalChargeWithCard(chargeId: string, sourceId: st
       })
       .eq("id", charge.id)
 
+    await notifyAdmins({
+      packageId: charge.package_id,
+      title: "追加料金のお支払いが完了しました",
+      body: "追加料金のお支払いが完了しました。管理画面からご確認ください。",
+      titleEn: "Additional charge payment completed",
+      bodyEn:
+        "The customer has completed payment for an additional charge. Please check the admin dashboard.",
+    })
+
     revalidatePath("/dashboard")
+    revalidatePath("/admin/packages")
     return { success: true }
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown error"
