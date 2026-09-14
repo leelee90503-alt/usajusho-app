@@ -291,6 +291,7 @@
     "matchQuoteAmountLabel": "Quote amount ($)",
     "matchAndQuote": "Match & Send Quote",
     "suggestedAmountShort": "Suggested: ${amount}",
+    "useSuggestedAmount": "Use this amount",
     "matchSuccess": "Quote sent.",
     "matchSuiteLabel": "Suite number",
     "deletePackage": "Delete",

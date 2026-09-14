@@ -113,6 +113,7 @@ function DeclarationCard({
   onDelete: () => void
 }) {
   const t = useTranslations("adminPackages")
+  const tDecl = useTranslations("packageDeclarations")
   const [itemName, setItemName] = useState(d.item_name)
   const [weightKg, setWeightKg] = useState("")
   const [lengthCm, setLengthCm] = useState("")
@@ -173,9 +174,9 @@ function DeclarationCard({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="h-8 text-xs">{t("itemProductNameLabel")}</TableHead>
-                    <TableHead className="h-8 text-xs">{t("itemQuantityLabel")}</TableHead>
-                    <TableHead className="h-8 text-xs">{t("itemUnitPriceLabel")}</TableHead>
+                    <TableHead className="h-8 text-xs">{tDecl("itemProductNameLabel")}</TableHead>
+                    <TableHead className="h-8 text-xs">{tDecl("itemQuantityLabel")}</TableHead>
+                    <TableHead className="h-8 text-xs">{tDecl("itemUnitPriceLabel")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
