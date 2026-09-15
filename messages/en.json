@@ -722,6 +722,9 @@
     "label": "Chat on LINE",
     "ariaLabel": "Contact us on LINE"
   },
+  "squareCardPayment": {
+    "customsNotice": "Any customs duties or import taxes are not included in the amount above and are the customer's responsibility."
+  },
   "howItWorks": {
     "eyebrow": "Getting Started",
     "title": "How USAJUSHO Works",

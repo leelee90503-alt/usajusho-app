@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Loader2 } from "lucide-react"
+import { useTranslations } from "next-intl"
 import type { BillingContact } from "@/lib/square"
 
 // Square's Web Payments SDK (loaded from Square's own CDN below) renders
@@ -114,6 +115,7 @@ export default function SquareCardPayment({
   successLabel: string
   onSuccess?: () => void
 }) {
+  const t = useTranslations("squareCardPayment")
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<
     "loading" | "ready" | "submitting" | "success" | "error"
@@ -250,6 +252,10 @@ export default function SquareCardPayment({
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{amountLabel}</DialogDescription>
         </DialogHeader>
+
+        {status !== "success" && (
+          <p className="text-xs text-muted-foreground">{t("customsNotice")}</p>
+        )}
 
         {status === "success" ? (
           <p className="py-4 text-sm text-accent">{successLabel}</p>
