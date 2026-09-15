@@ -716,8 +716,11 @@
   "footer": {
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
-    "line": "Official LINE Account",
     "copyright": "© 2026 USAJUSHO. All rights reserved."
+  },
+  "lineChat": {
+    "label": "Chat on LINE",
+    "ariaLabel": "Contact us on LINE"
   },
   "howItWorks": {
     "eyebrow": "Getting Started",
