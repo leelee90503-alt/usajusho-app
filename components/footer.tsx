@@ -17,6 +17,17 @@ export default async function Footer() {
           <Link href="/legal/privacy" className="transition-colors hover:text-primary">
             {t("privacy")}
           </Link>
+          <a
+            href="https://lin.ee/Yu1BDaz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-primary"
+          >
+            <span className="rounded bg-[#06C755] px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
+              LINE
+            </span>
+            {t("line")}
+          </a>
         </nav>
       </div>
     </footer>
