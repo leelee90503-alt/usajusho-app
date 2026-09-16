@@ -366,6 +366,12 @@
     "markShippedInvoiceWarning": "The commercial invoice is not marked complete yet. Mark as shipped anyway?",
     "resendQuoteButton": "Resend quote",
     "resendQuoteSuccess": "Quote resent.",
+    "customMessageButton": "Send message",
+    "customMessageLabel": "Message to customer",
+    "customMessagePlaceholder": "Enter a message to send to the customer",
+    "customMessageSubmit": "Send",
+    "customMessageSuccess": "Message sent.",
+    "customMessageEmptyError": "Please enter a message.",
     "quoteRecipientPhone": "Phone: ",
     "quoteRecipientAddress": "Address: ",
     "quoteRecipientNotSet": "Not set"
