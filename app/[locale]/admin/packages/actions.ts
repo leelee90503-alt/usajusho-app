@@ -501,6 +501,42 @@ export async function resendQuoteNotification(packageId: string) {
   return { success: true }
 }
 
+// Lets an admin send a free-form message to the customer who owns this
+// package -- an in-app notification plus (when Resend is configured) an
+// email -- for anything that doesn't fit one of the fixed-template events
+// above (e.g. "please contact us via LINE about your shipment"). Unlike
+// those, the body text is whatever the admin typed, so there is no
+// titleEn/bodyEn pair here; the notification and email both stay
+// Japanese-only, same as the other not-yet-translated call sites.
+export async function sendCustomMessage(packageId: string, message: string) {
+  const supabase = await requireAdmin()
+
+  const trimmed = message.trim()
+  if (!trimmed) {
+    return { error: "メッセージを入力してください。" }
+  }
+
+  const { data: pkg, error: pkgError } = await supabase
+    .from("packages")
+    .select("id, user_id, item_name")
+    .eq("id", packageId)
+    .single()
+
+  if (pkgError || !pkg || !pkg.user_id) {
+    return { error: "荷物が見つかりません。" }
+  }
+
+  await notifyUser(supabase, {
+    userId: pkg.user_id,
+    packageId,
+    title: "配送に関するご連絡",
+    body: trimmed,
+  })
+
+  revalidatePath("/admin/packages")
+  return { success: true }
+}
+
 // Bills a customer an extra amount against an already-existing package --
 // e.g. the item weighed more than the original estimate. Modeled on the
 // purchase_requests Square payment-link flow (createCheckoutSession() in
