@@ -364,6 +364,8 @@
     "markShippedMissingTracking": "Please enter a tracking number.",
     "markShippedSuccess": "Marked as shipped.",
     "markShippedInvoiceWarning": "The commercial invoice is not marked complete yet. Mark as shipped anyway?",
+    "resendQuoteButton": "Resend quote",
+    "resendQuoteSuccess": "Quote resent.",
     "quoteRecipientPhone": "Phone: ",
     "quoteRecipientAddress": "Address: ",
     "quoteRecipientNotSet": "Not set"
