@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
-import { updatePackageStatus, deletePackage, markShipped, createAdditionalCharge, addPackagePhotos, deletePackagePhoto } from "./actions"
+import { updatePackageStatus, deletePackage, markShipped, createAdditionalCharge, addPackagePhotos, deletePackagePhoto, resendQuoteNotification } from "./actions"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -139,6 +139,7 @@ export default function PackageRow({
   const [photoFiles, setPhotoFiles] = useState<File[]>([])
   const [photoMessage, setPhotoMessage] = useState<string | null>(null)
   const [photoInputKey, setPhotoInputKey] = useState(0)
+  const [resendMessage, setResendMessage] = useState<string | null>(null)
 
   function handleCreateCharge() {
     const amountCents = Math.round(Number(chargeAmount) * 100)
@@ -214,6 +215,18 @@ export default function PackageRow({
         setPhotoFiles([])
         setPhotoInputKey((key) => key + 1)
         setShowPhotoForm(false)
+      }
+    })
+  }
+
+  function handleResendQuote() {
+    setResendMessage(null)
+    startTransition(async () => {
+      const result = await resendQuoteNotification(pkg.id)
+      if (result?.error) {
+        setResendMessage(result.error)
+      } else {
+        setResendMessage(t("resendQuoteSuccess"))
       }
     })
   }
@@ -440,6 +453,22 @@ export default function PackageRow({
 
         {statusMessage && (
           <p className="mt-2 text-xs text-destructive">{statusMessage}</p>
+        )}
+
+        {pkg.status === "quoted" && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleResendQuote}
+              disabled={isPending}
+              className="whitespace-nowrap"
+            >
+              {t("resendQuoteButton")}
+            </Button>
+            {resendMessage && <p className="text-xs text-amber-800">{resendMessage}</p>}
+          </div>
         )}
 
         {pkg.status === "paid" && (
