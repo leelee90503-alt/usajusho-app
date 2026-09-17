@@ -398,7 +398,15 @@
     "markShippedInvoiceWarning": "商業インボイスがまだ完了していません。それでも発送完了にしますか？",
     "quoteRecipientPhone": "電話番号：",
     "quoteRecipientAddress": "住所：",
-    "quoteRecipientNotSet": "未設定"
+    "quoteRecipientNotSet": "未設定",
+    "resendQuoteButton": "見積りを再送信",
+    "resendQuoteSuccess": "見積りを再送信しました。",
+    "customMessageButton": "メッセージを送信",
+    "customMessageLabel": "お客様へのメッセージ",
+    "customMessagePlaceholder": "お客様に送るメッセージを入力してください",
+    "customMessageSubmit": "送信",
+    "customMessageSuccess": "メッセージを送信しました。",
+    "customMessageEmptyError": "メッセージを入力してください。"
   },
   "addPackageForm": {
     "heading": "一致しない荷物を登録",

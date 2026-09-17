@@ -449,6 +449,94 @@ export async function markShipped(packageId: string, trackingNumber: string) {
   return { success: true }
 }
 
+// Re-sends the same shipping-quote notification/email that
+// resolveMissingPackage() sends the first time a package is quoted, without
+// changing the package's status or any of its data. For when a customer
+// says they never received the original quote (or an admin just wants to
+// make sure it went out) -- resolveMissingPackage() only fires once, at the
+// "missing" -> "quoted" transition, so there was previously no way to
+// trigger it again short of un-quoting and re-quoting the package by hand.
+export async function resendQuoteNotification(packageId: string) {
+  const supabase = await requireAdmin()
+
+  const { data: pkg, error: pkgError } = await supabase
+    .from("packages")
+    .select("id, user_id, item_name, status, tracking_number, weight_kg, quote_amount, quote_note")
+    .eq("id", packageId)
+    .single()
+
+  if (pkgError || !pkg) {
+    return { error: "荷物が見つかりません。" }
+  }
+
+  if (pkg.status !== "quoted" || !pkg.user_id) {
+    return { error: "この荷物は「見積済み」状態ではないため、見積りを再送信できません。" }
+  }
+
+  const amount = formatUSD(pkg.quote_amount ?? 0)
+  await notifyUser(supabase, {
+    userId: pkg.user_id,
+    packageId,
+    title: "送料の見積りが届きました",
+    body: `${pkg.item_name} の送料お見積りをお送りいたします。お見積り金額は $${amount} です。${
+      pkg.quote_note ? `担当者より一言：${pkg.quote_note} ` : ""
+    }内容をご確認のうえ、ダッシュボードよりお支払いのお手続きをお願いいたします。`,
+    titleEn: "Your shipping quote is ready",
+    bodyEn: `Your shipping quote of $${amount} for "${pkg.item_name}" is ready.${
+      pkg.quote_note ? ` Note: ${pkg.quote_note}.` : ""
+    } Please pay from your dashboard.`,
+    emailDetails: {
+      itemName: pkg.item_name,
+      trackingNumber: pkg.tracking_number,
+      weightKg: pkg.weight_kg,
+      amountCaption: "送料お見積り金額",
+      amountLabel: `$${amount} USD`,
+      statusBadge: "お支払いをお待ちしております",
+    },
+    emailSteps: shippingEmailSteps({ hasPackage: true, packageStatus: "quoted" }),
+    emailCtaLabel: "ダッシュボードでお支払い手続きへ",
+  })
+
+  revalidatePath("/admin/packages")
+  return { success: true }
+}
+
+// Lets an admin send a free-form message to the customer who owns this
+// package -- an in-app notification plus (when Resend is configured) an
+// email -- for anything that doesn't fit one of the fixed-template events
+// above (e.g. "please contact us via LINE about your shipment"). Unlike
+// those, the body text is whatever the admin typed, so there is no
+// titleEn/bodyEn pair here; the notification and email both stay
+// Japanese-only, same as the other not-yet-translated call sites.
+export async function sendCustomMessage(packageId: string, message: string) {
+  const supabase = await requireAdmin()
+
+  const trimmed = message.trim()
+  if (!trimmed) {
+    return { error: "メッセージを入力してください。" }
+  }
+
+  const { data: pkg, error: pkgError } = await supabase
+    .from("packages")
+    .select("id, user_id, item_name")
+    .eq("id", packageId)
+    .single()
+
+  if (pkgError || !pkg || !pkg.user_id) {
+    return { error: "荷物が見つかりません。" }
+  }
+
+  await notifyUser(supabase, {
+    userId: pkg.user_id,
+    packageId,
+    title: "配送に関するご連絡",
+    body: trimmed,
+  })
+
+  revalidatePath("/admin/packages")
+  return { success: true }
+}
+
 // Bills a customer an extra amount against an already-existing package --
 // e.g. the item weighed more than the original estimate. Modeled on the
 // purchase_requests Square payment-link flow (createCheckoutSession() in

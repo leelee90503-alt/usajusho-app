@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
-import { updatePackageStatus, deletePackage, markShipped, createAdditionalCharge, addPackagePhotos, deletePackagePhoto } from "./actions"
+import { updatePackageStatus, deletePackage, markShipped, createAdditionalCharge, addPackagePhotos, deletePackagePhoto, resendQuoteNotification, sendCustomMessage } from "./actions"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -139,6 +139,10 @@ export default function PackageRow({
   const [photoFiles, setPhotoFiles] = useState<File[]>([])
   const [photoMessage, setPhotoMessage] = useState<string | null>(null)
   const [photoInputKey, setPhotoInputKey] = useState(0)
+  const [resendMessage, setResendMessage] = useState<string | null>(null)
+  const [showCustomMessageForm, setShowCustomMessageForm] = useState(false)
+  const [customMessageText, setCustomMessageText] = useState("")
+  const [customMessageStatus, setCustomMessageStatus] = useState<string | null>(null)
 
   function handleCreateCharge() {
     const amountCents = Math.round(Number(chargeAmount) * 100)
@@ -214,6 +218,35 @@ export default function PackageRow({
         setPhotoFiles([])
         setPhotoInputKey((key) => key + 1)
         setShowPhotoForm(false)
+      }
+    })
+  }
+
+  function handleResendQuote() {
+    setResendMessage(null)
+    startTransition(async () => {
+      const result = await resendQuoteNotification(pkg.id)
+      if (result?.error) {
+        setResendMessage(result.error)
+      } else {
+        setResendMessage(t("resendQuoteSuccess"))
+      }
+    })
+  }
+
+  function handleSendCustomMessage() {
+    if (!customMessageText.trim()) {
+      setCustomMessageStatus(t("customMessageEmptyError"))
+      return
+    }
+    setCustomMessageStatus(null)
+    startTransition(async () => {
+      const result = await sendCustomMessage(pkg.id, customMessageText)
+      if (result?.error) {
+        setCustomMessageStatus(result.error)
+      } else {
+        setCustomMessageStatus(t("customMessageSuccess"))
+        setCustomMessageText("")
       }
     })
   }
@@ -442,6 +475,22 @@ export default function PackageRow({
           <p className="mt-2 text-xs text-destructive">{statusMessage}</p>
         )}
 
+        {pkg.status === "quoted" && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleResendQuote}
+              disabled={isPending}
+              className="whitespace-nowrap"
+            >
+              {t("resendQuoteButton")}
+            </Button>
+            {resendMessage && <p className="text-xs text-amber-800">{resendMessage}</p>}
+          </div>
+        )}
+
         {pkg.status === "paid" && (
           <div className="mt-3 flex flex-wrap items-end gap-2 rounded-lg border border-sky-200 bg-sky-50 p-3">
             <p className="w-full text-xs font-semibold text-sky-800">{t("preparingShipmentHeading")}</p>
@@ -525,6 +574,53 @@ export default function PackageRow({
             )}
           </div>
         )}
+
+        <div className="mt-3">
+          {!showCustomMessageForm ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowCustomMessageForm(true)}
+            >
+              {t("customMessageButton")}
+            </Button>
+          ) : (
+            <div className="space-y-1.5 rounded-lg border border-border bg-muted/40 p-3">
+              <Label className="text-xs font-normal text-muted-foreground">
+                {t("customMessageLabel")}
+              </Label>
+              <textarea
+                value={customMessageText}
+                onChange={(e) => setCustomMessageText(e.target.value)}
+                placeholder={t("customMessagePlaceholder")}
+                rows={4}
+                className="w-full rounded-md border border-input bg-transparent px-2 py-1.5 text-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              />
+              <div className="flex gap-2 pt-1">
+                <Button type="button" size="sm" disabled={isPending} onClick={handleSendCustomMessage}>
+                  {t("customMessageSubmit")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={isPending}
+                  onClick={() => {
+                    setShowCustomMessageForm(false)
+                    setCustomMessageStatus(null)
+                    setCustomMessageText("")
+                  }}
+                >
+                  {tAdmin("additionalChargeCancel")}
+                </Button>
+              </div>
+              {customMessageStatus && (
+                <p className="w-full text-xs text-muted-foreground">{customMessageStatus}</p>
+              )}
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   )
