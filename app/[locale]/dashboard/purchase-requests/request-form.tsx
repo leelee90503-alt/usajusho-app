@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { submitPurchaseRequest } from "./actions"
+import { trackGenerateLead } from "@/lib/gtag"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -21,6 +22,7 @@ export default function RequestForm() {
       if (result?.error) {
         setMessage(result.error)
       } else {
+        trackGenerateLead({ content_type: "purchase_agency_request" })
         setMessage(t("submitSuccess"))
         formRef.current?.reset()
       }

@@ -138,6 +138,37 @@
       "tagline": "USAJUSHO is a US-to-Japan package forwarding service.",
       "linksTitle": "Account",
       "copyright": "© 2026 USAJUSHO. All rights reserved."
+    },
+    "comparison": {
+      "title": "How USAJUSHO compares to DHL, UPS, and USPS",
+      "description": "Shipping each purchase directly through DHL, UPS, or USPS means paying international shipping on every order. USAJUSHO consolidates packages from multiple stores into one shipment to save on cost.",
+      "headerItem": "Item",
+      "headerUsajusho": "USAJUSHO",
+      "headerOthers": "Direct DHL / UPS / USPS",
+      "row1Label": "Shipping cost structure",
+      "row1Usajusho": "Consolidate multiple packages into a single international shipment",
+      "row1Others": "Separate international shipping cost for every store",
+      "row2Label": "Inspection",
+      "row2Usajusho": "100% of packages are photographed and checked before shipping",
+      "row2Others": "No inspection, so damage or mistakes can go unnoticed",
+      "row3Label": "Payment",
+      "row3Usajusho": "No US credit card needed — purchase agency service available",
+      "row3Others": "Often requires a US card or US billing address",
+      "row4Label": "Support language",
+      "row4Usajusho": "Support available in Japanese",
+      "row4Others": "Primarily English-language support",
+      "row5Label": "Getting started",
+      "row5Usajusho": "Free registration, charged only when you ship",
+      "row5Others": "May require a separate account or contract with each carrier",
+      "footnote": "DHL, UPS, and USPS are each excellent international carriers in their own right. USAJUSHO is built specifically for consolidating multiple purchases from US-only stores and delivering them to Japan."
+    },
+    "purchaseAgencyHighlight": {
+      "eyebrow": "No US card? No problem",
+      "title": "No US credit card? Our purchase agency handles it for you",
+      "description": "Even items from US-only stores, or stores that don't ship overseas, can be purchased on your behalf by USAJUSHO — then inspected and consolidated like any other package.",
+      "feeExampleLabel": "Example fee (for a $100 item)",
+      "feeExampleText": "A flat fee of {flatFee} plus {percent} of the item price ({percentFee}) comes to {feeTotal} total. Together with the item, that's {grandTotal} (shipping to Japan is billed separately).",
+      "ctaLabel": "Learn more about purchase agency"
     }
   },
   "login": {
@@ -191,7 +222,8 @@
     "login": "My Account",
     "signup": "Sign Up",
     "howItWorks": "How It Works",
-    "customs": "Customs Guide"
+    "customs": "Customs Guide",
+    "menuLabel": "Menu"
   },
   "packageList": {
     "empty": "No packages have arrived yet.",
@@ -716,7 +748,8 @@
   "footer": {
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
-    "copyright": "© 2026 USAJUSHO. All rights reserved."
+    "copyright": "© 2026 USAJUSHO. All rights reserved.",
+    "companyInfo": "Operated by Victoria Tech Innovation | 18533 S. Western Ave., Gardena, CA 90248, USA | Tel: 310.325.5000 | Email: info@usajusho.com"
   },
   "lineChat": {
     "label": "Chat on LINE",

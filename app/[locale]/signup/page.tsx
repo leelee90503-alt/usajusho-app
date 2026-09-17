@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { trackSignUp } from '@/lib/gtag'
 import { Loader2, MailCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -74,6 +75,7 @@ export default function SignupPage() {
       return
     }
 
+    trackSignUp()
     setSubmittedEmail(email)
     setLoading(false)
   }

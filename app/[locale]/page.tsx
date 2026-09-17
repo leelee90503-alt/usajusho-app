@@ -16,6 +16,8 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import type { ShippingRate } from "@/lib/pricing"
+import { getPurchaseAgencyPublicFeeSettings } from "@/lib/purchase-agency-settings"
+import { formatUSD } from "@/lib/format"
 
 const addonIcons: Record<string, LucideIcon> = {
   item1: Search,
@@ -52,6 +54,21 @@ export default async function Home() {
     .order("sort_order", { ascending: true })
 
   const shippingRates = (rates ?? []) as ShippingRate[]
+
+  const feeSettings = await getPurchaseAgencyPublicFeeSettings()
+  const exampleItemPrice = 100
+  const examplePercentFee = exampleItemPrice * feeSettings.feePercent
+  const exampleFlatFee = feeSettings.flatFeeCents / 100
+  const exampleFeeTotal = exampleFlatFee + examplePercentFee
+  const exampleGrandTotal = exampleItemPrice + exampleFeeTotal
+  const feeExampleValues = {
+    itemPrice: `$${formatUSD(exampleItemPrice)}`,
+    flatFee: `$${formatUSD(exampleFlatFee)}`,
+    percent: `${Math.round(feeSettings.feePercent * 100)}%`,
+    percentFee: `$${formatUSD(examplePercentFee)}`,
+    feeTotal: `$${formatUSD(exampleFeeTotal)}`,
+    grandTotal: `$${formatUSD(exampleGrandTotal)}`,
+  }
 
   return (
     <main className="flex flex-col">
@@ -112,6 +129,34 @@ export default async function Home() {
           <div>
             <p className="text-2xl font-bold text-primary">{t("trust.stat4Value")}</p>
             <p className="text-xs text-slate-500 mt-1">{t("trust.stat4Label")}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 3.5 Purchase agency highlight (no US card needed) */}
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <p className="text-[var(--usj-accent)] font-semibold text-sm mb-3 tracking-wide">
+              {t("purchaseAgencyHighlight.eyebrow")}
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
+              {t("purchaseAgencyHighlight.title")}
+            </h2>
+            <p className="text-slate-600 leading-relaxed mb-6">
+              {t("purchaseAgencyHighlight.description")}
+            </p>
+            <Button asChild size="lg">
+              <Link href="/purchase-agency">{t("purchaseAgencyHighlight.ctaLabel")}</Link>
+            </Button>
+          </div>
+          <div className="bg-surface border border-slate-200 rounded-lg p-6">
+            <p className="text-xs text-slate-400 tracking-wide mb-3">
+              {t("purchaseAgencyHighlight.feeExampleLabel")}
+            </p>
+            <p className="text-sm text-[var(--usj-text)] leading-relaxed">
+              {t("purchaseAgencyHighlight.feeExampleText", feeExampleValues)}
+            </p>
           </div>
         </div>
       </section>
@@ -249,6 +294,49 @@ export default async function Home() {
             })}
           </div>
           <p className="text-xs text-slate-500 mt-6">{t("addons.footnote")}</p>
+        </div>
+      </section>
+
+      {/* 8.5 Comparison with international couriers */}
+      <section className="bg-surface border-y border-slate-200">
+        <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+          <div className="max-w-2xl mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-3">
+              {t("comparison.title")}
+            </h2>
+            <p className="text-slate-600 leading-relaxed">{t("comparison.description")}</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="py-3 pr-4 text-left font-semibold text-slate-500">
+                    {t("comparison.headerItem")}
+                  </th>
+                  <th className="py-3 px-4 text-left font-semibold text-primary bg-primary/5 rounded-t-md">
+                    {t("comparison.headerUsajusho")}
+                  </th>
+                  <th className="py-3 pl-4 text-left font-semibold text-slate-500">
+                    {t("comparison.headerOthers")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {["row1", "row2", "row3", "row4", "row5"].map((key) => (
+                  <tr key={key} className="border-b border-slate-100 align-top">
+                    <td className="py-3 pr-4 font-medium text-[var(--usj-text)]">
+                      {t(`comparison.${key}Label`)}
+                    </td>
+                    <td className="py-3 px-4 bg-primary/5 text-[var(--usj-text)]">
+                      {t(`comparison.${key}Usajusho`)}
+                    </td>
+                    <td className="py-3 pl-4 text-slate-500">{t(`comparison.${key}Others`)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-slate-500 mt-6">{t("comparison.footnote")}</p>
         </div>
       </section>
 

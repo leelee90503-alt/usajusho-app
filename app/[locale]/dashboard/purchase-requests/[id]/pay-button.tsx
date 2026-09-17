@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { payPurchaseRequestWithCard } from "../actions"
 import SquareCardPayment from "@/components/square-card-payment"
 import type { BillingContact } from "@/lib/square"
+import { trackPurchase } from "@/lib/gtag"
 
 export default function PayButton({
   requestId,
@@ -38,7 +39,10 @@ export default function PayButton({
       submittingLabel={t("cardPaySubmitting")}
       genericErrorLabel={t("cardPayError")}
       successLabel={t("cardPaySuccess")}
-      onSuccess={() => router.refresh()}
+      onSuccess={() => {
+        trackPurchase({ transactionId: requestId, value: Number(amount), transactionType: "purchase_agency" })
+        router.refresh()
+      }}
     />
   )
 }

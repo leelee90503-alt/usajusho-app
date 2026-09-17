@@ -9,6 +9,7 @@ import { Package as PackageIcon } from "lucide-react"
 import { formatUSD } from "@/lib/format"
 import SquareCardPayment from "@/components/square-card-payment"
 import { buildBillingContact } from "@/lib/square"
+import { trackPurchase } from "@/lib/gtag"
 import OrderStepper from "./order-stepper"
 import { computeShippingSteps, computePurchaseSteps } from "./order-progress"
 
@@ -216,7 +217,10 @@ export default function PackageList({
                         submittingLabel={t("cardPaySubmitting")}
                         genericErrorLabel={t("cardPayError")}
                         successLabel={t("cardPaySuccess")}
-                        onSuccess={() => router.refresh()}
+                        onSuccess={() => {
+                          trackPurchase({ transactionId: pkg.id, value: Number(pkg.quote_amount), transactionType: "shipment" })
+                          router.refresh()
+                        }}
                       />
                     </div>
                   )}

@@ -9,6 +9,7 @@ import { routing } from "@/i18n/routing";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import LineFloatingButton from "@/components/line-floating-button";
+import GoogleAnalytics from "@/components/google-analytics";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -110,6 +111,7 @@ export default async function RootLayout({
           <div className="flex-1 flex flex-col">{children}</div>
           <Footer />
           <LineFloatingButton />
+          <GoogleAnalytics />
         </NextIntlClientProvider>
       </body>
     </html>
