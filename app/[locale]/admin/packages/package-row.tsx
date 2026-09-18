@@ -54,6 +54,7 @@ function formatJapanAddress(profile: PackageWithProfile["profiles"]) {
 type LinkedDeclaration = {
   order_amount: number | null
   origin_tracking_number: string | null
+  receipt_url: string | null
 }
 
 type PackageInvoice = {
@@ -337,7 +338,7 @@ export default function PackageRow({
                 ))}
               </div>
             )}
-            {declaration && (declaration.order_amount != null || declaration.origin_tracking_number) && (
+              {declaration && (declaration.order_amount != null || declaration.origin_tracking_number || declaration.receipt_url) && (
               <div className="mt-2 rounded-md bg-slate-50 px-2 py-1.5 text-xs text-muted-foreground">
                 <p className="font-semibold text-slate-700">{t("linkedDeclarationHeading")}</p>
                 {declaration.order_amount != null && (
@@ -348,6 +349,16 @@ export default function PackageRow({
                     <span>{tAdmin("originTracking")}: {declaration.origin_tracking_number}</span>
                     <CarrierTrackLink trackingNumber={declaration.origin_tracking_number} />
                   </p>
+                {declaration.receipt_url && (
+                  <a
+                    href={declaration.receipt_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 inline-block text-xs text-primary underline"
+                  >
+                    {tAdmin("viewReceipt")}
+                  </a>
+                )}
                 )}
               </div>
             )}
