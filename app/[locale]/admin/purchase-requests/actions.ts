@@ -118,6 +118,13 @@ export async function markPurchasing(requestId: string) {
 export async function markPurchasedAndLinkPackage(
   requestId: string,
   itemName: string,
+  // Carrier tracking number for the shipment now on its way from the
+  // merchant to our US warehouse (e.g. UPS/USPS/FedEx number the admin
+  // gets at checkout) -- set on the new packages row so it's visible
+  // before the box physically arrives and moves through the normal
+  // Missing Packages weigh-in flow. Optional: admins may not always have
+  // it yet and can fill it in later directly on /admin/packages.
+  trackingNumber?: string | null,
   // Consolidation (합송배송/묶음배송): when set, this request's item joins
   // an existing not-yet-weighed, shipping-prepaid package for the same
   // customer (created by an earlier purchase request) instead of creating
@@ -157,7 +164,7 @@ export async function markPurchasedAndLinkPackage(
   if (existingPackageId) {
     const { data: existingPackage, error: existingPackageError } = await supabase
       .from("packages")
-      .select("id, user_id, status, shipping_prepaid, quote_amount")
+      .select("id, user_id, status, shipping_prepaid, quote_amount, tracking_number")
       .eq("id", existingPackageId)
       .single()
 
@@ -181,6 +188,12 @@ export async function markPurchasedAndLinkPackage(
       .from("packages")
       .update({
         quote_amount: Number(existingPackage.quote_amount ?? 0) + shippingCents / 100,
+        // Only fill in tracking_number if the consolidated box doesn't
+        // already have one -- never overwrite a tracking number that was
+        // already recorded for the box.
+        ...(trackingNumber && !existingPackage.tracking_number
+          ? { tracking_number: trackingNumber }
+          : {}),
         updated_at: new Date().toISOString(),
       })
       .eq("id", packageId)
@@ -194,6 +207,7 @@ export async function markPurchasedAndLinkPackage(
       .insert({
         user_id: request.user_id,
         item_name: itemName,
+        tracking_number: trackingNumber || null,
         status: "missing",
         admin_note: `購入代行リクエスト ${request.id} 経由で作成`,
         shipping_prepaid: true,
