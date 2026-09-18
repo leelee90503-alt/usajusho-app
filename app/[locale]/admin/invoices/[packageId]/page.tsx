@@ -70,6 +70,8 @@ export default async function AdminInvoiceDetailPage({
     shipperAddress: ft("shipperAddress"),
     consigneeName: ft("consigneeName"),
     consigneeAddress: ft("consigneeAddress"),
+    consigneePhone: ft("consigneePhone"),
+    importFromProfileButton: ft("importFromProfileButton"),
     reasonForExport: ft("reasonForExport"),
     shippingTerms: ft("shippingTerms"),
     lineItemsTitle: ft("lineItemsTitle"),
