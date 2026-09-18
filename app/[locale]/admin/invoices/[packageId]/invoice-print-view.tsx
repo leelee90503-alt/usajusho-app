@@ -18,6 +18,7 @@ type Invoice = {
   shipper_address: string | null
   consignee_name: string | null
   consignee_address: string | null
+  consignee_phone: string | null
   reason_for_export: string | null
   shipping_terms: string | null
   total_declared_value: number
@@ -64,6 +65,11 @@ export default function InvoicePrintView({
           <p className="text-[9px] font-semibold uppercase tracking-wide">{labels.consigneeName}</p>
           <p className="mt-1 whitespace-pre-line text-[10px]">{invoice.consignee_name}</p>
           <p className="mt-1 whitespace-pre-line text-[10px]">{invoice.consignee_address}</p>
+          {invoice.consignee_phone && (
+            <p className="mt-1 text-[10px]">
+              {labels.consigneePhone}: {invoice.consignee_phone}
+            </p>
+          )}
         </div>
       </div>
 
