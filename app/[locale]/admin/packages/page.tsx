@@ -69,10 +69,6 @@ export default async function AdminPackagesPage({
   const matchedDeclarations = declarations.filter(
     (d) => d.status === "matched" && d.matched_package_id
   )
-  const declarationByPackageId = new Map(
-    matchedDeclarations.map((d) => [d.matched_package_id as string, d])
-  )
-
   const missingPackages = packages.filter((p) => p.status === "missing")
 
   // Consolidation (합송배송/묶음배송): a pending declaration can be matched
@@ -108,6 +104,27 @@ export default async function AdminPackagesPage({
         candidatePackages: attachableCandidatesByUserId.get(d.user_id) ?? [],
       }
     })
+  )
+
+  // Once a declaration is matched to a package it drops out of the pending
+  // list above (and its receipt_url with it) -- but the uploaded receipt is
+  // still sitting in the package-receipts bucket and admins still need to
+  // check it when quoting/invoicing. Sign a URL for matched declarations too
+  // so PackageRow can show a "View Receipt" link on the package itself.
+  const matchedDeclarationsWithUrls = await Promise.all(
+    matchedDeclarations.map(async (d) => {
+      let receipt_url: string | null = null
+      if (d.receipt_path) {
+        const { data: signed } = await supabase.storage
+          .from("package-receipts")
+          .createSignedUrl(d.receipt_path, 60 * 60)
+        receipt_url = signed?.signedUrl ?? null
+      }
+      return { ...d, receipt_url }
+    })
+  )
+  const declarationByPackageId = new Map(
+    matchedDeclarationsWithUrls.map((d) => [d.matched_package_id as string, d])
   )
 
   const { data: activeRates } = await supabase
