@@ -720,6 +720,8 @@
     "refundConfirm": "Are you sure you want to refund this request via Square?",
     "refundSuccess": "Refund processed.",
     "packageItemNameLabel": "Package Item Name",
+        "trackingNumberLabel": "Incoming Tracking Number",
+        "trackingNumberPlaceholder": "e.g. 1Z999AA10123456784",
     "markPurchasedButton": "Mark Purchased & Create Package",
     "purchasedSuccess": "Marked as purchased and linked to a new package.",
     "linkedPackageLabel": "Linked Package",
