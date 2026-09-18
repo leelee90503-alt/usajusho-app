@@ -349,6 +349,7 @@ export default function PackageRow({
                     <span>{tAdmin("originTracking")}: {declaration.origin_tracking_number}</span>
                     <CarrierTrackLink trackingNumber={declaration.origin_tracking_number} />
                   </p>
+                )}
                 {declaration.receipt_url && (
                   <a
                     href={declaration.receipt_url}
@@ -358,7 +359,6 @@ export default function PackageRow({
                   >
                     {tAdmin("viewReceipt")}
                   </a>
-                )}
                 )}
               </div>
             )}
