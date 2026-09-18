@@ -510,6 +510,7 @@
     "shipperAddress": "発送人住所",
     "consigneeName": "受取人・輸入者",
     "consigneeAddress": "受取人住所",
+    "consigneePhone": "受取人電話番号",
     "reasonForExport": "輸出理由",
     "shippingTerms": "配送条件（インコタームズ）",
     "lineItemsTitle": "品目明細",
@@ -534,7 +535,8 @@
     "confirmSubmit": "確認して提出",
     "printButton": "印刷",
     "invoiceDateLabel": "発行日",
-    "importFromPackageButton": "パッケージから取り込み"
+    "importFromPackageButton": "パッケージから取り込み",
+    "importFromProfileButton": "プロフィールから取り込み"
   },
   "adminInvoices": {
     "title": "商業インボイス",
