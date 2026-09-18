@@ -65,6 +65,7 @@ type AdminHeaderInput = Partial<{
   shipper_address: string
   consignee_name: string
   consignee_address: string
+  consignee_phone: string
   reason_for_export: string
   currency: string
   shipping_terms: string
@@ -92,6 +93,7 @@ const ADMIN_HEADER_ALLOWED_KEYS = [
   "shipper_address",
   "consignee_name",
   "consignee_address",
+  "consignee_phone",
   "reason_for_export",
   "currency",
   "shipping_terms",
@@ -161,7 +163,7 @@ export async function adminCreateOrGetInvoice(packageId: string) {
 
   const { data: pkg, error: pkgError } = await supabase
     .from("packages")
-    .select("id, user_id, tracking_number, profiles(full_name, japan_postal_code, japan_prefecture, japan_city, japan_address_line1, japan_address_line2)")
+    .select("id, user_id, tracking_number, profiles(full_name, phone_number, japan_postal_code, japan_prefecture, japan_city, japan_address_line1, japan_address_line2)")
     .eq("id", packageId)
     .single()
 
@@ -199,6 +201,7 @@ export async function adminCreateOrGetInvoice(packageId: string) {
       shipper_address: COMPANY_SHIPPER_ADDRESS,
       consignee_name: profile?.full_name ?? null,
       consignee_address: formatJapanAddress(profile),
+      consignee_phone: profile?.phone_number ?? null,
     })
     .select("*, invoice_items(*)")
     .single()
@@ -214,6 +217,59 @@ export async function adminCreateOrGetInvoice(packageId: string) {
   // click (not render) can revalidate themselves afterward if needed.
 
   return { success: true, invoice: created }
+}
+
+// Re-pulls the customer's name/address/phone from their profile and
+// overwrites the invoice's consignee_* fields with the current values.
+// adminCreateOrGetInvoice only fills these in once, at creation time -- if
+// the customer's profile was incomplete then (or was edited afterward),
+// the invoice is left showing stale or blank consignee info that never
+// updates on its own. This lets an admin refresh it on demand instead of
+// re-typing everything by hand into the header fields below.
+export async function adminImportConsigneeFromProfile(invoiceId: string, packageId: string) {
+  const supabase = await requireAdmin()
+
+  const { data: invoice, error: fetchError } = await supabase
+    .from("invoices")
+    .select("id")
+    .eq("id", invoiceId)
+    .single()
+
+  if (fetchError || !invoice) {
+    return { error: "Invoice not found." }
+  }
+
+  const { data: pkg, error: pkgError } = await supabase
+    .from("packages")
+    .select("profiles(full_name, phone_number, japan_postal_code, japan_prefecture, japan_city, japan_address_line1, japan_address_line2)")
+    .eq("id", packageId)
+    .single()
+
+  if (pkgError || !pkg) {
+    return { error: "Package not found." }
+  }
+
+  const profile = Array.isArray(pkg.profiles) ? pkg.profiles[0] : pkg.profiles
+
+  const consignee_name = profile?.full_name ?? null
+  const consignee_address = formatJapanAddress(profile)
+  const consignee_phone = profile?.phone_number ?? null
+
+  const { error: updateError } = await supabase
+    .from("invoices")
+    .update({
+      consignee_name,
+      consignee_address,
+      consignee_phone,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", invoiceId)
+
+  if (updateError) {
+    return { error: updateError.message }
+  }
+
+  return { success: true, consignee_name, consignee_address, consignee_phone }
 }
 
 export async function adminUpdateInvoiceHeader(
