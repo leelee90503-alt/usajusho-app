@@ -8,6 +8,7 @@ import {
   adminDeleteInvoiceItem,
   adminDuplicateInvoiceItem,
   adminImportItemsFromPackage,
+  adminImportConsigneeFromProfile,
   adminSubmitOnBehalf,
   adminRequestCorrection,
   adminApproveAndComplete,
@@ -60,6 +61,7 @@ type Invoice = {
   shipper_address: string | null
   consignee_name: string | null
   consignee_address: string | null
+  consignee_phone: string | null
   reason_for_export: string | null
   currency: string
   shipping_terms: string | null
@@ -200,6 +202,30 @@ export default function AdminInvoiceForm({
     })
   }
 
+  function handleImportConsignee() {
+    if (!guardEditWhenComplete()) return
+    setError(null)
+    startTransition(async () => {
+      const res = await adminImportConsigneeFromProfile(invoice.id, invoice.package_id)
+      if (res?.error) {
+        setError(res.error)
+        return
+      }
+      setInvoice((prev) => ({
+        ...prev,
+        consignee_name: res.consignee_name ?? prev.consignee_name,
+        consignee_address: res.consignee_address ?? prev.consignee_address,
+        consignee_phone: res.consignee_phone ?? prev.consignee_phone,
+      }))
+      savedInvoiceRef.current = {
+        ...savedInvoiceRef.current,
+        consignee_name: res.consignee_name ?? savedInvoiceRef.current.consignee_name,
+        consignee_address: res.consignee_address ?? savedInvoiceRef.current.consignee_address,
+        consignee_phone: res.consignee_phone ?? savedInvoiceRef.current.consignee_phone,
+      }
+    })
+  }
+
   function handleItemFieldChange(itemId: string, field: string, value: string) {
     setInvoice((prev) => ({
       ...prev,
@@ -337,7 +363,18 @@ export default function AdminInvoiceForm({
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="flex items-center justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isPending}
+            onClick={handleImportConsignee}
+          >
+            {labels.importFromProfileButton}
+          </Button>
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <HeaderField
             label={labels.shipperName}
             value={invoice.shipper_name || ""}
@@ -361,6 +398,12 @@ export default function AdminInvoiceForm({
             value={invoice.consignee_address || ""}
             onChange={(v) => refreshField("consignee_address", v)}
             onBlur={(v) => handleHeaderBlur("consignee_address", v)}
+          />
+          <HeaderField
+            label={labels.consigneePhone}
+            value={invoice.consignee_phone || ""}
+            onChange={(v) => refreshField("consignee_phone", v)}
+            onBlur={(v) => handleHeaderBlur("consignee_phone", v)}
           />
           <HeaderField
             label={labels.reasonForExport}
