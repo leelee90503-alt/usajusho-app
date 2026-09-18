@@ -720,6 +720,8 @@
     "refundConfirm": "このリクエストをSquare経由で返金してもよろしいですか？",
     "refundSuccess": "返金処理が完了しました。",
     "packageItemNameLabel": "パッケージの品名",
+        "trackingNumberLabel": "倉庫到着時の追跡番号",
+        "trackingNumberPlaceholder": "例: 1Z999AA10123456784",
     "markPurchasedButton": "購入完了にしてパッケージを作成",
     "purchasedSuccess": "購入完了にし、新しいパッケージにリンクしました。",
     "linkedPackageLabel": "リンク済みパッケージ",
