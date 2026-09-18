@@ -85,6 +85,7 @@ export default function RequestRow({
   const [itemName, setItemName] = useState(
     request.product_description.slice(0, 80),
   )
+    const [trackingNumber, setTrackingNumber] = useState("")
   const [existingPackageId, setExistingPackageId] = useState("")
   const candidatePackages = request.candidatePackages ?? []
 
@@ -131,6 +132,7 @@ export default function RequestRow({
       const result = await markPurchasedAndLinkPackage(
         request.id,
         itemName,
+                trackingNumber.trim() || undefined,
         existingPackageId || undefined,
       )
       setMessage(result?.error ?? t("purchasedSuccess"))
@@ -307,6 +309,19 @@ export default function RequestRow({
                 value={itemName}
                 onChange={(e) => setItemName(e.target.value)}
                 className="w-64"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor={`tracking-number-${request.id}`} className="text-xs font-normal text-muted-foreground">
+                {t("trackingNumberLabel")}
+              </Label>
+              <Input
+                id={`tracking-number-${request.id}`}
+                type="text"
+                value={trackingNumber}
+                onChange={(e) => setTrackingNumber(e.target.value)}
+                placeholder={t("trackingNumberPlaceholder")}
+                className="w-56"
               />
             </div>
             {candidatePackages.length > 0 && (
