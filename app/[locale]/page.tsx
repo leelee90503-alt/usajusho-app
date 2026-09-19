@@ -28,6 +28,24 @@ const addonIcons: Record<string, LucideIcon> = {
   item6: Settings2,
 }
 
+// Representative US shopping sites shown in the homepage hero's "supported
+// shops" ticker. This is an example list, not an allowlist -- any US site
+// with an address can generally be forwarded, which is why the ticker ends
+// on shopBand.moreLabel ("and many more") rather than implying these are
+// the only sites we support.
+const SUPPORTED_SHOPS = [
+  "amazon.com",
+  "iherb.com",
+  "ebay.com",
+  "ralphlauren.com",
+  "gap.com",
+  "oldnavy.gap.com",
+  "jomashop.com",
+  "shopbop.com",
+  "macys.com",
+  "6pm.com",
+]
+
 
 export async function generateMetadata({
   params,
@@ -76,37 +94,80 @@ export default async function Home() {
       <section className="relative isolate overflow-hidden border-b border-slate-200">
         <div className="absolute inset-0 -z-10">
           <img
-            src="/images/hero-bg.webp"
+            src="/images/hero-bg-v2.webp"
             alt=""
             className="h-full w-full object-cover object-right-top"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[var(--usj-primary)] via-[var(--usj-primary)]/85 to-[var(--usj-primary)]/20" />
+          {/* Bright wash (left -> right) so the photo's warm, natural light
+              reads through instead of being covered by the brand navy. */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white from-0% via-white/75 via-50% to-white/5 to-100%" />
         </div>
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-28">
           <div className="max-w-xl">
-            <p className="text-emerald-300 font-semibold text-sm mb-3 tracking-wide">
+            <p className="text-[var(--usj-accent)] font-semibold text-sm mb-3 tracking-wide">
               {t("hero.eyebrow")}
             </p>
-            <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-5">
+            <h1 className="text-3xl md:text-5xl font-bold text-[var(--usj-text)] leading-tight mb-5">
               {t("hero.headline")}
             </h1>
-            <p className="text-slate-200 text-base md:text-lg mb-8 max-w-md leading-relaxed">
+            <p className="text-slate-600 text-base md:text-lg mb-8 max-w-md leading-relaxed">
               {t("hero.description")}
             </p>
             <div className="flex flex-wrap gap-3 mb-8">
-              <Button asChild size="lg" className="h-auto px-6 py-3 text-sm font-semibold bg-white text-primary hover:bg-slate-100">
+              <Button asChild size="lg" className="h-auto px-6 py-3 text-sm font-semibold bg-[var(--usj-accent)] text-white hover:bg-[var(--usj-accent)]/90">
                 <Link href="/signup">{t("hero.ctaPrimary")}</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 size="lg"
-                className="h-auto px-6 py-3 text-sm font-semibold bg-transparent border-white/40 text-white hover:bg-white/10"
+                className="h-auto px-6 py-3 text-sm font-semibold bg-transparent border-[var(--usj-text)]/30 text-[var(--usj-text)] hover:bg-black/5"
               >
                 <a href="#calculator">{t("hero.ctaSecondary")}</a>
               </Button>
             </div>
-            <p className="text-xs text-slate-300">{t("hero.trustNote")}</p>
+            <p className="text-xs text-slate-500">{t("hero.trustNote")}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 2b. Supported shops ticker */}
+      <section className="bg-[var(--usj-surface)] border-b border-slate-200 py-7 md:py-8">
+        <div className="mx-auto max-w-6xl px-4 text-center mb-4">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            {t("shopBand.eyebrow")}
+          </p>
+          <p className="text-base md:text-lg font-bold text-[var(--usj-text)] mt-1">
+            {t("shopBand.title")}
+          </p>
+          <p className="text-xs text-slate-500 mt-1">{t("shopBand.note")}</p>
+        </div>
+        <div
+          className="shop-ticker-mask overflow-hidden"
+          style={{
+            maskImage:
+              "linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%)",
+          }}
+        >
+          <div className="shop-ticker-track flex w-max gap-3">
+            {[0, 1].map((dup) => (
+              <div key={dup} className="flex gap-3 pr-3">
+                {SUPPORTED_SHOPS.map((shop) => (
+                  <span
+                    key={`${dup}-${shop}`}
+                    className="inline-flex flex-none items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-[var(--usj-text)] whitespace-nowrap"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--usj-accent)]" />
+                    {shop}
+                  </span>
+                ))}
+                <span className="inline-flex flex-none items-center rounded-full border border-dashed border-slate-300 px-4 py-2 text-sm italic text-slate-500 whitespace-nowrap">
+                  {t("shopBand.moreLabel")}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
