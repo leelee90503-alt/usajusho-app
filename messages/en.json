@@ -169,6 +169,12 @@
       "feeExampleLabel": "Example fee (for a $100 item)",
       "feeExampleText": "A flat fee of {flatFee} plus {percent} of the item price ({percentFee}) comes to {feeTotal} total. Together with the item, that's {grandTotal} (shipping to Japan is billed separately).",
       "ctaLabel": "Learn more about purchase agency"
+    },
+    "shopBand": {
+      "eyebrow": "Supported Shops",
+      "title": "Works with almost any US online store",
+      "note": "A few examples below -- if a site ships within the US, we can generally receive and forward it for you.",
+      "moreLabel": "and many more..."
     }
   },
   "login": {
