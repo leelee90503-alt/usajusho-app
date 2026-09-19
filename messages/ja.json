@@ -169,6 +169,12 @@
       "feeExampleLabel": "手数料の例（商品代金 $100 の場合）",
       "feeExampleText": "定額手数料{flatFee}に商品代金の{percent}（{percentFee}）を加えた手数料は合計{feeTotal}。商品代金と合わせて{grandTotal}です（米国→日本の送料は別途）。",
       "ctaLabel": "購入代行について詳しく見る"
+    },
+    "shopBand": {
+      "eyebrow": "対応ショップ例",
+      "title": "米国のほぼすべてのオンラインショップに対応",
+      "note": "下記は代表例です。米国内発送のサイトであれば、基本的に受け取り・転送が可能です。",
+      "moreLabel": "その他多数…"
     }
   },
   "login": {
