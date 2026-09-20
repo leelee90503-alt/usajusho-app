@@ -103,7 +103,7 @@ export default async function Home() {
           line up with the rest of the page instead of running edge to
           edge on wide screens. */}
       <section className="border-b border-slate-200">
-        <div className="relative isolate overflow-hidden rounded-2xl mx-auto max-w-6xl px-4 py-8 md:py-14 my-4 md:my-6">
+        <div className="relative isolate overflow-hidden rounded-2xl mx-auto max-w-6xl px-4 py-8 md:py-14 mt-4 md:mt-6">
           <div className="absolute inset-0 -z-10 bg-white">
             <img
               src="/images/hero-bg-v2.webp"
@@ -142,43 +142,47 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 2b. Supported shops ticker */}
-      <section className="bg-[var(--usj-surface)] border-b border-slate-200 py-7 md:py-8">
-        <div className="mx-auto max-w-6xl px-4 text-center mb-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            {t("shopBand.eyebrow")}
-          </p>
-          <p className="text-base md:text-lg font-bold text-[var(--usj-text)] mt-1">
-            {t("shopBand.title")}
-          </p>
-          <p className="text-xs text-slate-500 mt-1">{t("shopBand.note")}</p>
-        </div>
-        <div
-          className="shop-ticker-mask overflow-hidden"
-          style={{
-            maskImage:
-              "linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%)",
-            WebkitMaskImage:
-              "linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%)",
-          }}
-        >
-          <div className="shop-ticker-track flex w-max gap-3">
-            {[0, 1].map((dup) => (
-              <div key={dup} className="flex gap-3 pr-3">
-                {SUPPORTED_SHOPS.map((shop) => (
-                  <span
-                    key={`${dup}-${shop}`}
-                    className="inline-flex flex-none items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-[var(--usj-text)] whitespace-nowrap"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--usj-accent)]" />
-                    {shop}
+      {/* 2b. Supported shops ticker -- boxed to the same max-w-6xl column
+          as the hero above it, with zero margin between them so the two
+          cards sit flush against each other. */}
+      <section className="border-b border-slate-200">
+        <div className="rounded-2xl bg-[var(--usj-surface)] mx-auto max-w-6xl px-0 py-7 md:py-8 overflow-hidden">
+          <div className="px-4 text-center mb-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+              {t("shopBand.eyebrow")}
+            </p>
+            <p className="text-base md:text-lg font-bold text-[var(--usj-text)] mt-1">
+              {t("shopBand.title")}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">{t("shopBand.note")}</p>
+          </div>
+          <div
+            className="shop-ticker-mask overflow-hidden"
+            style={{
+              maskImage:
+                "linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%)",
+            }}
+          >
+            <div className="shop-ticker-track flex w-max gap-3">
+              {[0, 1].map((dup) => (
+                <div key={dup} className="flex gap-3 pr-3">
+                  {SUPPORTED_SHOPS.map((shop) => (
+                    <span
+                      key={`${dup}-${shop}`}
+                      className="inline-flex flex-none items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-[var(--usj-text)] whitespace-nowrap"
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-[var(--usj-accent)]" />
+                      {shop}
+                    </span>
+                  ))}
+                  <span className="inline-flex flex-none items-center rounded-full border border-dashed border-slate-300 px-4 py-2 text-sm italic text-slate-500 whitespace-nowrap">
+                    {t("shopBand.moreLabel")}
                   </span>
-                ))}
-                <span className="inline-flex flex-none items-center rounded-full border border-dashed border-slate-300 px-4 py-2 text-sm italic text-slate-500 whitespace-nowrap">
-                  {t("shopBand.moreLabel")}
-                </span>
-              </div>
-            ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
