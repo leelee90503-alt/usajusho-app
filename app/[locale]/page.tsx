@@ -456,7 +456,7 @@ export default async function Home() {
               </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/comparison-usps-box.webp"
+                src="/images/usps-priority-mail-box.webp"
                 alt="USPS Priority Mail box"
                 className="w-full justify-self-end self-end object-contain"
               />
