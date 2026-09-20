@@ -692,7 +692,22 @@
     "benefit4Title": "One simple, transparent fee",
     "benefit4Description": "A flat fee plus a small percentage of the item price - clearly shown in your quote before you pay, no hidden costs.",
     "finalCtaTitle": "Ready to get something we can't buy in Japan?",
-    "finalCtaDescription": "Sign up for a free USAJUSHO account and submit your first purchase request in minutes."
+    "finalCtaDescription": "Sign up for a free USAJUSHO account and submit your first purchase request in minutes.",
+    "heroImageAlt": "A USAJUSHO staff member handling a purchase request from Amazon, eBay, and Zara",
+    "calculatorEyebrow": "Check shipping too",
+    "calculatorTitle": "Estimate the US-to-Japan shipping cost too",
+    "calculatorDescription": "Items we buy on your behalf ship to Japan using the same rates as any other package. Enter an approximate weight to see the estimated cost.",
+    "faqEyebrow": "FAQ",
+    "faqTitle": "Purchase Proxy FAQ",
+    "faqQ1Question": "Can I request multiple items at once?",
+    "faqQ1Answer": "Yes -- submitting a separate request per item makes quoting faster. Multiple purchased items can be consolidated into one shipment once they arrive at our warehouse.",
+    "faqQ2Question": "What if the price changes after you send the quote?",
+    "faqQ2Answer": "If a sale ends or stock changes before we purchase, we'll reach out with the new price and any difference before buying anything.",
+    "faqQ3Question": "How long does a quote take?",
+    "faqQ3Answer": "Usually within one business day. If it will take longer due to demand, we'll let you know.",
+    "faqQ4Question": "Do the same customs and prohibited-item rules apply to purchase proxy orders?",
+    "faqQ4Answer": "Yes -- the same rules as our regular forwarding service apply. See the forwarding guide and customs guide for duty estimates and items that can't ship.",
+    "faqQ4Link": "See the forwarding guide"
   },
   "purchaseRequests": {
     "title": "Purchase Requests",

@@ -12,6 +12,9 @@ import {
   Languages,
   Star,
   Receipt,
+  MessageCircle,
+  Phone,
+  Mail,
   type LucideIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -22,8 +25,11 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/ui/card"
+import { createClient } from "@/lib/supabase/server"
+import FeeCalculator from "@/components/home/fee-calculator"
 import { getPurchaseAgencyPublicFeeSettings } from "@/lib/purchase-agency-settings"
 import { formatUSD } from "@/lib/format"
+import type { ShippingRate } from "@/lib/pricing"
 
 
 export async function generateMetadata({
@@ -41,9 +47,26 @@ export async function generateMetadata({
 
 export default async function PurchaseAgencyPage() {
   const t = await getTranslations("purchaseAgency")
+  const th = await getTranslations("home")
   const feeSettings = await getPurchaseAgencyPublicFeeSettings()
   const feePercentDisplay = `${Math.round(feeSettings.feePercent * 100)}%`
   const flatFeeDisplay = `$${formatUSD(feeSettings.flatFeeCents / 100)}`
+
+  const supabase = await createClient()
+  const { data: rates } = await supabase
+    .from("shipping_rates")
+    .select("id, label, min_weight_kg, max_weight_kg, price_per_kg, min_charge, is_active, sort_order")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+
+  const shippingRates = (rates ?? []) as ShippingRate[]
+
+  const faqItems = [
+    { question: t("faqQ1Question"), answer: t("faqQ1Answer") },
+    { question: t("faqQ2Question"), answer: t("faqQ2Answer") },
+    { question: t("faqQ3Question"), answer: t("faqQ3Answer") },
+    { question: t("faqQ4Question"), answer: t("faqQ4Answer") },
+  ]
 
   const steps: { title: string; description: string; icon: LucideIcon }[] = [
     { title: t("step1Title"), description: t("step1Description"), icon: FileText },
@@ -65,24 +88,32 @@ export default async function PurchaseAgencyPage() {
     <main className="flex flex-col">
       {/* Hero */}
       <section className="bg-[var(--usj-surface)] border-b border-slate-200">
-        <div className="mx-auto max-w-4xl px-4 py-16 md:py-24 text-center">
-          <p className="text-[var(--usj-accent)] font-semibold text-sm mb-3 tracking-wide">
-            {t("eyebrow")}
-          </p>
-          <h1 className="text-3xl md:text-5xl font-bold text-primary leading-tight mb-5">
-            {t("headline")}
-          </h1>
-          <p className="text-slate-600 text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
-            {t("description")}
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg">
-              <Link href="/dashboard/purchase-requests">{t("ctaPrimary")}</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="text-primary">
-              <Link href="/signup">{t("ctaSecondary")}</Link>
-            </Button>
+        <div className="mx-auto max-w-6xl px-4 py-16 md:py-24 grid md:grid-cols-2 gap-10 md:gap-12 items-center">
+          <div className="text-center md:text-left">
+            <p className="text-[var(--usj-accent)] font-semibold text-sm mb-3 tracking-wide">
+              {t("eyebrow")}
+            </p>
+            <h1 className="text-3xl md:text-5xl font-bold text-primary leading-tight mb-5">
+              {t("headline")}
+            </h1>
+            <p className="text-slate-600 text-base md:text-lg mb-8 max-w-2xl mx-auto md:mx-0 leading-relaxed">
+              {t("description")}
+            </p>
+            <div className="flex flex-wrap justify-center md:justify-start gap-3">
+              <Button asChild size="lg">
+                <Link href="/dashboard/purchase-requests">{t("ctaPrimary")}</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="text-primary">
+                <Link href="/signup">{t("ctaSecondary")}</Link>
+              </Button>
+            </div>
           </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/forwarding/checklist-purchase-agency.webp"
+            alt={t("heroImageAlt")}
+            className="w-full h-auto rounded-lg border border-slate-200"
+          />
         </div>
       </section>
 
@@ -176,15 +207,153 @@ export default async function PurchaseAgencyPage() {
         </div>
       </section>
 
+      {/* Shipping fee calculator */}
+      <section id="calculator" className="bg-white scroll-mt-16">
+        <div className="mx-auto max-w-6xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-start">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-accent mb-2">
+              {t("calculatorEyebrow")}
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
+              {t("calculatorTitle")}
+            </h2>
+            <p className="text-slate-600 leading-relaxed">{t("calculatorDescription")}</p>
+          </div>
+          <FeeCalculator
+            rates={shippingRates}
+            labels={{
+              weightLabel: th("calculator.weightLabel"),
+              weightPlaceholder: th("calculator.weightPlaceholder"),
+              dimensionsLabel: th("calculator.dimensionsLabel"),
+              lengthPlaceholder: th("calculator.lengthPlaceholder"),
+              widthPlaceholder: th("calculator.widthPlaceholder"),
+              heightPlaceholder: th("calculator.heightPlaceholder"),
+              dimensionsHint: th("calculator.dimensionsHint"),
+              resultLabel: th("calculator.resultLabel"),
+              unavailable: th("calculator.unavailable"),
+              disclaimer: th("calculator.disclaimer"),
+              currency: th("calculator.currency"),
+              overweightContact: th("calculator.overweightContact"),
+              jpyApprox: th("calculator.jpyApprox"),
+              customsTitle: th("calculator.customsTitle"),
+              customsItemPriceLabel: th("calculator.customsItemPriceLabel"),
+              customsItemPricePlaceholder: th("calculator.customsItemPricePlaceholder"),
+              customsCategoryLabel: th("calculator.customsCategoryLabel"),
+              customsCategoryOther: th("calculator.customsCategoryOther"),
+              customsCategoryApparel: th("calculator.customsCategoryApparel"),
+              customsCategoryFurniture: th("calculator.customsCategoryFurniture"),
+              customsCategoryCoffeeTea: th("calculator.customsCategoryCoffeeTea"),
+              customsDutyFreeResult: th("calculator.customsDutyFreeResult"),
+              customsDutyLabel: th("calculator.customsDutyLabel"),
+              customsTaxLabel: th("calculator.customsTaxLabel"),
+              customsTotalLabel: th("calculator.customsTotalLabel"),
+              customsUnavailable: th("calculator.customsUnavailable"),
+              customsDisclaimer: th("calculator.customsDisclaimer"),
+              customsLinkLabel: th("calculator.customsLinkLabel"),
+            }}
+          />
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="bg-[var(--usj-surface)] border-y border-slate-200">
+        <div className="mx-auto max-w-3xl px-4 py-16 md:py-20">
+          <p className="text-xs font-semibold uppercase tracking-wide text-accent mb-2 text-center">
+            {t("faqEyebrow")}
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold text-primary mb-10 text-center">
+            {t("faqTitle")}
+          </h2>
+          <div className="space-y-4">
+            {faqItems.map((item, i) => (
+              <details key={item.question} className="bg-white border border-slate-200 rounded-lg p-5 group">
+                <summary className="text-sm font-semibold text-[var(--usj-text)] cursor-pointer list-none flex justify-between items-center gap-4">
+                  {item.question}
+                  <span className="text-slate-400 group-open:rotate-45 transition-transform text-lg leading-none" aria-hidden="true">
+                    +
+                  </span>
+                </summary>
+                <p className="text-sm text-slate-600 mt-3 leading-relaxed">
+                  {item.answer}
+                  {i === faqItems.length - 1 && (
+                    <>
+                      {" "}
+                      <Link href="/forwarding" className="font-semibold text-primary hover:underline">
+                        {t("faqQ4Link")} →
+                      </Link>
+                    </>
+                  )}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section className="bg-white">
+        <div className="mx-auto max-w-4xl px-4 py-16 md:py-20">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
+              {th("contact.title")}
+            </h2>
+            <p className="text-slate-600 leading-relaxed max-w-2xl mx-auto">
+              {th("contact.description")}
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="border-[#06C755]/30 bg-[#06C755]/5">
+              <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+                <MessageCircle className="h-8 w-8 text-[#06C755]" aria-hidden="true" />
+                <p className="text-sm font-semibold text-[var(--usj-text)]">
+                  {th("contact.lineNote")}
+                </p>
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-auto px-6 py-3 bg-[#06C755] hover:bg-[#05b64c] text-white"
+                >
+                  <a href="https://lin.ee/Yu1BDaz" target="_blank" rel="noopener noreferrer">
+                    {th("contact.lineButton")}
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6 flex flex-col justify-center gap-3 text-sm text-slate-600">
+                <p className="font-semibold text-[var(--usj-text)]">{th("contact.companyName")}</p>
+                <p>{th("contact.companyAddress")}</p>
+                <a
+                  href="tel:+13103255000"
+                  className="flex items-center gap-2 hover:text-primary transition-colors"
+                >
+                  <Phone className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  {th("contact.phoneLabel")}
+                </a>
+                <a
+                  href="mailto:info@usajusho.com"
+                  className="flex items-center gap-2 hover:text-primary transition-colors"
+                >
+                  <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  {th("contact.emailLabel")}
+                </a>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
-      <section className="mx-auto max-w-3xl px-4 py-16 md:py-20 text-center w-full">
-        <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
-          {t("finalCtaTitle")}
-        </h2>
-        <p className="text-slate-600 mb-8">{t("finalCtaDescription")}</p>
-        <Button asChild size="lg">
-          <Link href="/dashboard/purchase-requests">{t("ctaPrimary")}</Link>
-        </Button>
+      <section className="bg-[var(--usj-surface)] border-t border-slate-200">
+        <div className="mx-auto max-w-3xl px-4 py-16 md:py-20 text-center w-full">
+          <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
+            {t("finalCtaTitle")}
+          </h2>
+          <p className="text-slate-600 mb-8">{t("finalCtaDescription")}</p>
+          <Button asChild size="lg">
+            <Link href="/dashboard/purchase-requests">{t("ctaPrimary")}</Link>
+          </Button>
+        </div>
       </section>
     </main>
   )
