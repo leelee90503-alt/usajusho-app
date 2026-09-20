@@ -20,6 +20,9 @@ import {
   CreditCard,
   Languages,
   TrendingDown,
+  Layers,
+  DollarSign,
+  Send,
   type LucideIcon,
 } from "lucide-react"
 import type { ShippingRate } from "@/lib/pricing"
@@ -374,99 +377,151 @@ export default async function Home() {
       </section>
 
       {/* 8.5 Comparison with international couriers */}
-      <section className="bg-surface border-y border-slate-200">
-        <div className="mx-auto max-w-4xl px-4 py-16 md:py-20">
-          <div className="max-w-2xl mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-3">
-              {t("comparison.title")}
-            </h2>
-            <p className="text-slate-600 leading-relaxed">{t("comparison.description")}</p>
-          </div>
-
-          {/* Price example callout -- concrete $ comparison, glanceable at a glance */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 md:p-8 mb-6">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4 text-center">
-              {t("comparison.priceExampleTitle")}
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-8">
-              <div className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-primary">
-                  {t("comparison.priceExampleUsajushoValue")}
-                </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  {t("comparison.priceExampleUsajushoJpy")}
-                </p>
-                <p className="text-xs text-slate-500 mt-1 max-w-40 mx-auto">
-                  {t("comparison.priceExampleUsajushoLabel")}
-                </p>
-              </div>
-              <span className="text-slate-300 text-lg font-bold" aria-hidden="true">
-                vs
-              </span>
-              <div className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-slate-400">
-                  {t("comparison.priceExampleOthersValue")}
-                </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  {t("comparison.priceExampleOthersJpy")}
-                </p>
-                <p className="text-xs text-slate-500 mt-1 max-w-40 mx-auto">
-                  {t("comparison.priceExampleOthersLabel")}
-                </p>
-              </div>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 whitespace-nowrap">
-                <TrendingDown className="h-3.5 w-3.5" aria-hidden="true" />
-                {t("comparison.savingsBadge")}
-              </span>
-            </div>
-            <p className="text-xs text-slate-400 mt-4 text-center">
-              {t("comparison.priceExampleNote")}
-            </p>
-
-            {/* Carrier-by-carrier chips -- same 3kg package, glanceable */}
-            <div className="mt-5 pt-5 border-t border-slate-100">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2 text-center">
-                {t("comparison.carrierCompareLabel")}
+      <section className="border-y border-slate-200">
+        <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+          {/* Hero row -- eyebrow/heading/lead/benefits on the left, boxes photo on the right */}
+          <div className="grid md:grid-cols-[1.45fr_0.75fr] gap-8 md:gap-10 items-center">
+            <div>
+              <p className="text-xs font-extrabold tracking-[0.2em] text-sky-600 mb-3">
+                {t("comparison.eyebrow")}
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-2">
-                {["carrierUsajusho", "carrierUsps", "carrierUps", "carrierDhl"].map((key) => (
-                  <span
-                    key={key}
-                    className={`text-xs rounded-full px-3 py-1.5 border ${
-                      key === "carrierUsajusho"
-                        ? "bg-primary/5 border-primary/20 text-primary font-semibold"
-                        : "bg-slate-50 border-slate-200 text-slate-500"
-                    }`}
-                  >
-                    {t(`comparison.${key}`)}
-                  </span>
+              <h2 className="text-3xl md:text-5xl font-bold text-primary leading-[1.05] tracking-tight mb-4">
+                {t("comparison.title")}
+              </h2>
+              <p className="text-slate-500 text-base md:text-lg leading-snug max-w-xl">
+                {t("comparison.description")}
+              </p>
+              <div className="flex flex-wrap gap-x-8 gap-y-4 mt-6">
+                {[
+                  { key: "benefit1Text", Icon: Layers },
+                  { key: "benefit2Text", Icon: DollarSign },
+                  { key: "benefit3Text", Icon: Send },
+                ].map(({ key, Icon }) => (
+                  <div key={key} className="flex items-center gap-3 max-w-[160px]">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-700">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <span className="text-sm font-bold text-[var(--usj-text)] leading-tight">
+                      {t(`comparison.${key}`)}
+                    </span>
+                  </div>
                 ))}
               </div>
             </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/comparison-boxes.webp"
+              alt=""
+              className="w-full max-h-[220px] object-contain"
+            />
+          </div>
+
+          {/* Price example -- best-value USAJUSHO card vs. the USPS competitor card */}
+          <div className="relative grid sm:grid-cols-2 gap-3 mt-10">
+            <div className="relative overflow-hidden rounded-2xl px-6 py-7 sm:px-8 text-white bg-gradient-to-br from-[#123b79] to-[#0050a8] grid grid-cols-[0.8fr_1.2fr] items-center gap-4">
+              <span className="absolute top-0 left-6 rounded-b-lg bg-[#ff6868] px-4 py-1.5 text-[11px] font-extrabold tracking-wide">
+                {t("comparison.bestValueBadge")}
+              </span>
+              <div className="text-center pt-4">
+                <p className="text-2xl">⌂</p>
+                <p className="text-sm font-bold mt-1">USAJUSHO</p>
+              </div>
+              <div>
+                <p className="text-4xl md:text-5xl font-bold leading-none">
+                  {t("comparison.priceExampleUsajushoValue")}
+                </p>
+                <p className="text-lg mt-1.5 text-white/85">
+                  {t("comparison.priceExampleUsajushoJpy")}
+                </p>
+                <p className="text-xs mt-1.5 text-white/80">
+                  {t("comparison.priceExampleUsajushoLabel")}
+                </p>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-2xl px-6 py-6 sm:pl-8 bg-[#f3f7fc] grid grid-cols-[1fr_120px] items-center gap-4">
+              <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold px-3 py-1.5 whitespace-nowrap">
+                <TrendingDown className="h-3.5 w-3.5" aria-hidden="true" />
+                {t("comparison.savingsBadge")}
+              </span>
+              <div>
+                <h3 className="text-base md:text-lg font-semibold text-primary mb-1">
+                  {t("comparison.priceExampleOthersLabel")}
+                </h3>
+                <p className="text-3xl md:text-4xl font-bold text-slate-400 leading-none">
+                  {t("comparison.priceExampleOthersValue")}
+                </p>
+                <p className="text-base text-slate-400 mt-1.5">
+                  {t("comparison.priceExampleOthersJpy")}
+                </p>
+              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/comparison-usps-box.webp"
+                alt="USPS Priority Mail box"
+                className="w-full max-w-[110px] justify-self-end self-end"
+              />
+            </div>
+
+            <div className="hidden sm:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-14 w-14 items-center justify-center rounded-full bg-white shadow-lg text-sm font-black text-slate-600 z-10">
+              VS
+            </div>
+          </div>
+
+          <p className="text-xs text-slate-400 mt-4 text-center max-w-3xl mx-auto leading-relaxed">
+            {t("comparison.priceExampleNote")}
+          </p>
+
+          {/* Carrier-by-carrier chips -- same 3kg package, glanceable */}
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mt-8 mb-3 text-center">
+            {t("comparison.carrierCompareLabel")}
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {["carrierUsajusho", "carrierUsps", "carrierUps", "carrierDhl"].map((key) => (
+              <div
+                key={key}
+                className={`rounded-xl border px-4 py-3 text-center ${
+                  key === "carrierUsajusho"
+                    ? "bg-sky-50 border-sky-200"
+                    : "bg-white border-slate-200"
+                }`}
+              >
+                <p
+                  className={`text-sm font-bold ${
+                    key === "carrierUsajusho" ? "text-primary" : "text-[var(--usj-text)]"
+                  }`}
+                >
+                  {t(`comparison.${key}`).split(" — ")[0]}
+                </p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {t(`comparison.${key}`).split(" — ")[1]}
+                </p>
+              </div>
+            ))}
           </div>
 
           {/* Compact feature comparison -- short, icon-led, scannable at a glance */}
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3 mt-4">
             {[
               { key: "row1", Icon: Clock },
               { key: "row2", Icon: ShieldCheck },
               { key: "row3", Icon: CreditCard },
               { key: "row4", Icon: Languages },
             ].map(({ key, Icon }) => (
-              <div key={key} className="bg-white border border-slate-200 rounded-lg p-4 flex gap-3">
-                <Icon className="h-5 w-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
-                <div>
-                  <p className="text-sm font-semibold text-[var(--usj-text)]">
-                    {t(`comparison.${key}Label`)}
-                  </p>
-                  <p className="text-xs text-primary mt-0.5">{t(`comparison.${key}Usajusho`)}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{t(`comparison.${key}Others`)}</p>
-                </div>
+              <div key={key} className="bg-white border border-slate-200 rounded-xl p-4">
+                <p className="flex items-center gap-2 text-sm font-bold text-[var(--usj-text)]">
+                  <Icon className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
+                  {t(`comparison.${key}Label`)}
+                </p>
+                <p className="text-sm text-primary mt-2">{t(`comparison.${key}Usajusho`)}</p>
+                <p className="text-xs text-slate-400 mt-1">{t(`comparison.${key}Others`)}</p>
               </div>
             ))}
           </div>
 
-          <p className="text-xs text-slate-500 mt-6">{t("comparison.footnote")}</p>
+          <p className="text-xs text-slate-500 mt-6 text-center max-w-3xl mx-auto leading-relaxed">
+            {t("comparison.footnote")}
+          </p>
         </div>
       </section>
 
