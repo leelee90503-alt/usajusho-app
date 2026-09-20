@@ -326,9 +326,14 @@ export default async function Home() {
       <section className="bg-surface border-y border-slate-200">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-center">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
-              {t("consolidation.title")}
-            </h2>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-primary">
+                {t("consolidation.title")}
+              </h2>
+              <span className="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold px-3 py-1 whitespace-nowrap">
+                {t("consolidation.freeBadge")}
+              </span>
+            </div>
             <p className="text-slate-600 leading-relaxed">{t("consolidation.description")}</p>
           </div>
           <div className="bg-white border border-slate-200 rounded-lg p-6">
