@@ -17,11 +17,13 @@ export default async function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 print:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link
-          href="/"
-          className="text-lg font-bold tracking-tight text-primary"
-        >
-          {tc("appName")}
+        <Link href="/" className="flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/logo-usajusho.webp"
+            alt={tc("appName")}
+            className="h-7 md:h-8 w-auto"
+          />
         </Link>
 
         {/* Desktop nav */}
