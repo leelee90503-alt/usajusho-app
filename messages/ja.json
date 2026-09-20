@@ -111,7 +111,22 @@
       "disclaimer": "※ 実際の送料は荷物のサイズ・重量や選択した付加サービスにより異なります。最終金額はマイページの商業送り状でご確認ください。",
       "currency": "$",
       "overweightContact": "50kgを超える場合は、お問い合わせいただければ個別にお見積もりします。",
-      "jpyApprox": "≈ 約¥{jpy}（参考レート・目安です）"
+      "jpyApprox": "≈ 約¥{jpy}（参考レート・目安です）",
+      "customsTitle": "関税・消費税の目安も計算できます（任意）",
+      "customsItemPriceLabel": "商品価格（USD）",
+      "customsItemPricePlaceholder": "例：100",
+      "customsCategoryLabel": "商品の種類",
+      "customsCategoryOther": "一般雑貨（5%）",
+      "customsCategoryApparel": "衣類・ニット以外（10%）",
+      "customsCategoryFurniture": "家具・プラスチック・ガラス・金属（3%）",
+      "customsCategoryCoffeeTea": "コーヒー・茶（15%）",
+      "customsDutyFreeResult": "免税対象です（この金額では関税・消費税はかかりません）。",
+      "customsDutyLabel": "予想関税",
+      "customsTaxLabel": "予想消費税",
+      "customsTotalLabel": "予想税額合計",
+      "customsUnavailable": "商品価格を入力すると、予想される関税・消費税が表示されます。",
+      "customsDisclaimer": "※ 現行の60%ルール・簡易税率に基づく参考目安です。革製品・ニット衣類・履物・手袋などは1万円以下でも課税対象となり、この簡易計算には含まれません。詳しくは",
+      "customsLinkLabel": "通関ガイド"
     },
     "tracking": {
       "title": "発送から到着まで追跡できます",

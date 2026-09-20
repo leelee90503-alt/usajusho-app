@@ -488,6 +488,21 @@ export default async function Home() {
               currency: t("calculator.currency"),
               overweightContact: t("calculator.overweightContact"),
               jpyApprox: t("calculator.jpyApprox"),
+              customsTitle: t("calculator.customsTitle"),
+              customsItemPriceLabel: t("calculator.customsItemPriceLabel"),
+              customsItemPricePlaceholder: t("calculator.customsItemPricePlaceholder"),
+              customsCategoryLabel: t("calculator.customsCategoryLabel"),
+              customsCategoryOther: t("calculator.customsCategoryOther"),
+              customsCategoryApparel: t("calculator.customsCategoryApparel"),
+              customsCategoryFurniture: t("calculator.customsCategoryFurniture"),
+              customsCategoryCoffeeTea: t("calculator.customsCategoryCoffeeTea"),
+              customsDutyFreeResult: t("calculator.customsDutyFreeResult"),
+              customsDutyLabel: t("calculator.customsDutyLabel"),
+              customsTaxLabel: t("calculator.customsTaxLabel"),
+              customsTotalLabel: t("calculator.customsTotalLabel"),
+              customsUnavailable: t("calculator.customsUnavailable"),
+              customsDisclaimer: t("calculator.customsDisclaimer"),
+              customsLinkLabel: t("calculator.customsLinkLabel"),
             }}
           />
         </div>

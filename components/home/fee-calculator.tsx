@@ -1,8 +1,14 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { Link } from "@/i18n/navigation"
 import { estimateQuote, type ShippingRate } from "@/lib/pricing"
 import { formatApproxJPY } from "@/lib/format"
+import {
+  estimateJapanCustoms,
+  CUSTOMS_CATEGORIES,
+  type CustomsCategoryKey,
+} from "@/lib/customs-jp"
 
 type Labels = {
   weightLabel: string
@@ -18,6 +24,28 @@ type Labels = {
   currency: string
   overweightContact: string
   jpyApprox: string
+  customsTitle: string
+  customsItemPriceLabel: string
+  customsItemPricePlaceholder: string
+  customsCategoryLabel: string
+  customsCategoryOther: string
+  customsCategoryApparel: string
+  customsCategoryFurniture: string
+  customsCategoryCoffeeTea: string
+  customsDutyFreeResult: string
+  customsDutyLabel: string
+  customsTaxLabel: string
+  customsTotalLabel: string
+  customsUnavailable: string
+  customsDisclaimer: string
+  customsLinkLabel: string
+}
+
+const SIMPLE_CATEGORY_LABEL_KEYS: Record<string, keyof Labels> = {
+  other: "customsCategoryOther",
+  apparel: "customsCategoryApparel",
+  furniture: "customsCategoryFurniture",
+  coffeeTea: "customsCategoryCoffeeTea",
 }
 
 export default function FeeCalculator({
@@ -31,6 +59,8 @@ export default function FeeCalculator({
   const [lengthInput, setLengthInput] = useState("")
   const [widthInput, setWidthInput] = useState("")
   const [heightInput, setHeightInput] = useState("")
+  const [itemPriceInput, setItemPriceInput] = useState("")
+  const [categoryKey, setCategoryKey] = useState<CustomsCategoryKey>("other")
 
   const weightKg = useMemo(() => {
     const parsed = Number(weightInput)
@@ -61,6 +91,18 @@ export default function FeeCalculator({
   // left unrated, so surface a distinct "contact us" message instead of the
   // generic unavailable copy in that case.
   const isOverweight = weightKg !== null && weightKg > 50
+
+  const itemPriceUsd = useMemo(() => {
+    const parsed = Number(itemPriceInput)
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null
+  }, [itemPriceInput])
+
+  const customsEstimate = useMemo(() => {
+    if (itemPriceUsd === null) return null
+    return estimateJapanCustoms({ itemPriceUsd, categoryKey })
+  }, [itemPriceUsd, categoryKey])
+
+  const simpleCategories = CUSTOMS_CATEGORIES.filter((c) => c.simple)
 
   return (
     <div className="bg-white border border-slate-200 rounded-lg p-6">
@@ -146,6 +188,78 @@ export default function FeeCalculator({
       </div>
 
       <p className="text-xs text-slate-400 mt-3">{labels.disclaimer}</p>
+
+      <div className="mt-6 pt-6 border-t border-slate-100">
+        <p className="text-sm font-medium text-[var(--usj-text)] mb-3">{labels.customsTitle}</p>
+
+        <label htmlFor="home-item-price" className="block text-xs text-slate-500 mb-1.5">
+          {labels.customsItemPriceLabel}
+        </label>
+        <div className="flex gap-2 mb-3">
+          <span className="flex items-center text-sm text-slate-500 px-1">$</span>
+          <input
+            id="home-item-price"
+            type="number"
+            inputMode="decimal"
+            min="0"
+            step="1"
+            value={itemPriceInput}
+            onChange={(e) => setItemPriceInput(e.target.value)}
+            placeholder={labels.customsItemPricePlaceholder}
+            className="flex-1 min-w-0 rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--usj-accent)] focus:border-transparent"
+          />
+        </div>
+
+        <label htmlFor="home-item-category" className="block text-xs text-slate-500 mb-1.5">
+          {labels.customsCategoryLabel}
+        </label>
+        <select
+          id="home-item-category"
+          value={categoryKey}
+          onChange={(e) => setCategoryKey(e.target.value as CustomsCategoryKey)}
+          className="w-full mb-4 rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--usj-accent)] focus:border-transparent bg-white"
+        >
+          {simpleCategories.map((c) => (
+            <option key={c.key} value={c.key}>
+              {labels[SIMPLE_CATEGORY_LABEL_KEYS[c.key]]}
+            </option>
+          ))}
+        </select>
+
+        <div className="rounded-md bg-[var(--usj-surface)] px-4 py-4 min-h-[64px] flex flex-col justify-center">
+          {customsEstimate ? (
+            customsEstimate.isDutyFree ? (
+              <p className="text-sm font-semibold text-emerald-700">{labels.customsDutyFreeResult}</p>
+            ) : (
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span>{labels.customsDutyLabel}</span>
+                  <span>¥{customsEstimate.dutyJpy.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span>{labels.customsTaxLabel}</span>
+                  <span>
+                    ¥{(customsEstimate.consumptionTaxJpy + customsEstimate.localConsumptionTaxJpy).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm font-bold text-[var(--usj-primary)] pt-1">
+                  <span>{labels.customsTotalLabel}</span>
+                  <span>¥{customsEstimate.totalTaxJpy.toLocaleString()}</span>
+                </div>
+              </div>
+            )
+          ) : (
+            <p className="text-sm text-slate-400">{labels.customsUnavailable}</p>
+          )}
+        </div>
+
+        <p className="text-xs text-slate-400 mt-3">
+          {labels.customsDisclaimer}{" "}
+          <Link href="/customs" className="text-primary underline underline-offset-2">
+            {labels.customsLinkLabel}
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }

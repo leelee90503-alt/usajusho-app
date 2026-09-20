@@ -33,6 +33,26 @@ export type Category = {
   blocks: CategoryBlock[]
 }
 
+export type DutyCalculatorLabels = {
+  title: string
+  intro: string
+  itemPriceLabel: string
+  itemPricePlaceholder: string
+  categoryLabel: string
+  categoryOther: string
+  categoryApparel: string
+  categoryFurniture: string
+  categoryCoffeeTea: string
+  categoryFurSauce: string
+  categoryRubberPaperSteel: string
+  dutyFreeResult: string
+  dutyLabel: string
+  taxLabel: string
+  totalLabel: string
+  unavailable: string
+  disclaimer: string
+}
+
 export type CustomsDoc = {
   eyebrow: string
   title: string
@@ -52,6 +72,7 @@ export type CustomsDoc = {
   taxDutiedIntro: string
   taxDutiedList: string[]
   taxDutiedNote: string
+  dutyCalculator: DutyCalculatorLabels
   taxPolicyNotice: Callout
   prohibitedHeading: string
   prohibitedIntro: string

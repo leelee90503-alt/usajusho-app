@@ -9,6 +9,7 @@ import type {
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react"
+import DutyCalculator from "@/components/customs/duty-calculator"
 
 const STATUS_STYLES: Record<
   ChipStatus,
@@ -264,6 +265,8 @@ export default function CustomsGuide({ doc }: { doc: CustomsDoc }) {
               <p className="text-sm text-slate-500">{doc.taxDutiedNote}</p>
             </CardContent>
           </Card>
+
+          <DutyCalculator labels={doc.dutyCalculator} />
 
           <CalloutBox callout={doc.taxPolicyNotice} />
         </div>

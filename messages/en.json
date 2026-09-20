@@ -111,7 +111,22 @@
       "disclaimer": "* Actual shipping cost depends on package size, weight, and any add-on services selected. See your commercial invoice on the dashboard for the final amount.",
       "currency": "$",
       "overweightContact": "For packages over 50kg, please contact support for a custom quote.",
-      "jpyApprox": "≈ ¥{jpy} (approximate, for reference only)"
+      "jpyApprox": "≈ ¥{jpy} (approximate, for reference only)",
+      "customsTitle": "Also estimate Japan customs duty (optional)",
+      "customsItemPriceLabel": "Item price (USD)",
+      "customsItemPricePlaceholder": "e.g. 100",
+      "customsCategoryLabel": "Item category",
+      "customsCategoryOther": "General goods (5%)",
+      "customsCategoryApparel": "Clothing, non-knit (10%)",
+      "customsCategoryFurniture": "Furniture, plastic, glass, metal (3%)",
+      "customsCategoryCoffeeTea": "Coffee, tea (15%)",
+      "customsDutyFreeResult": "Duty-free — no customs duty or consumption tax at this value.",
+      "customsDutyLabel": "Estimated customs duty",
+      "customsTaxLabel": "Estimated consumption tax",
+      "customsTotalLabel": "Estimated total tax",
+      "customsUnavailable": "Enter an item price to see an estimated customs duty.",
+      "customsDisclaimer": "* Reference estimate only, based on Japan's current 60%-valuation / simplified-tariff rules. Leather goods, knitwear, footwear, and gloves are dutiable even under ¥10,000 and aren't covered by this simple estimate. See the",
+      "customsLinkLabel": "Customs Guide"
     },
     "tracking": {
       "title": "Track it from shipment to delivery",
