@@ -24,7 +24,7 @@ import {
 } from "lucide-react"
 import type { ShippingRate } from "@/lib/pricing"
 import { getPurchaseAgencyPublicFeeSettings } from "@/lib/purchase-agency-settings"
-import { formatUSD } from "@/lib/format"
+import { formatUSD, formatApproxJPY } from "@/lib/format"
 
 const addonIcons: Record<string, LucideIcon> = {
   item1: Search,
@@ -93,6 +93,7 @@ export default async function Home() {
     percentFee: `$${formatUSD(examplePercentFee)}`,
     feeTotal: `$${formatUSD(exampleFeeTotal)}`,
     grandTotal: `$${formatUSD(exampleGrandTotal)}`,
+    grandTotalJpy: formatApproxJPY(exampleGrandTotal),
   }
 
   return (
@@ -385,6 +386,9 @@ export default async function Home() {
                 <p className="text-3xl md:text-4xl font-bold text-primary">
                   {t("comparison.priceExampleUsajushoValue")}
                 </p>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  {t("comparison.priceExampleUsajushoJpy")}
+                </p>
                 <p className="text-xs text-slate-500 mt-1 max-w-40 mx-auto">
                   {t("comparison.priceExampleUsajushoLabel")}
                 </p>
@@ -395,6 +399,9 @@ export default async function Home() {
               <div className="text-center">
                 <p className="text-3xl md:text-4xl font-bold text-slate-400">
                   {t("comparison.priceExampleOthersValue")}
+                </p>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  {t("comparison.priceExampleOthersJpy")}
                 </p>
                 <p className="text-xs text-slate-500 mt-1 max-w-40 mx-auto">
                   {t("comparison.priceExampleOthersLabel")}
@@ -480,6 +487,7 @@ export default async function Home() {
               disclaimer: t("calculator.disclaimer"),
               currency: t("calculator.currency"),
               overweightContact: t("calculator.overweightContact"),
+              jpyApprox: t("calculator.jpyApprox"),
             }}
           />
         </div>
@@ -521,7 +529,7 @@ export default async function Home() {
             {t("faq.title")}
           </h2>
           <div className="space-y-4">
-            {["q1", "q2", "q3", "q4"].map((key) => (
+            {["q1", "q2", "q3", "q4", "q5", "q6"].map((key) => (
               <details key={key} className="bg-white border border-slate-200 rounded-lg p-5 group">
                 <summary className="text-sm font-semibold text-[var(--usj-text)] cursor-pointer list-none flex justify-between items-center gap-4">
                   {t(`faq.${key}Question`)}

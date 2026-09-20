@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { estimateQuote, type ShippingRate } from "@/lib/pricing"
+import { formatApproxJPY } from "@/lib/format"
 
 type Labels = {
   weightLabel: string
@@ -16,6 +17,7 @@ type Labels = {
   disclaimer: string
   currency: string
   overweightContact: string
+  jpyApprox: string
 }
 
 export default function FeeCalculator({
@@ -131,6 +133,9 @@ export default function FeeCalculator({
             <p className="text-2xl font-bold text-[var(--usj-primary)]">
               {labels.currency}
               {estimate.amount.toLocaleString()}
+            </p>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {labels.jpyApprox.replace("{jpy}", formatApproxJPY(estimate.amount))}
             </p>
           </>
         ) : isOverweight ? (

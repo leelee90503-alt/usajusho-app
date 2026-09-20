@@ -10,7 +10,7 @@
 create table if not exists public.purchase_agency_settings (
   id integer primary key default 1,
   flat_fee_cents integer not null default 600,
-  fee_percent numeric(6,2) not null default 7,
+  fee_percent numeric(6,2) not null default 5,
   -- Which Square environment (Sandbox test vs. Production live) the whole
   -- site currently processes payments under. Read by lib/square.ts via the
   -- service-role client; toggled by admins from /admin/purchase-requests
@@ -44,5 +44,5 @@ create policy "Admins can insert purchase agency settings"
   with check (public.is_admin(auth.uid()));
 
 insert into public.purchase_agency_settings (id, flat_fee_cents, fee_percent)
-values (1, 600, 7)
+values (1, 600, 5)
 on conflict (id) do nothing;

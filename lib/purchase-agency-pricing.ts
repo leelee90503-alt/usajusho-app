@@ -10,7 +10,7 @@
 // lib/purchase-agency-settings.ts instead and is called server-side,
 // with the result passed down as a prop/argument.
 export const PURCHASE_AGENCY_FLAT_FEE_CENTS = 600 // $6.00 flat fee per request
-export const PURCHASE_AGENCY_PERCENT_FEE = 0.07 // 7% of the item price
+export const PURCHASE_AGENCY_PERCENT_FEE = 0.05 // 5% of the item price
 
 export type PurchaseAgencyFeeSettings = {
   flatFeeCents: number

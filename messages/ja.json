@@ -88,8 +88,8 @@
       "item2Description": "壊れやすい商品を追加で保護します。",
       "item3Title": "外箱・値札の除去",
       "item3Description": "送り状や値札を取り外してから発送します。",
-      "item4Title": "追加保管",
-      "item4Description": "他の荷物が届くまで倉庫で保管します。",
+      "item4Title": "到着後30日間無料保管＋延長も可能",
+      "item4Description": "荷物到着後30日間は無料で保管し、他の荷物が届くのを待てます。それ以上の保管が必要な場合は、少額の追加料金で延長できます。",
       "item5Title": "配送保険",
       "item5Description": "万一の輸送事故に備えられます。",
       "item6Title": "その他カスタム対応",
@@ -110,7 +110,8 @@
       "unavailable": "重さを入力すると概算送料が表示されます。",
       "disclaimer": "※ 実際の送料は荷物のサイズ・重量や選択した付加サービスにより異なります。最終金額はマイページの商業送り状でご確認ください。",
       "currency": "$",
-      "overweightContact": "50kgを超える場合は、お問い合わせいただければ個別にお見積もりします。"
+      "overweightContact": "50kgを超える場合は、お問い合わせいただければ個別にお見積もりします。",
+      "jpyApprox": "≈ 約¥{jpy}（参考レート・目安です）"
     },
     "tracking": {
       "title": "発送から到着まで追跡できます",
@@ -127,7 +128,11 @@
       "q3Question": "まとめ配送とは何ですか？",
       "q3Answer": "複数の荷物を1つにまとめて発送することで、個別に発送するより送料を抑えられるサービスです。",
       "q4Question": "商業送り状（インボイス）は必要ですか？",
-      "q4Answer": "はい。海外へ発送するすべての荷物に必要な書類です。マイページから簡単に作成でき、必要に応じてスタッフが代行することも可能です。"
+      "q4Answer": "はい。海外へ発送するすべての荷物に必要な書類です。マイページから簡単に作成でき、必要に応じてスタッフが代行することも可能です。",
+      "q5Question": "荷物は無料でどのくらい保管してもらえますか？",
+      "q5Answer": "倉庫到着後30日間は無料で保管しますので、他のご注文が届くのを待ってからまとめて発送できます。30日を超えて保管が必要な場合は、有料の保管延長サービスをご利用いただけます。",
+      "q6Question": "配送中に荷物が破損・紛失した場合はどうなりますか？",
+      "q6Answer": "発送前に全ての荷物を撮影し、状態を記録しています。国際配送中の破損・紛失に備えたい場合は、発送時に配送保険（オプション）を追加いただけます。"
     },
     "contact": {
       "title": "お問い合わせ",
@@ -158,8 +163,10 @@
       "priceExampleTitle": "料金の目安：同じ3kgの荷物を日本へ送る場合",
       "priceExampleUsajushoLabel": "USAJUSHOでまとめて発送（3kg）",
       "priceExampleUsajushoValue": "$29〜",
+      "priceExampleUsajushoJpy": "約¥4,500〜",
       "priceExampleOthersLabel": "自分で発送した場合（USPS）",
       "priceExampleOthersValue": "$94.80",
+      "priceExampleOthersJpy": "約¥14,700",
       "priceExampleNote": "※ 3kgの荷物を日本へ送る場合の実際の料金：USPS Priority Mail International $94.80（6〜10営業日）。UPS Worldwide SaverやDHL Express Worldwideも同程度かそれ以上になるのが一般的です。料金・日数は配送会社・サイズ・時期により変動します。",
       "savingsBadge": "約70%お得",
       "carrierCompareLabel": "3kgを日本へ・配送会社別",
@@ -186,7 +193,7 @@
       "title": "米国のクレジットカードがなくても、購入代行でOK",
       "description": "米国限定販売の店舗や、海外発送に対応していない店舗の商品も、USAJUSHOが代わりに購入し、検品・まとめ発送まで代行します。",
       "feeExampleLabel": "手数料の例（商品代金 $100 の場合）",
-      "feeExampleText": "定額手数料{flatFee}に商品代金の{percent}（{percentFee}）を加えた手数料は合計{feeTotal}。商品代金と合わせて{grandTotal}です（米国→日本の送料は別途）。",
+      "feeExampleText": "定額手数料{flatFee}に商品代金の{percent}（{percentFee}）を加えた手数料は合計{feeTotal}。商品代金と合わせて{grandTotal}（約¥{grandTotalJpy}）です（米国→日本の送料は別途）。",
       "ctaLabel": "購入代行について詳しく見る"
     },
     "shopBand": {

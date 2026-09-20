@@ -88,8 +88,8 @@
       "item2Description": "Extra protection for fragile items.",
       "item3Title": "Invoice / price-tag removal",
       "item3Description": "Remove packing slips and price tags before shipping.",
-      "item4Title": "Extended storage",
-      "item4Description": "We hold your package until the rest arrive.",
+      "item4Title": "Free 30-day storage + extensions",
+      "item4Description": "Every package is held free for 30 days after arrival while you wait for the rest to consolidate. Need more time? We can extend storage for a small fee.",
       "item5Title": "Shipping insurance",
       "item5Description": "Coverage in case something goes wrong in transit.",
       "item6Title": "Custom requests",
@@ -110,7 +110,8 @@
       "unavailable": "Enter a weight to see an estimated cost.",
       "disclaimer": "* Actual shipping cost depends on package size, weight, and any add-on services selected. See your commercial invoice on the dashboard for the final amount.",
       "currency": "$",
-      "overweightContact": "For packages over 50kg, please contact support for a custom quote."
+      "overweightContact": "For packages over 50kg, please contact support for a custom quote.",
+      "jpyApprox": "≈ ¥{jpy} (approximate, for reference only)"
     },
     "tracking": {
       "title": "Track it from shipment to delivery",
@@ -127,7 +128,11 @@
       "q3Question": "What is consolidation?",
       "q3Answer": "Combining multiple packages into a single shipment, which costs less than shipping each one separately.",
       "q4Question": "Do I need a commercial invoice?",
-      "q4Answer": "Yes — it's required for every international shipment. You can create one easily from your dashboard, and our staff can also prepare it on your behalf if needed."
+      "q4Answer": "Yes — it's required for every international shipment. You can create one easily from your dashboard, and our staff can also prepare it on your behalf if needed.",
+      "q5Question": "How long will you hold my packages for free?",
+      "q5Answer": "Every package is stored free for 30 days after it arrives at our warehouse, so you can wait for other orders and consolidate them into one shipment. Need more time beyond 30 days? A paid storage extension is available as an add-on.",
+      "q6Question": "What if my package is damaged or lost in transit?",
+      "q6Answer": "Every package is photographed before shipping, so we have proof of its condition. Optional shipping insurance covers loss or damage during international transit — add it when you create your shipment if you'd like extra coverage."
     },
     "contact": {
       "title": "Customer Service",
@@ -158,8 +163,10 @@
       "priceExampleTitle": "Price example: same 3kg package to Japan",
       "priceExampleUsajushoLabel": "USAJUSHO consolidated shipping (3kg)",
       "priceExampleUsajushoValue": "$29+",
+      "priceExampleUsajushoJpy": "≈¥4,500〜",
       "priceExampleOthersLabel": "Shipping it yourself (USPS)",
       "priceExampleOthersValue": "$94.80",
+      "priceExampleOthersJpy": "≈¥14,700",
       "priceExampleNote": "* Real carrier rates for a 3kg package shipped to Japan: USPS Priority Mail International $94.80 (6–10 business days). UPS Worldwide Saver and DHL Express Worldwide are typically similar or higher for the same weight. Rates and delivery times vary by carrier, dimensions, and season.",
       "savingsBadge": "Save ~70%",
       "carrierCompareLabel": "3kg to Japan, by carrier",
@@ -186,7 +193,7 @@
       "title": "No US credit card? Our purchase agency handles it for you",
       "description": "Even items from US-only stores, or stores that don't ship overseas, can be purchased on your behalf by USAJUSHO — then inspected and consolidated like any other package.",
       "feeExampleLabel": "Example fee (for a $100 item)",
-      "feeExampleText": "A flat fee of {flatFee} plus {percent} of the item price ({percentFee}) comes to {feeTotal} total. Together with the item, that's {grandTotal} (shipping to Japan is billed separately).",
+      "feeExampleText": "A flat fee of {flatFee} plus {percent} of the item price ({percentFee}) comes to {feeTotal} total. Together with the item, that's {grandTotal} — approximately ¥{grandTotalJpy} — with shipping to Japan billed separately.",
       "ctaLabel": "Learn more about purchase agency"
     },
     "shopBand": {
