@@ -98,19 +98,22 @@ export default async function Home() {
 
   return (
     <main className="flex flex-col">
-      {/* 2. Hero */}
-      <section className="relative isolate overflow-hidden border-b border-slate-200">
-        <div className="absolute inset-0 -z-10">
-          <img
-            src="/images/hero-bg-v2.webp"
-            alt=""
-            className="h-full w-full object-cover object-right-top"
-          />
-          {/* Bright wash (left -> right) so the photo's warm, natural light
-              reads through instead of being covered by the brand navy. */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white from-0% via-white/75 via-50% to-white/5 to-100%" />
-        </div>
-        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-28">
+      {/* 2. Hero -- boxed to the same max-w-6xl content column as every
+          section below (not a full-bleed banner), so its left/right edges
+          line up with the rest of the page instead of running edge to
+          edge on wide screens. */}
+      <section className="border-b border-slate-200">
+        <div className="relative isolate overflow-hidden rounded-2xl mx-auto max-w-6xl px-4 py-16 md:py-28 my-4 md:my-6">
+          <div className="absolute inset-0 -z-10">
+            <img
+              src="/images/hero-bg-v2.webp"
+              alt=""
+              className="h-full w-full object-cover object-right-top"
+            />
+            {/* Bright wash (left -> right) so the photo's warm, natural light
+                reads through instead of being covered by the brand navy. */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white from-0% via-white/75 via-50% to-white/5 to-100%" />
+          </div>
           <div className="max-w-xl">
             <p className="text-[var(--usj-accent)] font-semibold text-sm mb-3 tracking-wide">
               {t("hero.eyebrow")}
