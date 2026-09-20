@@ -125,31 +125,36 @@ export default async function PurchaseAgencyPage() {
           </h2>
           <p className="text-slate-600 mt-2">{t("stepsDescription")}</p>
         </div>
-        <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <ol className="space-y-4 max-w-3xl mx-auto">
           {steps.map((step, index) => {
             const Icon = step.icon
             return (
               <li key={step.title}>
-                <Card className="h-full">
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-1">
-                      <Badge className="h-7 w-7 shrink-0 justify-center rounded-full p-0 text-sm">
+                <Card>
+                  <CardContent className="p-5 flex gap-4 items-start">
+                    <div className="flex flex-col items-center gap-2 shrink-0 pt-0.5">
+                      <Badge className="h-8 w-8 shrink-0 justify-center rounded-full p-0 text-sm">
                         {index + 1}
                       </Badge>
                       <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
                     </div>
-                    <CardTitle className="text-base">{step.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      {step.description}
-                    </p>
+                    <div>
+                      <p className="text-base font-semibold text-[var(--usj-text)] mb-1">
+                        {step.title}
+                      </p>
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        {step.description}
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               </li>
             )
           })}
         </ol>
+        <p className="max-w-3xl mx-auto mt-6 text-xs text-slate-500 bg-[var(--usj-surface)] border border-slate-200 rounded-lg px-4 py-3 leading-relaxed">
+          {t("stepsPaymentNote")}
+        </p>
       </section>
 
       {/* Fee explanation */}
