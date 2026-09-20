@@ -103,7 +103,7 @@ export default async function Home() {
           line up with the rest of the page instead of running edge to
           edge on wide screens. */}
       <section className="border-b border-slate-200">
-        <div className="relative isolate overflow-hidden rounded-2xl mx-auto max-w-6xl px-4 py-16 md:py-28 my-4 md:my-6">
+        <div className="relative isolate overflow-hidden rounded-2xl mx-auto max-w-6xl px-4 py-11 md:py-20 my-4 md:my-6">
           <div className="absolute inset-0 -z-10">
             <img
               src="/images/hero-bg-v2.webp"
