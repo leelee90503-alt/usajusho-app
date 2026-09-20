@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation"
 import { createClient } from "@/lib/supabase/server"
 import FeeCalculator from "@/components/home/fee-calculator"
 import DeliveryJourney from "@/components/home/delivery-journey"
-import HeroBackgroundSlideshow from "@/components/home/hero-background-slideshow"
+import HeroSlideshow from "@/components/home/hero-slideshow"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -109,41 +109,25 @@ export default async function Home() {
           line up with the rest of the page instead of running edge to
           edge on wide screens. */}
       <section>
-        <div className="relative isolate overflow-hidden rounded-2xl mx-auto max-w-6xl px-4 py-8 md:py-14 mt-4 md:mt-6">
-          <div className="absolute inset-0 -z-10 bg-white">
-            <HeroBackgroundSlideshow
-              images={["/images/hero-bg-v2.webp", "/images/hero-bg-no-hidden-fees.webp"]}
-            />
-            {/* Bright wash (left -> right) so the photo's warm, natural light
-                reads through instead of being covered by the brand navy. */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white from-0% via-white/75 via-50% to-white/5 to-100%" />
-          </div>
-          <div className="max-w-xl">
-            <p className="text-[var(--usj-accent)] font-semibold text-sm mb-3 tracking-wide">
-              {t("hero.eyebrow")}
-            </p>
-            <h1 className="text-3xl md:text-5xl font-bold text-[var(--usj-text)] leading-tight mb-5">
-              {t("hero.headline")}
-            </h1>
-            <p className="text-slate-600 text-base md:text-lg mb-8 max-w-md leading-relaxed">
-              {t("hero.description")}
-            </p>
-            <div className="flex flex-wrap gap-3 mb-8">
-              <Button asChild size="lg" className="h-auto px-6 py-3 text-sm font-semibold bg-[var(--usj-accent)] text-white hover:bg-[var(--usj-accent)]/90">
-                <Link href="/signup">{t("hero.ctaPrimary")}</Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="h-auto px-6 py-3 text-sm font-semibold bg-transparent border-[var(--usj-text)]/30 text-[var(--usj-text)] hover:bg-black/5"
-              >
-                <a href="#calculator">{t("hero.ctaSecondary")}</a>
-              </Button>
-            </div>
-            <p className="text-xs text-slate-500">{t("hero.trustNote")}</p>
-          </div>
-        </div>
+        <HeroSlideshow
+          slides={[
+            {
+              image: "/images/hero-bg-v2.webp",
+              eyebrow: t("hero.eyebrow"),
+              headline: t("hero.headline"),
+              description: t("hero.description"),
+            },
+            {
+              image: "/images/hero-bg-no-hidden-fees.webp",
+              eyebrow: t("hero.slide2Eyebrow"),
+              headline: t("hero.slide2Headline"),
+              description: t("hero.slide2Description"),
+            },
+          ]}
+          ctaPrimaryText={t("hero.ctaPrimary")}
+          ctaSecondaryText={t("hero.ctaSecondary")}
+          trustNote={t("hero.trustNote")}
+        />
       </section>
 
       {/* 2b. Supported shops ticker -- boxed to the same max-w-6xl column
