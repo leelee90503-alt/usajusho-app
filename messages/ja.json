@@ -207,7 +207,22 @@
       "row4Label": "サポート",
       "row4Usajusho": "日本語対応",
       "row4Others": "基本は英語",
-      "footnote": "※ DHL・UPS・USPSはそれぞれ優れた国際配送サービスです。USAJUSHOは「米国限定ショップでの複数購入をまとめて日本へ届ける」用途に特化したサービスとしてご利用いただけます。"
+      "footnote": "※ DHL・UPS・USPSはそれぞれ優れた国際配送サービスです。USAJUSHOは「米国限定ショップでの複数購入をまとめて日本へ届ける」用途に特化したサービスとしてご利用いただけます。",
+      "noHiddenFeesLabel": "USAJUSHOなら0円",
+      "noHiddenFeeInspection": "検品費用",
+      "noHiddenFeeReceiving": "入庫手数料",
+      "noHiddenFeeConsolidation": "合梱手数料",
+      "hiddenFeesTitle": "他社では別途かかることが多い費用",
+      "hiddenFeesIntro": "送料の表示価格が安く見えても、実際には次のような追加費用がかかるサービスが少なくありません。",
+      "hiddenFeesItem1Label": "検品費用",
+      "hiddenFeesItem1Desc": "1点ごとに$1〜$2程度。有料会員のみ無料になる場合も",
+      "hiddenFeesItem2Label": "入庫手数料",
+      "hiddenFeesItem2Desc": "荷物を倉庫で受け取るだけで発生する手数料",
+      "hiddenFeesItem3Label": "合梱・再梱包手数料",
+      "hiddenFeesItem3Desc": "複数の購入品を1つにまとめる際に箱ごとに課金",
+      "hiddenFeesItem4Label": "有料会員プラン",
+      "hiddenFeesItem4Desc": "安い料金は月額・年額の有料会員登録が条件になっていることが多い",
+      "hiddenFeesNote": "USAJUSHOはこれらの費用を一切いただきません。表示されている送料がそのままご請求額です — 追加費用ではなく、正直な送料そのもので勝負します。"
     },
     "purchaseAgencyHighlight": {
       "eyebrow": "クレジットカードがなくても",

@@ -23,6 +23,8 @@ import {
   Layers,
   DollarSign,
   Send,
+  CircleCheck,
+  X,
   type LucideIcon,
 } from "lucide-react"
 import type { ShippingRate } from "@/lib/pricing"
@@ -515,6 +517,57 @@ export default async function Home() {
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* No hidden fees -- $0 badges + what other forwarders often charge instead */}
+          <div className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 sm:p-6">
+            <p className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wide mb-3 text-center">
+              {t("comparison.noHiddenFeesLabel")}
+            </p>
+            <div className="grid grid-cols-3 gap-3">
+              {["noHiddenFeeInspection", "noHiddenFeeReceiving", "noHiddenFeeConsolidation"].map(
+                (key) => (
+                  <div
+                    key={key}
+                    className="rounded-xl bg-white border border-emerald-200 px-3 py-3 text-center"
+                  >
+                    <p className="flex items-center justify-center gap-1 text-lg font-extrabold text-emerald-600">
+                      <CircleCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      $0
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">{t(`comparison.${key}`)}</p>
+                  </div>
+                )
+              )}
+            </div>
+
+            <div className="mt-5 pt-5 border-t border-emerald-200/70">
+              <p className="text-sm font-bold text-[var(--usj-text)] mb-1.5">
+                {t("comparison.hiddenFeesTitle")}
+              </p>
+              <p className="text-xs text-slate-500 mb-3">{t("comparison.hiddenFeesIntro")}</p>
+              <div className="grid sm:grid-cols-2 gap-2.5">
+                {["hiddenFeesItem1", "hiddenFeesItem2", "hiddenFeesItem3", "hiddenFeesItem4"].map(
+                  (key) => (
+                    <div
+                      key={key}
+                      className="flex items-start gap-2 bg-white/70 rounded-lg px-3 py-2.5"
+                    >
+                      <X className="h-4 w-4 text-rose-400 shrink-0 mt-0.5" aria-hidden="true" />
+                      <div>
+                        <p className="text-xs font-bold text-[var(--usj-text)]">
+                          {t(`comparison.${key}Label`)}
+                        </p>
+                        <p className="text-[11px] text-slate-400 leading-snug">
+                          {t(`comparison.${key}Desc`)}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-3">{t("comparison.hiddenFeesNote")}</p>
+            </div>
           </div>
 
           {/* Compact feature comparison -- short, icon-led, scannable at a glance */}

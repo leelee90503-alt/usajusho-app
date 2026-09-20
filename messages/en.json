@@ -207,7 +207,22 @@
       "row4Label": "Support",
       "row4Usajusho": "Japanese-language support",
       "row4Others": "Primarily English only",
-      "footnote": "DHL, UPS, and USPS are each excellent international carriers in their own right. USAJUSHO is built specifically for consolidating multiple purchases from US-only stores and delivering them to Japan."
+      "footnote": "DHL, UPS, and USPS are each excellent international carriers in their own right. USAJUSHO is built specifically for consolidating multiple purchases from US-only stores and delivering them to Japan.",
+      "noHiddenFeesLabel": "USAJUSHO charges $0 for these",
+      "noHiddenFeeInspection": "Inspection fee",
+      "noHiddenFeeReceiving": "Receiving fee",
+      "noHiddenFeeConsolidation": "Consolidation fee",
+      "hiddenFeesTitle": "What many other forwarders charge instead",
+      "hiddenFeesIntro": "A low headline shipping rate often isn't the full price. These extra charges are common across the industry:",
+      "hiddenFeesItem1Label": "Inspection fee",
+      "hiddenFeesItem1Desc": "Often $1–$2 per item, sometimes waived only for paid members",
+      "hiddenFeesItem2Label": "Receiving / intake fee",
+      "hiddenFeesItem2Desc": "Charged just to accept your package into their warehouse",
+      "hiddenFeesItem3Label": "Consolidation / repacking fee",
+      "hiddenFeesItem3Desc": "Charged per box to combine multiple purchases into one shipment",
+      "hiddenFeesItem4Label": "Paid membership tiers",
+      "hiddenFeesItem4Desc": "Lower rates are often locked behind monthly or annual membership fees",
+      "hiddenFeesNote": "USAJUSHO doesn't charge any of these. The shipping price you see is the price you pay — we compete on the honest, all-in shipping rate, not add-on fees."
     },
     "purchaseAgencyHighlight": {
       "eyebrow": "No US card? No problem",
