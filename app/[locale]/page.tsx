@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation"
 import { createClient } from "@/lib/supabase/server"
 import FeeCalculator from "@/components/home/fee-calculator"
 import DeliveryJourney from "@/components/home/delivery-journey"
+import HeroBackgroundSlideshow from "@/components/home/hero-background-slideshow"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -110,10 +111,8 @@ export default async function Home() {
       <section>
         <div className="relative isolate overflow-hidden rounded-2xl mx-auto max-w-6xl px-4 py-8 md:py-14 mt-4 md:mt-6">
           <div className="absolute inset-0 -z-10 bg-white">
-            <img
-              src="/images/hero-bg-v2.webp"
-              alt=""
-              className="h-full w-full object-contain object-right-top"
+            <HeroBackgroundSlideshow
+              images={["/images/hero-bg-v2.webp", "/images/hero-bg-no-hidden-fees.webp"]}
             />
             {/* Bright wash (left -> right) so the photo's warm, natural light
                 reads through instead of being covered by the brand navy. */}
