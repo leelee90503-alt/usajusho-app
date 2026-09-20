@@ -292,7 +292,7 @@
     "purchaseAgency": "購入代行",
     "login": "マイアカウント",
     "signup": "会員登録",
-    "howItWorks": "ご利用の流れ",
+    "forwarding": "転送サービス",
     "customs": "関税ガイド",
     "menuLabel": "メニュー"
   },
@@ -845,10 +845,15 @@
   "squareCardPayment": {
     "customsNotice": "※関税・輸入税等が発生した場合、上記金額とは別にお客様のご負担となります。"
   },
-  "howItWorks": {
-    "eyebrow": "はじめに",
-    "title": "USAJUSHOのご利用の流れ",
-    "description": "会員登録から日本のご自宅への到着まで、各ステップで実際に何が起こるのか、お客様にしていただくことと当社が行うことを分けてご説明します。",
+  "forwarding": {
+    "eyebrow": "転送サービスとは",
+    "title": "米国 → 日本 転送サービス",
+    "description": "あなた専用の米国住所で買い物して、USAJUSHOがまとめて日本へお届けする転送サービスです。会員登録から日本のご自宅への到着まで、実際に何が起こるのかを順を追ってご説明します。",
+    "ctaPrimary": "無料で始める",
+    "ctaSecondary": "送料を計算する",
+    "stepsEyebrow": "ご利用の流れ",
+    "stepsTitle": "転送サービスの流れ（7ステップ）",
+    "stepsDescription": "お客様にしていただくことと、当社が行うことを分けてご説明します。",
     "youDoLabel": "お客様にしていただくこと",
     "weHandleLabel": "当社が行うこと",
     "step1Title": "無料アカウントを作成",
@@ -863,7 +868,7 @@
     "step4Title": "受領・検品・撮影",
     "step4YouDo": "この段階でお客様にしていただくことはありません。",
     "step4WeHandle": "商品が倉庫に到着次第、内容を確認し撮影します。撮影後すぐにダッシュボードに写真を掲載します。",
-    "step5Title": "確認・まとめ・オプション選択",
+    "step5Title": "確認・合配送・オプション選択",
     "step5YouDo": "ダッシュボードにログインして到着した荷物を確認し、複数の荷物をまとめて送料を抑えるかどうかご選択ください。必要な追加サービスもここで選べます。",
     "step5WeHandle": "選択いただいた内容をもとに、最終金額を記載した商業送り状(インボイス)を作成します。",
     "step6Title": "お支払い・日本へ発送",
@@ -872,6 +877,37 @@
     "step7Title": "日本のご自宅にお届け",
     "step7YouDo": "いつでもダッシュボードから配送状況を確認できます。",
     "step7WeHandle": "発送後、通常3〜5日で、指定の日本国内住所に到着します。",
+    "addressExampleTitle": "実際の送り状はこんな感じです",
+    "addressExampleDescription": "USAJUSHO専用住所と会員番号が記載されたラベルが荷物に貼られ、追跡番号つきで日本へ発送されます。",
+    "addressExampleAlt": "USAJUSHOの発送ラベルが貼られた実際の荷物の写真",
+    "consolidationTitle": "合配送（コンソリデーション）でもっとお得に",
+    "consolidationDescription": "複数のショップで購入した荷物を、当社倉庫で1つにまとめて発送することで、個別に発送するより送料を大きく抑えられます。梱包・検品・発送まで当社が対応するので、お客様の作業はダッシュボードでの選択だけです。",
+    "consolidationAlt": "合配送前は箱が3つ、合配送後は1つにまとまる様子を示す写真",
+    "checklistEyebrow": "発送前に確認",
+    "checklistTitle": "発送前にこれだけは確認してください",
+    "checklistDescription": "ご注文の前に知っておくと安心なポイントを4つにまとめました。詳しい条件は各ガイドページでご確認いただけます。",
+    "checklistCustomsTitle": "関税・免税ラインを知っておく",
+    "checklistCustomsDescription": "課税価格が1万円以下なら原則免税です（個人使用は海外小売価格の60%で計算するため、実質約16,600円までが目安）。それを超えると簡易税率が適用されます。",
+    "checklistCustomsLink": "関税ガイドを見る",
+    "checklistQuantityTitle": "個数に上限がある商品に注意",
+    "checklistQuantityDescription": "ビタミン・サプリメントは個人使用の範囲（合計10kg程度）まで、医薬品は2か月分までなど、品目ごとに数量の上限があります。注文前に必ずご確認ください。",
+    "checklistQuantityLink": "対象品目を見る",
+    "checklistProhibitedTitle": "そもそも送れないものがあります",
+    "checklistProhibitedDescription": "お酒などのアルコール類は、当サービスでは航空輸送の制約により発送できません。ご注文前に発送可否をご確認ください。",
+    "checklistProhibitedLink": "発送禁止品目を見る",
+    "checklistPurchaseTitle": "米国のクレジットカードがなくても",
+    "checklistPurchaseDescription": "米国発行のカードが必要なショップや、海外発送に対応していないショップの商品も、購入代行サービスで当社が代わりに購入します。",
+    "checklistPurchaseLink": "購入代行について見る",
+    "calculatorTitle": "送料を今すぐ計算",
+    "calculatorDescription": "荷物の重さを入力するだけで、日本までの概算送料をすぐに確認できます。",
+    "faqEyebrow": "よくあるご質問",
+    "faqTitle": "転送サービスによくあるご質問",
+    "faqNewQ1Question": "ビタミン・サプリも継続して注文して大丈夫ですか？",
+    "faqNewQ1Answer": "個人使用の範囲であれば発送可能です。目安は合計10kg程度までで、これを超えるご注文は事前にご相談ください。",
+    "faqNewQ2Question": "関税は誰が、いつ支払うのですか？",
+    "faqNewQ2Answer": "課税対象になった場合、日本国内でお受け取りの際に配送業者を通じてお客様にご請求されます。当社からの送料請求とは別のお支払いになります。",
+    "faqNewQ3Question": "発送できない商品を知らずに注文してしまったら？",
+    "faqNewQ3Answer": "確認が取れ次第すぐにご連絡いたします。お客様のご負担で廃棄または返送となり、商品代金の返金はできませんので、ご注文前の確認をおすすめします。",
     "ctaTitle": "ご自身の米国住所を手に入れませんか?",
     "ctaDescription": "登録は無料 - 実際に発送するときだけ料金が発生します。",
     "ctaButton": "無料で始める"
@@ -934,9 +970,9 @@
       "title": "米国転送サービス｜あなた専用の米国住所で日本から米国ショッピング - USAJUSHO",
       "description": "米国の専用住所を無料で取得。Amazon・Walmartなど米国限定ショッピングを、検品・まとめ発送で送料を押えて日本へお届けします。"
     },
-    "howItWorks": {
-      "title": "米国転送サービスの使い方 - USAJUSHO",
-      "description": "会員登録から米国住所の取得、荷物の検品、まとめ発送、日本到着まで。USAJUSHOのご利用の流れをわかりやすく解説します。"
+    "forwarding": {
+      "title": "米国転送サービス（転送サービス）の使い方 - USAJUSHO",
+      "description": "会員登録から米国住所の取得、荷物の検品、合配送、日本到着まで。転送サービスの流れと、発送前に確認すべき関税・制限品目もわかりやすく解説します。"
     },
     "purchaseAgency": {
       "title": "アメリカ購入代行サービス｜クレジットカード不要 - USAJUSHO",

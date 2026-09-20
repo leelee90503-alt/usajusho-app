@@ -13,6 +13,24 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "4mb",
     },
   },
+  async redirects() {
+    // /how-it-works was renamed to /forwarding and expanded into a full
+    // forwarding-service hub page. Redirect both locale-prefixed forms
+    // (localePrefix is "always", so every URL is /ja/... or /en/...) to
+    // preserve any inbound links / SEO equity.
+    return [
+      {
+        source: "/how-it-works",
+        destination: "/forwarding",
+        permanent: true,
+      },
+      {
+        source: "/:locale(ja|en)/how-it-works",
+        destination: "/:locale/forwarding",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

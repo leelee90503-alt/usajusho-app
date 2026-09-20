@@ -292,7 +292,7 @@
     "purchaseAgency": "Purchase Proxy",
     "login": "My Account",
     "signup": "Sign Up",
-    "howItWorks": "How It Works",
+    "forwarding": "Forwarding Service",
     "customs": "Customs Guide",
     "menuLabel": "Menu"
   },
@@ -845,10 +845,15 @@
   "squareCardPayment": {
     "customsNotice": "Any customs duties or import taxes are not included in the amount above and are the customer's responsibility."
   },
-  "howItWorks": {
-    "eyebrow": "Getting Started",
-    "title": "How USAJUSHO Works",
-    "description": "From your first sign-up to a package on your doorstep in Japan — here's exactly what happens at each step, and what's on you versus what we take care of.",
+  "forwarding": {
+    "eyebrow": "About Forwarding",
+    "title": "US → Japan Forwarding Service",
+    "description": "Shop with your own dedicated US address, and USAJUSHO consolidates and ships everything to Japan for you. Here's exactly what happens at each step, from sign-up to your doorstep in Japan.",
+    "ctaPrimary": "Start for Free",
+    "ctaSecondary": "Calculate Shipping",
+    "stepsEyebrow": "Getting Started",
+    "stepsTitle": "How Forwarding Works (7 Steps)",
+    "stepsDescription": "Here's what's on you versus what we take care of, at each step.",
     "youDoLabel": "What you do",
     "weHandleLabel": "What we handle",
     "step1Title": "Create your free account",
@@ -872,6 +877,37 @@
     "step7Title": "Delivered to your door in Japan",
     "step7YouDo": "Track your shipment anytime from your dashboard.",
     "step7WeHandle": "Your package arrives at the Japan address you specified — typically within 3–5 days after shipping.",
+    "addressExampleTitle": "Here's what a real shipping label looks like",
+    "addressExampleDescription": "Your package ships with a label showing your dedicated USAJUSHO address and member number, plus a tracking number.",
+    "addressExampleAlt": "A real package with a USAJUSHO shipping label attached",
+    "consolidationTitle": "Consolidation saves you even more",
+    "consolidationDescription": "Packages from multiple stores are combined into a single shipment at our warehouse, cutting your shipping cost compared to shipping each one separately. We handle the packing, inspection, and shipping — you just choose consolidation from your dashboard.",
+    "consolidationAlt": "Three separate boxes on the left combining into one box on the right",
+    "checklistEyebrow": "Before You Ship",
+    "checklistTitle": "A few things to check before you order",
+    "checklistDescription": "Four things worth knowing up front. Full details are on the linked guide pages.",
+    "checklistCustomsTitle": "Know the duty-free threshold",
+    "checklistCustomsDescription": "Orders with a taxable value of ¥10,000 or less are generally duty-free (personal-use imports are valued at 60% of the retail price, so about ¥16,600 in practice). Above that, simplified tariff rates apply.",
+    "checklistCustomsLink": "See the customs guide",
+    "checklistQuantityTitle": "Watch for quantity limits",
+    "checklistQuantityDescription": "Vitamins and supplements are fine up to personal-use quantities (roughly 10kg total), medications up to a 2-month supply, and so on. Check before you order.",
+    "checklistQuantityLink": "See restricted items",
+    "checklistProhibitedTitle": "Some items can't ship at all",
+    "checklistProhibitedDescription": "Alcohol, for example, can't be shipped through this service due to air-carrier restrictions. Please confirm an item can ship before ordering it.",
+    "checklistProhibitedLink": "See prohibited items",
+    "checklistPurchaseTitle": "No US card? No problem",
+    "checklistPurchaseDescription": "For stores that require a US-issued card, or that don't ship overseas, our Purchase Proxy service buys the item on your behalf.",
+    "checklistPurchaseLink": "Learn about Purchase Proxy",
+    "calculatorTitle": "Calculate your shipping cost",
+    "calculatorDescription": "Enter your package weight to get an instant estimate for shipping to Japan.",
+    "faqEyebrow": "FAQ",
+    "faqTitle": "Forwarding FAQ",
+    "faqNewQ1Question": "Can I keep ordering vitamins or supplements?",
+    "faqNewQ1Answer": "Yes, within personal-use quantities — roughly 10kg total. If your order is larger than that, please reach out to us first.",
+    "faqNewQ2Question": "Who pays customs duty, and when?",
+    "faqNewQ2Answer": "If your shipment is dutiable, the carrier collects it from you upon delivery in Japan. It's separate from the shipping fee you pay us.",
+    "faqNewQ3Question": "What if I accidentally order something that can't be shipped?",
+    "faqNewQ3Answer": "We'll contact you as soon as we spot it. The item will need to be discarded or returned at your expense, and we can't refund the item cost — so it's worth checking before you order.",
     "ctaTitle": "Ready to get your own US address?",
     "ctaDescription": "Sign up is free — you're only charged when you actually ship.",
     "ctaButton": "Start for Free"
@@ -934,9 +970,9 @@
       "title": "US Package Forwarding to Japan | Your Own US Address - USAJUSHO",
       "description": "Get a free US address. Shop Amazon, Walmart, and other US-only stores, then let USAJUSHO inspect, consolidate, and ship your packages to Japan for less."
     },
-    "howItWorks": {
-      "title": "How USAJUSHO Works - US to Japan Package Forwarding",
-      "description": "From signing up and getting your US address to inspection, consolidation, and delivery in Japan — here's how USAJUSHO works, step by step."
+    "forwarding": {
+      "title": "US to Japan Package Forwarding Service - USAJUSHO",
+      "description": "From signing up and getting your US address to warehouse inspection, consolidation, and delivery in Japan. See how the forwarding process works, plus customs duty and restricted-item basics to check before you ship."
     },
     "purchaseAgency": {
       "title": "US Purchase Agency Service | No US Credit Card Needed - USAJUSHO",

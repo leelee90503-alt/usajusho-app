@@ -5,7 +5,7 @@ const BASE_URL = "https://www.usajusho.com";
 
 const PUBLIC_PATHS = [
   "",
-  "/how-it-works",
+  "/forwarding",
   "/purchase-agency",
   "/customs",
   "/legal/terms",

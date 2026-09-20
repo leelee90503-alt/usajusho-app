@@ -9,7 +9,7 @@ export default async function Header() {
   const tc = await getTranslations("common")
 
   const mobileLinks = [
-    { href: "/how-it-works", label: t("howItWorks") },
+    { href: "/forwarding", label: t("forwarding") },
     { href: "/customs", label: t("customs") },
     { href: "/purchase-agency", label: t("purchaseAgency") },
   ]
@@ -34,7 +34,7 @@ export default async function Header() {
             size="sm"
             className="text-sm font-medium text-slate-600 hover:text-primary hover:bg-primary/5"
           >
-            <Link href="/how-it-works">{t("howItWorks")}</Link>
+            <Link href="/forwarding">{t("forwarding")}</Link>
           </Button>
           <Button
             asChild
