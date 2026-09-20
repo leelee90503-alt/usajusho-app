@@ -2,12 +2,6 @@ import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation"
 import { getTranslations } from "next-intl/server"
 import {
-  FileText,
-  FileCheck,
-  CreditCard,
-  ShoppingCart,
-  PackageCheck,
-  Truck,
   Globe,
   Languages,
   Star,
@@ -27,6 +21,14 @@ import {
 } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/server"
 import FeeCalculator from "@/components/home/fee-calculator"
+import {
+  RequestArt,
+  QuoteArt,
+  PaymentArt,
+  PurchaseArt,
+  InspectArt,
+  ShipJapanArt,
+} from "@/components/purchase-agency/step-illustrations"
 import { getPurchaseAgencyPublicFeeSettings } from "@/lib/purchase-agency-settings"
 import { formatUSD } from "@/lib/format"
 import type { ShippingRate } from "@/lib/pricing"
@@ -68,13 +70,13 @@ export default async function PurchaseAgencyPage() {
     { question: t("faqQ4Question"), answer: t("faqQ4Answer") },
   ]
 
-  const steps: { title: string; description: string; icon: LucideIcon }[] = [
-    { title: t("step1Title"), description: t("step1Description"), icon: FileText },
-    { title: t("step2Title"), description: t("step2Description"), icon: FileCheck },
-    { title: t("step3Title"), description: t("step3Description"), icon: CreditCard },
-    { title: t("step4Title"), description: t("step4Description"), icon: ShoppingCart },
-    { title: t("step5Title"), description: t("step5Description"), icon: PackageCheck },
-    { title: t("step6Title"), description: t("step6Description"), icon: Truck },
+  const steps = [
+    { Art: RequestArt, title: t("step1Title"), description: t("step1Description") },
+    { Art: QuoteArt, title: t("step2Title"), description: t("step2Description") },
+    { Art: PaymentArt, title: t("step3Title"), description: t("step3Description") },
+    { Art: PurchaseArt, title: t("step4Title"), description: t("step4Description") },
+    { Art: InspectArt, title: t("step5Title"), description: t("step5Description") },
+    { Art: ShipJapanArt, title: t("step6Title"), description: t("step6Description") },
   ]
 
   const benefits: { title: string; description: string; icon: LucideIcon }[] = [
@@ -117,42 +119,42 @@ export default async function PurchaseAgencyPage() {
         </div>
       </section>
 
-      {/* Process steps */}
+      {/* Process steps -- same alternating layout as the /forwarding 7-step section */}
       <section className="mx-auto max-w-5xl px-4 py-16 md:py-20 w-full">
-        <div className="text-center mb-10">
+        <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-primary">
             {t("stepsTitle")}
           </h2>
           <p className="text-slate-600 mt-2">{t("stepsDescription")}</p>
         </div>
-        <ol className="space-y-4 max-w-3xl mx-auto">
-          {steps.map((step, index) => {
-            const Icon = step.icon
+        <div className="space-y-14">
+          {steps.map((step, i) => {
+            const Art = step.Art
+            const reversed = i % 2 === 1
             return (
-              <li key={step.title}>
-                <Card>
-                  <CardContent className="p-5 flex gap-4 items-start">
-                    <div className="flex flex-col items-center gap-2 shrink-0 pt-0.5">
-                      <Badge className="h-8 w-8 shrink-0 justify-center rounded-full p-0 text-sm">
-                        {index + 1}
-                      </Badge>
-                      <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
-                    </div>
-                    <div>
-                      <p className="text-base font-semibold text-[var(--usj-text)] mb-1">
-                        {step.title}
-                      </p>
-                      <p className="text-sm text-slate-600 leading-relaxed">
-                        {step.description}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </li>
+              <div
+                key={step.title}
+                className={`flex flex-col items-center gap-8 md:gap-12 ${
+                  reversed ? "md:flex-row-reverse" : "md:flex-row"
+                }`}
+              >
+                <div className="w-full md:w-1/2 flex justify-center">
+                  <div className="w-full max-w-[280px] rounded-2xl bg-[var(--usj-surface)] p-4">
+                    <Art className="w-full h-auto" />
+                  </div>
+                </div>
+                <div className="w-full md:w-1/2">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Badge className="h-7 w-7 shrink-0 justify-center rounded-full p-0 text-sm">{i + 1}</Badge>
+                    <h3 className="text-xl font-semibold text-[var(--usj-text)]">{step.title}</h3>
+                  </div>
+                  <p className="text-sm text-slate-600 leading-relaxed pl-10">{step.description}</p>
+                </div>
+              </div>
             )
           })}
-        </ol>
-        <p className="max-w-3xl mx-auto mt-6 text-xs text-slate-500 bg-[var(--usj-surface)] border border-slate-200 rounded-lg px-4 py-3 leading-relaxed">
+        </div>
+        <p className="max-w-3xl mx-auto mt-10 text-xs text-slate-500 bg-[var(--usj-surface)] border border-slate-200 rounded-lg px-4 py-3 leading-relaxed">
           {t("stepsPaymentNote")}
         </p>
       </section>
