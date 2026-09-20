@@ -408,6 +408,27 @@ export default async function Home() {
             <p className="text-xs text-slate-400 mt-4 text-center">
               {t("comparison.priceExampleNote")}
             </p>
+
+            {/* Carrier-by-carrier chips -- same 3kg package, glanceable */}
+            <div className="mt-5 pt-5 border-t border-slate-100">
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2 text-center">
+                {t("comparison.carrierCompareLabel")}
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {["carrierUsajusho", "carrierUsps", "carrierUps", "carrierDhl"].map((key) => (
+                  <span
+                    key={key}
+                    className={`text-xs rounded-full px-3 py-1.5 border ${
+                      key === "carrierUsajusho"
+                        ? "bg-primary/5 border-primary/20 text-primary font-semibold"
+                        : "bg-slate-50 border-slate-200 text-slate-500"
+                    }`}
+                  >
+                    {t(`comparison.${key}`)}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Compact feature comparison -- short, icon-led, scannable at a glance */}
