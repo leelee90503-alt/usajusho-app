@@ -438,27 +438,30 @@ export default async function Home() {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-2xl px-6 py-6 sm:pl-8 bg-[#f3f7fc] grid grid-cols-[1fr_120px] items-center gap-4">
+            <div className="relative overflow-hidden rounded-2xl px-6 py-7 sm:px-8 bg-[#f3f7fc] grid grid-cols-[0.8fr_1.2fr] items-center gap-4">
               <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold px-3 py-1.5 whitespace-nowrap">
                 <TrendingDown className="h-3.5 w-3.5" aria-hidden="true" />
                 {t("comparison.savingsBadge")}
               </span>
+              <div className="text-center pt-4">
+                <p className="text-lg font-extrabold tracking-tight text-slate-500">USPS</p>
+              </div>
               <div>
-                <h3 className="text-base md:text-lg font-semibold text-primary mb-1">
-                  {t("comparison.priceExampleOthersLabel")}
-                </h3>
-                <p className="text-3xl md:text-4xl font-bold text-slate-400 leading-none">
+                <p className="text-4xl md:text-5xl font-bold text-slate-400 leading-none">
                   {t("comparison.priceExampleOthersValue")}
                 </p>
-                <p className="text-base text-slate-400 mt-1.5">
+                <p className="text-lg mt-1.5 text-slate-400">
                   {t("comparison.priceExampleOthersJpy")}
+                </p>
+                <p className="text-xs mt-1.5 text-slate-500">
+                  {t("comparison.priceExampleOthersLabel")}
                 </p>
               </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/usps-priority-mail-box.webp"
                 alt="USPS Priority Mail box"
-                className="w-full justify-self-end self-end object-contain"
+                className="hidden md:block absolute bottom-2 right-2 w-20 object-contain opacity-90"
               />
             </div>
 
