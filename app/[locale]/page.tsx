@@ -552,7 +552,9 @@ export default async function Home() {
                       key={key}
                       className="flex items-start gap-2 bg-white/70 rounded-lg px-3 py-2.5"
                     >
-                      <X className="h-4 w-4 text-rose-400 shrink-0 mt-0.5" aria-hidden="true" />
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-100 mt-0.5">
+                        <X className="h-3.5 w-3.5 text-rose-500" strokeWidth={3} aria-hidden="true" />
+                      </span>
                       <div>
                         <p className="text-xs font-bold text-[var(--usj-text)]">
                           {t(`comparison.${key}Label`)}
