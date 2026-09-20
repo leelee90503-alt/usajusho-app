@@ -102,7 +102,7 @@ export default async function Home() {
           section below (not a full-bleed banner), so its left/right edges
           line up with the rest of the page instead of running edge to
           edge on wide screens. */}
-      <section className="border-b border-slate-200">
+      <section>
         <div className="relative isolate overflow-hidden rounded-2xl mx-auto max-w-6xl px-4 py-8 md:py-14 mt-4 md:mt-6">
           <div className="absolute inset-0 -z-10 bg-white">
             <img
@@ -145,7 +145,7 @@ export default async function Home() {
       {/* 2b. Supported shops ticker -- boxed to the same max-w-6xl column
           as the hero above it, with zero margin between them so the two
           cards sit flush against each other. */}
-      <section className="border-b border-slate-200">
+      <section>
         <div className="rounded-2xl bg-[var(--usj-surface)] mx-auto max-w-6xl px-0 py-7 md:py-8 overflow-hidden">
           <div className="px-4 text-center mb-4">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
@@ -188,7 +188,7 @@ export default async function Home() {
       </section>
 
       {/* 3. Trust indicators */}
-      <section className="border-b border-slate-200">
+      <section>
         <div className="mx-auto max-w-6xl px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div>
             <p className="text-2xl font-bold text-primary">{t("trust.stat1Value")}</p>
