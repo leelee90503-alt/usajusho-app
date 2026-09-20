@@ -23,6 +23,7 @@ import {
   Layers,
   DollarSign,
   Send,
+  Home as HomeIcon,
   type LucideIcon,
 } from "lucide-react"
 import type { ShippingRate } from "@/lib/pricing"
@@ -422,9 +423,11 @@ export default async function Home() {
               <span className="absolute top-0 left-6 rounded-b-lg bg-[#ff6868] px-4 py-1.5 text-[11px] font-extrabold tracking-wide">
                 {t("comparison.bestValueBadge")}
               </span>
-              <div className="text-center pt-4">
-                <p className="text-2xl">⌂</p>
-                <p className="text-sm font-bold mt-1">USAJUSHO</p>
+              <div className="flex flex-col items-center gap-2 text-center pt-4">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/15">
+                  <HomeIcon className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <p className="text-sm font-bold">USAJUSHO</p>
               </div>
               <div>
                 <p className="text-4xl md:text-5xl font-bold leading-none">
@@ -459,7 +462,7 @@ export default async function Home() {
               <img
                 src="/images/comparison-usps-box.webp"
                 alt="USPS Priority Mail box"
-                className="w-full max-w-[110px] justify-self-end self-end"
+                className="w-full max-w-[130px] justify-self-end self-end object-contain"
               />
             </div>
 
