@@ -314,11 +314,11 @@ export default async function Home() {
             <p className="text-slate-600 leading-relaxed">{t("consolidation.description")}</p>
           </div>
           <div className="bg-white border border-slate-200 rounded-lg p-6">
-            <div className="flex items-center gap-3 text-sm text-slate-500 mb-3">
+            <div className="mb-3">
               <img
-                src="/images/consolidation-flow.svg"
+                src="/images/consolidation-flow.png"
                 alt={t("consolidation.flowAlt")}
-                className="h-16 w-auto"
+                className="w-full h-auto"
               />
             </div>
             <p className="text-sm text-[var(--usj-text)] font-medium">{t("consolidation.exampleLabel")}</p>
