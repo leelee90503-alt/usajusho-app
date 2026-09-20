@@ -13,6 +13,9 @@ import {
   Archive,
   ShieldCheck,
   Settings2,
+  MessageCircle,
+  Phone,
+  Mail,
   type LucideIcon,
 } from "lucide-react"
 import type { ShippingRate } from "@/lib/pricing"
@@ -477,6 +480,59 @@ export default async function Home() {
                 <p className="text-sm text-slate-600 mt-3 leading-relaxed">{t(`faq.${key}Answer`)}</p>
               </details>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 11.5 Customer service / contact */}
+      <section className="bg-white border-t border-slate-200">
+        <div className="mx-auto max-w-4xl px-4 py-16 md:py-20">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
+              {t("contact.title")}
+            </h2>
+            <p className="text-slate-600 leading-relaxed max-w-2xl mx-auto">
+              {t("contact.description")}
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="border-[#06C755]/30 bg-[#06C755]/5">
+              <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+                <MessageCircle className="h-8 w-8 text-[#06C755]" aria-hidden="true" />
+                <p className="text-sm font-semibold text-[var(--usj-text)]">
+                  {t("contact.lineNote")}
+                </p>
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-auto px-6 py-3 bg-[#06C755] hover:bg-[#05b64c] text-white"
+                >
+                  <a href="https://lin.ee/Yu1BDaz" target="_blank" rel="noopener noreferrer">
+                    {t("contact.lineButton")}
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6 flex flex-col justify-center gap-3 text-sm text-slate-600">
+                <p className="font-semibold text-[var(--usj-text)]">{t("contact.companyName")}</p>
+                <p>{t("contact.companyAddress")}</p>
+                <a
+                  href="tel:+13103255000"
+                  className="flex items-center gap-2 hover:text-primary transition-colors"
+                >
+                  <Phone className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  {t("contact.phoneLabel")}
+                </a>
+                <a
+                  href="mailto:info@usajusho.com"
+                  className="flex items-center gap-2 hover:text-primary transition-colors"
+                >
+                  <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  {t("contact.emailLabel")}
+                </a>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

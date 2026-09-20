@@ -129,6 +129,16 @@
       "q4Question": "Do I need a commercial invoice?",
       "q4Answer": "Yes — it's required for every international shipment. You can create one easily from your dashboard, and our staff can also prepare it on your behalf if needed."
     },
+    "contact": {
+      "title": "Customer Service",
+      "description": "Have a question or need help with a package? We're happy to assist.",
+      "lineNote": "The fastest way to reach us is LINE.",
+      "lineButton": "Chat with us on LINE",
+      "companyName": "Victoria Tech Innovation",
+      "companyAddress": "18533 S. Western Ave., Gardena, CA 90248, USA",
+      "phoneLabel": "310.325.5000",
+      "emailLabel": "info@usajusho.com"
+    },
     "cta": {
       "title": "Get started for free today",
       "description": "Signup is free. Get your dedicated US address and enjoy shopping US stores from Japan.",
