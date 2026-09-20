@@ -489,6 +489,9 @@ export default async function Home() {
               { key: "carrierUsps", logo: "/images/carrier-usps-logo.webp" },
               { key: "carrierUps", logo: "/images/carrier-ups-logo.webp" },
               { key: "carrierDhl", logo: "/images/carrier-dhl-logo.webp" },
+              { key: "carrierBuyandship", logo: null },
+              { key: "carrierAliceHouse", logo: null },
+              { key: "carrierUsbuyer", logo: null },
             ].map(({ key, logo }) => (
               <div
                 key={key}
