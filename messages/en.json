@@ -354,6 +354,10 @@
       "cancelled": "Cancelled",
       "refunded": "Refunded"
     },
+    "additionalChargeEditButton": "Edit",
+    "additionalChargeVoidButton": "Void",
+    "additionalChargeVoidConfirm": "Void this additional charge? The customer will no longer be able to pay it.",
+    "additionalChargeUpdateSubmit": "Update Charge",
     "photosLabel": "Package Photos (3–5 required)",
     "photosHint": "Attach photos taken during inspection.",
     "photosCountLabel": "{count} selected",

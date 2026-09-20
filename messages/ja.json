@@ -354,6 +354,10 @@
       "cancelled": "キャンセル済み",
       "refunded": "返金済み"
     },
+    "additionalChargeEditButton": "編集",
+    "additionalChargeVoidButton": "取り消す",
+    "additionalChargeVoidConfirm": "この追加料金を取り消しますか？お客様は今後お支払いできなくなります。",
+    "additionalChargeUpdateSubmit": "更新する",
     "photosLabel": "荷物の写真（3〜5枚必須）",
     "photosHint": "検品時に撮影した写真を添付してください。",
     "photosCountLabel": "{count}枚選択中",

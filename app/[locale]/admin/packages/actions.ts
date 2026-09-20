@@ -619,6 +619,97 @@ export async function createAdditionalCharge(
   return { success: true }
 }
 
+// Corrects a mistaken additional charge (wrong amount/reason) before the
+// customer pays it. Only "pending" charges can be touched -- once Square has
+// taken a payment (or it's been refunded) the row is a financial record and
+// must not be edited in place. This intentionally does NOT re-notify the
+// customer: admins use the existing per-package "send a message" feature
+// (adminSendMessageToUser-style flow below) to explain a correction, so this
+// stays a plain data fix rather than triggering a second, possibly
+// conflicting email. Previously the only way to fix a mistaken charge was to
+// edit the database directly.
+export async function updateAdditionalCharge(
+  chargeId: string,
+  reason: string,
+  amountCents: number,
+) {
+  const supabase = await requireAdmin()
+
+  const trimmedReason = reason.trim()
+  if (!trimmedReason) {
+    return { error: "理由を入力してください。" }
+  }
+  if (!amountCents || amountCents <= 0) {
+    return { error: "正しい金額を入力してください。" }
+  }
+
+  const { data: charge, error: chargeError } = await supabase
+    .from("additional_charges")
+    .select("id, status, package_id")
+    .eq("id", chargeId)
+    .single()
+
+  if (chargeError || !charge) {
+    return { error: "追加料金が見つかりません。" }
+  }
+  if (charge.status !== "pending") {
+    return { error: "この追加料金はすでに処理済みのため編集できません。" }
+  }
+
+  const { error: updateError } = await supabase
+    .from("additional_charges")
+    .update({
+      reason: trimmedReason,
+      amount_cents: amountCents,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", chargeId)
+    .eq("status", "pending")
+
+  if (updateError) {
+    return { error: updateError.message }
+  }
+
+  revalidatePath("/admin/packages")
+  revalidatePath("/dashboard")
+  return { success: true }
+}
+
+// Voids a mistaken additional charge outright (e.g. it should never have
+// been issued). Same "pending only" guard as updateAdditionalCharge() above
+// -- a paid or already-refunded charge is a financial record, not something
+// to quietly delete or flip back to pending.
+export async function cancelAdditionalCharge(chargeId: string) {
+  const supabase = await requireAdmin()
+
+  const { data: charge, error: chargeError } = await supabase
+    .from("additional_charges")
+    .select("id, status")
+    .eq("id", chargeId)
+    .single()
+
+  if (chargeError || !charge) {
+    return { error: "追加料金が見つかりません。" }
+  }
+  if (charge.status !== "pending") {
+    return { error: "この追加料金はすでに処理済みのため取り消せません。" }
+  }
+
+  const { error: updateError } = await supabase
+    .from("additional_charges")
+    .update({ status: "cancelled", updated_at: new Date().toISOString() })
+    .eq("id", chargeId)
+    .eq("status", "pending")
+
+  if (updateError) {
+    return { error: updateError.message }
+  }
+
+  revalidatePath("/admin/packages")
+  revalidatePath("/dashboard")
+  return { success: true }
+}
+
 export async function deletePackage(packageId: string) {
   const supabase = await requireAdmin()
 

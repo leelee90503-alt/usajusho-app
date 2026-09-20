@@ -285,12 +285,12 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-center">
           <div className="order-2 md:order-1 grid grid-cols-2 gap-3">
             <img
-              src="/images/inspection-exterior.svg"
+              src="/images/inspection-exterior.png"
               alt={t("inspection.exteriorAlt")}
               className="aspect-square rounded-lg bg-surface border border-slate-200 object-cover w-full"
             />
             <img
-              src="/images/inspection-interior.svg"
+              src="/images/inspection-interior.png"
               alt={t("inspection.interiorAlt")}
               className="aspect-square rounded-lg bg-surface border border-slate-200 object-cover w-full mt-6"
             />

@@ -3,7 +3,18 @@
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
-import { updatePackageStatus, deletePackage, markShipped, createAdditionalCharge, addPackagePhotos, deletePackagePhoto, resendQuoteNotification, sendCustomMessage } from "./actions"
+import {
+  updatePackageStatus,
+  deletePackage,
+  markShipped,
+  createAdditionalCharge,
+  updateAdditionalCharge,
+  cancelAdditionalCharge,
+  addPackagePhotos,
+  deletePackagePhoto,
+  resendQuoteNotification,
+  sendCustomMessage,
+} from "./actions"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -140,10 +151,56 @@ export default function PackageRow({
   const [photoFiles, setPhotoFiles] = useState<File[]>([])
   const [photoMessage, setPhotoMessage] = useState<string | null>(null)
   const [photoInputKey, setPhotoInputKey] = useState(0)
+  const [editingChargeId, setEditingChargeId] = useState<string | null>(null)
+  const [editChargeReason, setEditChargeReason] = useState("")
+  const [editChargeAmount, setEditChargeAmount] = useState("")
+  const [editChargeMessage, setEditChargeMessage] = useState<string | null>(null)
+  const [voidChargeMessage, setVoidChargeMessage] = useState<string | null>(null)
   const [resendMessage, setResendMessage] = useState<string | null>(null)
   const [showCustomMessageForm, setShowCustomMessageForm] = useState(false)
   const [customMessageText, setCustomMessageText] = useState("")
   const [customMessageStatus, setCustomMessageStatus] = useState<string | null>(null)
+
+  function handleStartEditCharge(charge: AdditionalCharge) {
+    setEditingChargeId(charge.id)
+    setEditChargeReason(charge.reason)
+    setEditChargeAmount((charge.amount_cents / 100).toFixed(2))
+    setEditChargeMessage(null)
+  }
+
+  function handleCancelEditCharge() {
+    setEditingChargeId(null)
+    setEditChargeMessage(null)
+  }
+
+  function handleUpdateCharge(chargeId: string) {
+    const amountCents = Math.round(Number(editChargeAmount) * 100)
+    if (!editChargeReason.trim() || !amountCents || amountCents <= 0) {
+      setEditChargeMessage(tAdmin("additionalChargeInvalid"))
+      return
+    }
+    setEditChargeMessage(null)
+    startTransition(async () => {
+      const result = await updateAdditionalCharge(chargeId, editChargeReason, amountCents)
+      if (result?.error) {
+        setEditChargeMessage(result.error)
+      } else {
+        setEditingChargeId(null)
+      }
+    })
+  }
+
+  function handleVoidCharge(chargeId: string) {
+    const ok = window.confirm(tAdmin("additionalChargeVoidConfirm"))
+    if (!ok) return
+    setVoidChargeMessage(null)
+    startTransition(async () => {
+      const result = await cancelAdditionalCharge(chargeId)
+      if (result?.error) {
+        setVoidChargeMessage(result.error)
+      }
+    })
+  }
 
   function handleCreateCharge() {
     const amountCents = Math.round(Number(chargeAmount) * 100)
@@ -320,22 +377,98 @@ export default function PackageRow({
               </p>
             )}
             {additionalCharges.length > 0 && (
-              <div className="mt-2 space-y-1">
-                {additionalCharges.map((charge) => (
-                  <p key={charge.id} className="text-xs text-muted-foreground">
-                    <span
-                      className={`mr-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
-                        CHARGE_STATUS_BADGE_CLASS[charge.status] ?? "bg-slate-100 text-slate-700"
-                      }`}
+              <div className="mt-2 space-y-1.5">
+                {additionalCharges.map((charge) =>
+                  editingChargeId === charge.id ? (
+                    <div
+                      key={charge.id}
+                      className="flex flex-wrap items-end gap-2 rounded-lg border border-border bg-muted/40 p-2"
                     >
-                      {tAdmin(`additionalChargeStatus.${charge.status}`)}
-                    </span>
-                    {tAdmin("additionalChargeLine", {
-                      amount: formatUSD(charge.amount_cents / 100),
-                      reason: charge.reason,
-                    })}
-                  </p>
-                ))}
+                      <div className="space-y-1">
+                        <Label className="text-xs font-normal text-muted-foreground">
+                          {tAdmin("additionalChargeReasonLabel")}
+                        </Label>
+                        <Input
+                          type="text"
+                          value={editChargeReason}
+                          onChange={(e) => setEditChargeReason(e.target.value)}
+                          className="w-56"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs font-normal text-muted-foreground">
+                          {tAdmin("additionalChargeAmountLabel")}
+                        </Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={editChargeAmount}
+                          onChange={(e) => setEditChargeAmount(e.target.value)}
+                          className="w-28"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={isPending}
+                        onClick={() => handleUpdateCharge(charge.id)}
+                      >
+                        {tAdmin("additionalChargeUpdateSubmit")}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={isPending}
+                        onClick={handleCancelEditCharge}
+                      >
+                        {tAdmin("additionalChargeCancel")}
+                      </Button>
+                      {editChargeMessage && (
+                        <p className="w-full text-xs text-destructive">{editChargeMessage}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p key={charge.id} className="text-xs text-muted-foreground">
+                      <span
+                        className={`mr-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                          CHARGE_STATUS_BADGE_CLASS[charge.status] ?? "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        {tAdmin(`additionalChargeStatus.${charge.status}`)}
+                      </span>
+                      {tAdmin("additionalChargeLine", {
+                        amount: formatUSD(charge.amount_cents / 100),
+                        reason: charge.reason,
+                      })}
+                      {charge.status === "pending" && (
+                        <>
+                          {" "}
+                          <button
+                            type="button"
+                            disabled={isPending}
+                            onClick={() => handleStartEditCharge(charge)}
+                            className="underline underline-offset-2 disabled:opacity-50"
+                          >
+                            {tAdmin("additionalChargeEditButton")}
+                          </button>{" "}
+                          <button
+                            type="button"
+                            disabled={isPending}
+                            onClick={() => handleVoidCharge(charge.id)}
+                            className="text-destructive underline underline-offset-2 disabled:opacity-50"
+                          >
+                            {tAdmin("additionalChargeVoidButton")}
+                          </button>
+                        </>
+                      )}
+                    </p>
+                  )
+                )}
+                {voidChargeMessage && (
+                  <p className="text-xs text-destructive">{voidChargeMessage}</p>
+                )}
               </div>
             )}
               {declaration && (declaration.order_amount != null || declaration.origin_tracking_number || declaration.receipt_url) && (
