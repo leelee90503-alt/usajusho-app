@@ -184,6 +184,27 @@ export default async function ForwardingPage({
         </div>
       </section>
 
+      {/* 2b. Free warehouse inspection & photo-sharing proof (real photo, both locales) */}
+      <section className="bg-[var(--usj-surface)] border-y border-slate-200">
+        <div className="mx-auto max-w-5xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-accent mb-2">
+              {t("warehouseEyebrow")}
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">
+              {t("warehouseTitle")}
+            </h2>
+            <p className="text-slate-600 leading-relaxed">{t("warehouseDescription")}</p>
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/forwarding/warehouse-inspection.webp"
+            alt={t("warehouseAlt")}
+            className="w-full h-auto rounded-lg border border-slate-200"
+          />
+        </div>
+      </section>
+
       {/* 3. Real shipping-label example (bilingual photo, both locales) */}
       <section className="bg-white border-y border-slate-200">
         <div className="mx-auto max-w-4xl px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 items-center">
