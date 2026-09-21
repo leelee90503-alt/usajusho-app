@@ -1089,7 +1089,11 @@
     "edit": "編集",
     "save": "保存",
     "cancel": "キャンセル",
-    "notSet": "未設定"
+    "notSet": "未設定",
+    "previewButton": "顧客画面をプレビュー",
+    "previewBannerTitle": "プレビューモード：{name} 様の画面を表示中",
+    "previewBannerNote": "これは管理者専用の読み取り専用プレビューです。ここでの操作（お支払いなど）は行えません。",
+    "previewBackLink": "← 顧客詳細に戻る"
   },
   "adminHome": {
     "title": "管理者ダッシュボード",

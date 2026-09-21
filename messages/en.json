@@ -1089,7 +1089,11 @@
     "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel",
-    "notSet": "Not set"
+    "notSet": "Not set",
+    "previewButton": "Preview customer view",
+    "previewBannerTitle": "Preview mode: viewing {name}'s dashboard",
+    "previewBannerNote": "This is a read-only, admin-only preview. Actions like payment can't be performed here.",
+    "previewBackLink": "← Back to customer details"
   },
   "adminHome": {
     "title": "Admin Dashboard",

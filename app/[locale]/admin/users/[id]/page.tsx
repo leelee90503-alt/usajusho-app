@@ -7,7 +7,8 @@ import ContactInfoForm from "./contact-info-form"
 import CarrierTrackLink from "@/components/carrier-track-link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, Eye } from "lucide-react"
 import { formatUSD } from "@/lib/format"
 
 export default async function AdminUserDetailPage({
@@ -122,7 +123,15 @@ export default async function AdminUserDetailPage({
           {t("backLink")}
         </Link>
 
-        <h1 className="mt-4 text-xl font-bold text-primary">{t("title")}</h1>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-xl font-bold text-primary">{t("title")}</h1>
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/admin/users/${profile.id}/preview`}>
+              <Eye className="h-4 w-4" />
+              {t("previewButton")}
+            </Link>
+          </Button>
+        </div>
 
         <div className="mt-4">
           <UserRow
