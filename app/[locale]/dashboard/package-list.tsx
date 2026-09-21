@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Package as PackageIcon } from "lucide-react"
 import { formatUSD } from "@/lib/format"
 import SquareCardPayment from "@/components/square-card-payment"
+import CarrierTrackLink from "@/components/carrier-track-link"
 import { buildBillingContact } from "@/lib/square"
 import { trackPurchase } from "@/lib/gtag"
 import OrderStepper from "./order-stepper"
@@ -167,8 +168,9 @@ export default function PackageList({
                       </div>
                     )}
                     {pkg.tracking_number && (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {t("trackingNumber")}{pkg.tracking_number}
+                      <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                        <span>{t("trackingNumber")}{pkg.tracking_number}</span>
+                        <CarrierTrackLink trackingNumber={pkg.tracking_number} />
                       </p>
                     )}
                     {pkg.weight_lbs && (
