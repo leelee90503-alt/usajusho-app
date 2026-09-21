@@ -76,6 +76,21 @@ export function detectCarrier(raw: string): CarrierMatch | null {
     }
   }
 
+  // OCS Worldwide (jp.ocsworld.com): the international carrier USAJUSHO uses
+  // for the US -> Japan leg of both forwarding and purchase-agency
+  // shipments. Air Waybill numbers are 11-digit numeric (confirmed against
+  // the placeholder/example on OCS's own tracking form). The direct result
+  // page URL (https://webcsw.ocs.co.jp/csw/ECSWG0201R00003P.do?cwbno=...)
+  // was confirmed by submitting OCS's own search form and observing where
+  // it actually navigates -- OCS's public-facing cwbCheck.html page is just
+  // a redirector to this results page, not the final tracking URL itself.
+  if (/^\d{11}$/.test(num)) {
+    return {
+      carrier: "OCS",
+      trackingUrl: `https://webcsw.ocs.co.jp/csw/ECSWG0201R00003P.do?cwbno=${num}`,
+    }
+  }
+
   // FedEx: 12, 15, or 20-22 digit numeric. Checked last among the numeric
   // formats since it's the least specific (catches whatever the USPS-prefix
   // check above didn't).
