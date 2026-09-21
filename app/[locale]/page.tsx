@@ -26,6 +26,7 @@ import {
   Send,
   CircleCheck,
   X,
+  Umbrella,
   type LucideIcon,
 } from "lucide-react"
 import type { ShippingRate } from "@/lib/pricing"
@@ -556,12 +557,13 @@ export default async function Home() {
           </div>
 
           {/* Compact feature comparison -- short, icon-led, scannable at a glance */}
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-4">
             {[
               { key: "row1", Icon: Clock },
               { key: "row2", Icon: ShieldCheck },
               { key: "row3", Icon: CreditCard },
               { key: "row4", Icon: Languages },
+              { key: "row5", Icon: Umbrella },
             ].map(({ key, Icon }) => (
               <div key={key} className="bg-white border border-slate-200 rounded-xl p-4">
                 <p className="flex items-center gap-2 text-sm font-bold text-[var(--usj-text)]">
