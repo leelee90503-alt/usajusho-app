@@ -253,6 +253,12 @@ export default async function PurchaseAgencyPage() {
               customsUnavailable: th("calculator.customsUnavailable"),
               customsDisclaimer: th("calculator.customsDisclaimer"),
               customsLinkLabel: th("calculator.customsLinkLabel"),
+              insuranceTitle: th("calculator.insuranceTitle"),
+              insuranceResultLabel: th("calculator.insuranceResultLabel"),
+              insuranceFreeResult: th("calculator.insuranceFreeResult"),
+              insuranceUnavailable: th("calculator.insuranceUnavailable"),
+              insuranceOverLimit: th("calculator.insuranceOverLimit"),
+              insuranceDisclaimer: th("calculator.insuranceDisclaimer"),
             }}
           />
         </div>

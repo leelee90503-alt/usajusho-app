@@ -130,7 +130,13 @@
       "customsTotalLabel": "予想税額合計",
       "customsUnavailable": "商品価格を入力すると、予想される関税・消費税が表示されます。",
       "customsDisclaimer": "※ 現行の60%ルール・簡易税率に基づく参考目安です。革製品・ニット衣類・履物・手袋などは1万円以下でも課税対象となり、この簡易計算には含まれません。詳しくは",
-      "customsLinkLabel": "通関ガイド"
+      "customsLinkLabel": "通関ガイド",
+      "insuranceTitle": "配送保険料の目安も計算できます（任意）",
+      "insuranceResultLabel": "予想保険料",
+      "insuranceFreeResult": "申告金額$100以下は保険料無料です（OCSの規定によりUS$100まで自動補償されます）。",
+      "insuranceUnavailable": "上の商品価格を入力すると、予想される保険料が表示されます。",
+      "insuranceOverLimit": "申告金額が$10,000を超える場合は、お問い合わせください。",
+      "insuranceDisclaimer": "※ OCS保険料金表（2025年1月1日改定・個人のお客様向け）に基づく参考目安です。実際の金額はお申込み時にご案内します。酒類・骨董品・貴金属（コスチュームジュエリーを除く）・現金・生き物・生鮮食品などはOCS保険の対象外で、事前承認が必要です。"
     },
     "tracking": {
       "title": "発送から到着まで追跡できます",

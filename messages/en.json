@@ -130,7 +130,13 @@
       "customsTotalLabel": "Estimated total tax",
       "customsUnavailable": "Enter an item price to see an estimated customs duty.",
       "customsDisclaimer": "* Reference estimate only, based on Japan's current 60%-valuation / simplified-tariff rules. Leather goods, knitwear, footwear, and gloves are dutiable even under ¥10,000 and aren't covered by this simple estimate. See the",
-      "customsLinkLabel": "Customs Guide"
+      "customsLinkLabel": "Customs Guide",
+      "insuranceTitle": "Estimate shipping insurance too (optional)",
+      "insuranceResultLabel": "Estimated insurance fee",
+      "insuranceFreeResult": "Free for declared values of $100 or less -- OCS automatically covers up to US$100 under their own terms.",
+      "insuranceUnavailable": "Enter the item price above to see the estimated insurance fee.",
+      "insuranceOverLimit": "For declared values over $10,000, please contact us directly.",
+      "insuranceDisclaimer": "* Reference estimate based on OCS's Insurance Price List (revised January 1, 2025; individual-customer rates). The final amount is confirmed when you place your order. Alcohol, antiques, precious metals/stones (other than costume jewelry), cash, live animals/plants, and perishables aren't covered by OCS insurance and require prior approval."
     },
     "tracking": {
       "title": "Track it from shipment to delivery",

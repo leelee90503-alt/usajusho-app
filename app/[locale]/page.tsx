@@ -620,6 +620,12 @@ export default async function Home() {
               customsUnavailable: t("calculator.customsUnavailable"),
               customsDisclaimer: t("calculator.customsDisclaimer"),
               customsLinkLabel: t("calculator.customsLinkLabel"),
+              insuranceTitle: t("calculator.insuranceTitle"),
+              insuranceResultLabel: t("calculator.insuranceResultLabel"),
+              insuranceFreeResult: t("calculator.insuranceFreeResult"),
+              insuranceUnavailable: t("calculator.insuranceUnavailable"),
+              insuranceOverLimit: t("calculator.insuranceOverLimit"),
+              insuranceDisclaimer: t("calculator.insuranceDisclaimer"),
             }}
           />
         </div>

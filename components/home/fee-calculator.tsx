@@ -9,6 +9,7 @@ import {
   CUSTOMS_CATEGORIES,
   type CustomsCategoryKey,
 } from "@/lib/customs-jp"
+import { estimateOcsInsurance, isOverOcsInsuranceLimit } from "@/lib/insurance-jp"
 
 type Labels = {
   weightLabel: string
@@ -39,6 +40,12 @@ type Labels = {
   customsUnavailable: string
   customsDisclaimer: string
   customsLinkLabel: string
+  insuranceTitle: string
+  insuranceResultLabel: string
+  insuranceFreeResult: string
+  insuranceUnavailable: string
+  insuranceOverLimit: string
+  insuranceDisclaimer: string
 }
 
 const SIMPLE_CATEGORY_LABEL_KEYS: Record<string, keyof Labels> = {
@@ -101,6 +108,15 @@ export default function FeeCalculator({
     if (itemPriceUsd === null) return null
     return estimateJapanCustoms({ itemPriceUsd, categoryKey })
   }, [itemPriceUsd, categoryKey])
+
+  // Shares the same declared-value input as the customs estimate above --
+  // "CIF Declared Value" for insurance purposes is the same figure.
+  const insuranceEstimate = useMemo(() => {
+    if (itemPriceUsd === null) return null
+    return estimateOcsInsurance(itemPriceUsd, "individual")
+  }, [itemPriceUsd])
+
+  const isOverInsuranceLimit = itemPriceUsd !== null && isOverOcsInsuranceLimit(itemPriceUsd)
 
   const simpleCategories = CUSTOMS_CATEGORIES.filter((c) => c.simple)
 
@@ -259,6 +275,29 @@ export default function FeeCalculator({
             {labels.customsLinkLabel}
           </Link>
         </p>
+      </div>
+
+      <div className="mt-6 pt-6 border-t border-slate-100">
+        <p className="text-sm font-medium text-[var(--usj-text)] mb-3">{labels.insuranceTitle}</p>
+
+        <div className="rounded-md bg-[var(--usj-surface)] px-4 py-4 min-h-[64px] flex flex-col justify-center">
+          {isOverInsuranceLimit ? (
+            <p className="text-sm text-slate-400">{labels.insuranceOverLimit}</p>
+          ) : insuranceEstimate ? (
+            insuranceEstimate.isFree ? (
+              <p className="text-sm font-semibold text-emerald-700">{labels.insuranceFreeResult}</p>
+            ) : (
+              <div className="flex justify-between text-sm font-bold text-[var(--usj-primary)]">
+                <span>{labels.insuranceResultLabel}</span>
+                <span>${insuranceEstimate.feeUsd.toLocaleString()}</span>
+              </div>
+            )
+          ) : (
+            <p className="text-sm text-slate-400">{labels.insuranceUnavailable}</p>
+          )}
+        </div>
+
+        <p className="text-xs text-slate-400 mt-3">{labels.insuranceDisclaimer}</p>
       </div>
     </div>
   )
