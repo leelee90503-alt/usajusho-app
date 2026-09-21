@@ -35,6 +35,7 @@ export const customsEn: CustomsDoc = {
   taxOverHeading: "If the value exceeds ¥10,000",
   taxOverParagraphs: [
     "If the dutiable value is ¥200,000 or less, a simplified per-category tariff applies. Most general merchandise falls under \"other goods = 5%\", plus 10% consumption tax on top.",
+    "When duty and consumption tax apply, the amount actually due is the duty/tax plus a ¥1,650 customs brokerage fee. You pay this directly to the delivery carrier when the package is delivered.",
   ],
   taxTable: {
     caption: "Simplified tariff rates for low-value imports (dutiable value ¥200,000 or less)",
