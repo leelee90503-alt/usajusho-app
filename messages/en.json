@@ -807,6 +807,7 @@
     "emptyNone": "No purchase requests yet.",
     "emptyFiltered": "No requests match this filter.",
     "budgetCapLabel": "Budget Cap",
+    "quoteTotalLabel": "Amount Charged",
     "writeQuoteTitle": "Write a Quote",
     "itemPriceLabel": "Item Price (USD)",
     "feeLabel": "Fee (USD)",

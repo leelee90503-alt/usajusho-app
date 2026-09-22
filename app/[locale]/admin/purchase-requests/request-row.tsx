@@ -189,6 +189,12 @@ export default function RequestRow({
                 {formatUSD(request.budget_cap_cents / 100)}
               </p>
             )}
+            {request.quote_total_cents != null && (
+              <p className="mt-1 text-xs font-semibold text-teal-700">
+                {t("quoteTotalLabel")}: $
+                {formatUSD(request.quote_total_cents / 100)}
+              </p>
+            )}
           </div>
           <Badge
             className={`shrink-0 ${STATUS_STYLES[request.status] ?? "bg-slate-100 text-slate-700"}`}

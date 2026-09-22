@@ -807,6 +807,7 @@
     "emptyNone": "まだ購入代行リクエストはありません。",
     "emptyFiltered": "条件に一致するリクエストはありません。",
     "budgetCapLabel": "ご予算上限",
+    "quoteTotalLabel": "決済金額",
     "writeQuoteTitle": "見積りを作成",
     "itemPriceLabel": "商品代金（USD）",
     "feeLabel": "手数料（USD）",
