@@ -9,6 +9,7 @@ import {
   markPurchasedAndLinkPackage,
   refundPurchaseRequest,
   cancelRequestAsAdmin,
+  deletePurchaseRequestAsAdmin,
 } from "./actions"
 import {
   estimatePurchaseAgencyFee,
@@ -155,6 +156,16 @@ export default function RequestRow({
     setMessage(null)
     startTransition(async () => {
       const result = await cancelRequestAsAdmin(request.id)
+      setMessage(result?.error ?? null)
+    })
+  }
+
+  function handleDelete() {
+    const ok = confirm(t("deleteConfirm"))
+    if (!ok) return
+    setMessage(null)
+    startTransition(async () => {
+      const result = await deletePurchaseRequestAsAdmin(request.id)
       setMessage(result?.error ?? null)
     })
   }
@@ -378,20 +389,32 @@ export default function RequestRow({
           </p>
         )}
 
-        {["submitted", "quote_sent", "awaiting_payment"].includes(
-          request.status,
-        ) && (
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          {["submitted", "quote_sent", "awaiting_payment"].includes(
+            request.status,
+          ) && (
+            <Button
+              type="button"
+              variant="link"
+              size="sm"
+              disabled={isPending}
+              onClick={handleCancel}
+              className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
+            >
+              {t("cancelButton")}
+            </Button>
+          )}
           <Button
             type="button"
             variant="link"
             size="sm"
             disabled={isPending}
-            onClick={handleCancel}
-            className="mt-3 h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
+            onClick={handleDelete}
+            className="h-auto p-0 text-xs text-destructive hover:text-destructive/80"
           >
-            {t("cancelButton")}
+            {t("deleteButton")}
           </Button>
-        )}
+        </div>
 
         {message && <p className="mt-2 text-xs text-accent">{message}</p>}
       </CardContent>

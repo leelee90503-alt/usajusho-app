@@ -832,6 +832,8 @@
     "viewInvoiceLink": "Commercial Invoice",
     "cancelButton": "Cancel Request",
     "cancelConfirm": "Are you sure you want to cancel this request?",
+    "deleteButton": "Delete",
+    "deleteConfirm": "This will permanently delete this request. This cannot be undone. Are you sure?",
     "status": {
       "submitted": "Submitted",
       "quote_sent": "Quote Sent",

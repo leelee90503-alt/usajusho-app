@@ -400,6 +400,43 @@ export async function cancelRequestAsAdmin(requestId: string) {
   return { success: true }
 }
 
+// Permanently removes a purchase request, for cleaning up test/duplicate/
+// spam entries. Deliberately restricted to requests with no payment and no
+// linked package -- anything that money or fulfillment has touched should
+// be cancelled/refunded (which preserves the record) rather than deleted.
+export async function deletePurchaseRequestAsAdmin(requestId: string) {
+  const supabase = await requireAdmin()
+
+  const { data: request, error: fetchError } = await supabase
+    .from("purchase_requests")
+    .select("id, square_payment_id, linked_package_id")
+    .eq("id", requestId)
+    .single()
+
+  if (fetchError || !request) {
+    return { error: "リクエストが見つかりません。" }
+  }
+
+  if (request.square_payment_id || request.linked_package_id) {
+    return {
+      error:
+        "支払いまたは荷物と紐付いているリクエストは削除できません。キャンセルをご利用ください。",
+    }
+  }
+
+  const { error } = await supabase
+    .from("purchase_requests")
+    .delete()
+    .eq("id", requestId)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath("/admin/purchase-requests")
+  return { success: true }
+}
+
 export async function saveFeeSettings(formData: FormData) {
   const supabase = await requireAdmin()
 
