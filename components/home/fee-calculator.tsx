@@ -121,7 +121,7 @@ export default function FeeCalculator({
   const simpleCategories = CUSTOMS_CATEGORIES.filter((c) => c.simple)
 
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-6">
+    <div className="min-w-0 bg-white border border-slate-200 rounded-lg p-6">
       <label htmlFor="home-weight-kg" className="block text-sm font-medium text-[var(--usj-text)] mb-2">
         {labels.weightLabel}
       </label>
