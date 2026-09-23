@@ -398,6 +398,8 @@ export default async function ForwardingPage({
               <CardContent className="p-6 flex flex-col justify-center gap-3 text-sm text-slate-600">
                 <p className="font-semibold text-[var(--usj-text)]">{th("contact.companyName")}</p>
                 <p>{th("contact.companyAddress")}</p>
+                <p>{th("contact.companyAddress2")}</p>
+                <p>{th("contact.companyAddress3")}</p>
                 <a
                   href="tel:+13103255000"
                   className="flex items-center gap-2 hover:text-primary transition-colors"

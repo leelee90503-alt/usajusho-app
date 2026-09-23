@@ -717,6 +717,8 @@ export default async function Home() {
               <CardContent className="p-6 flex flex-col justify-center gap-3 text-sm text-slate-600">
                 <p className="font-semibold text-[var(--usj-text)]">{t("contact.companyName")}</p>
                 <p>{t("contact.companyAddress")}</p>
+                <p>{t("contact.companyAddress2")}</p>
+                <p>{t("contact.companyAddress3")}</p>
                 <a
                   href="tel:+13103255000"
                   className="flex items-center gap-2 hover:text-primary transition-colors"
