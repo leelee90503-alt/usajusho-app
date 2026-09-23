@@ -401,10 +401,24 @@ export async function cancelRequestAsAdmin(requestId: string) {
 }
 
 // Permanently removes a purchase request, for cleaning up test/duplicate/
-// spam entries. Deliberately restricted to requests with no payment and no
-// linked package -- anything that money or fulfillment has touched should
-// be cancelled/refunded (which preserves the record) rather than deleted.
-export async function deletePurchaseRequestAsAdmin(requestId: string) {
+// spam entries. By default this is restricted to requests with no payment
+// and no linked package -- anything that money or fulfillment has touched
+// should normally be cancelled/refunded (which preserves the record)
+// rather than deleted.
+//
+// Passing force:true skips that restriction, for the rare case of a known
+// test/junk entry that does have a payment or linked package attached
+// (e.g. a real test charge run against a fake product). This is still
+// safe at the database level: packages.source_purchase_request_id and
+// package_items.source_purchase_request_id are both declared
+// "on delete set null", so deleting the request just clears its back-
+// reference from any linked package instead of failing or leaving a
+// dangling id -- the package itself, and any Square charge already made
+// against it, are untouched.
+export async function deletePurchaseRequestAsAdmin(
+  requestId: string,
+  force = false,
+) {
   const supabase = await requireAdmin()
 
   const { data: request, error: fetchError } = await supabase
@@ -417,10 +431,11 @@ export async function deletePurchaseRequestAsAdmin(requestId: string) {
     return { error: "リクエストが見つかりません。" }
   }
 
-  if (request.square_payment_id || request.linked_package_id) {
+  if (!force && (request.square_payment_id || request.linked_package_id)) {
     return {
       error:
         "支払いまたは荷物と紐付いているリクエストは削除できません。キャンセルをご利用ください。",
+      requiresForce: true,
     }
   }
 

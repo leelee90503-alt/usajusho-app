@@ -160,13 +160,28 @@ export default function RequestRow({
     })
   }
 
+  const [requiresForceDelete, setRequiresForceDelete] = useState(false)
+
   function handleDelete() {
     const ok = confirm(t("deleteConfirm"))
     if (!ok) return
     setMessage(null)
+    setRequiresForceDelete(false)
     startTransition(async () => {
       const result = await deletePurchaseRequestAsAdmin(request.id)
       setMessage(result?.error ?? null)
+      setRequiresForceDelete(Boolean(result?.requiresForce))
+    })
+  }
+
+  function handleForceDelete() {
+    const ok = confirm(t("forceDeleteConfirm"))
+    if (!ok) return
+    setMessage(null)
+    startTransition(async () => {
+      const result = await deletePurchaseRequestAsAdmin(request.id, true)
+      setMessage(result?.error ?? null)
+      if (!result?.error) setRequiresForceDelete(false)
     })
   }
 
@@ -414,6 +429,18 @@ export default function RequestRow({
           >
             {t("deleteButton")}
           </Button>
+          {requiresForceDelete && (
+            <Button
+              type="button"
+              variant="link"
+              size="sm"
+              disabled={isPending}
+              onClick={handleForceDelete}
+              className="h-auto p-0 text-xs font-semibold text-destructive hover:text-destructive/80"
+            >
+              {t("forceDeleteButton")}
+            </Button>
+          )}
         </div>
 
         {message && <p className="mt-2 text-xs text-accent">{message}</p>}

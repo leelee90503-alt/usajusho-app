@@ -834,6 +834,8 @@
     "cancelConfirm": "Are you sure you want to cancel this request?",
     "deleteButton": "Delete",
     "deleteConfirm": "This will permanently delete this request. This cannot be undone. Are you sure?",
+    "forceDeleteButton": "Delete anyway (ignore payment/package link)",
+    "forceDeleteConfirm": "This request has a payment or a linked package, but it will be permanently deleted anyway. The package's reference back to this request will be cleared, but the package itself and the Square payment history are not deleted. This cannot be undone. Are you sure?",
     "status": {
       "submitted": "Submitted",
       "quote_sent": "Quote Sent",
