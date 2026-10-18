@@ -97,6 +97,41 @@ export async function sendQuote(
   return { success: true }
 }
 
+// Lets an admin send a free-form message to the customer who made this
+// purchase request (e.g. "please tell us the product URL / size / color").
+// Same mechanism as sendCustomMessage() on the packages page -- an in-app
+// notification plus (when Resend is configured) an email -- but keyed on the
+// request, since a request that hasn't been bought yet has no package to
+// attach the message to.
+export async function sendRequestMessage(requestId: string, message: string) {
+  const supabase = await requireAdmin()
+
+  const trimmed = message.trim()
+  if (!trimmed) {
+    return { error: "メッセージを入力してください。" }
+  }
+
+  const { data: request, error: requestError } = await supabase
+    .from("purchase_requests")
+    .select("id, user_id")
+    .eq("id", requestId)
+    .single()
+
+  if (requestError || !request || !request.user_id) {
+    return { error: "リクエストが見つかりません。" }
+  }
+
+  await notifyUser(supabase, {
+    userId: request.user_id,
+    title: "購入代行のご依頼に関するご連絡",
+    body: trimmed,
+    titleEn: "A message about your purchase request",
+  })
+
+  revalidatePath("/admin/purchase-requests")
+  return { success: true }
+}
+
 export async function markPurchasing(requestId: string) {
   const supabase = await requireAdmin()
 

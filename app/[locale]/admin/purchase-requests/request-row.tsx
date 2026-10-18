@@ -10,6 +10,7 @@ import {
   refundPurchaseRequest,
   cancelRequestAsAdmin,
   deletePurchaseRequestAsAdmin,
+  sendRequestMessage,
 } from "./actions"
 import {
   estimatePurchaseAgencyFee,
@@ -65,6 +66,9 @@ export default function RequestRow({
   const t = useTranslations("adminPurchaseRequests")
   const [isPending, startTransition] = useTransition()
   const [message, setMessage] = useState<string | null>(null)
+  const [showMessageForm, setShowMessageForm] = useState(false)
+  const [messageText, setMessageText] = useState("")
+  const [messageStatus, setMessageStatus] = useState<string | null>(null)
 
   const [itemPrice, setItemPrice] = useState(() =>
     request.quote_item_price_cents != null
@@ -116,6 +120,23 @@ export default function RequestRow({
         expiresAt ? new Date(expiresAt).toISOString() : null,
       )
       setMessage(result?.error ?? t("quoteSentSuccess"))
+    })
+  }
+
+  function handleSendMessage() {
+    if (!messageText.trim()) {
+      setMessageStatus(t("customMessageEmptyError"))
+      return
+    }
+    setMessageStatus(null)
+    startTransition(async () => {
+      const result = await sendRequestMessage(request.id, messageText)
+      if (result?.error) {
+        setMessageStatus(result.error)
+      } else {
+        setMessageStatus(t("customMessageSuccess"))
+        setMessageText("")
+      }
     })
   }
 
@@ -403,6 +424,48 @@ export default function RequestRow({
             </Link>
           </p>
         )}
+
+        <div className="mt-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isPending}
+            onClick={() => setShowMessageForm((v) => !v)}
+          >
+            {t("customMessageButton")}
+          </Button>
+          {showMessageForm && (
+            <div className="mt-2 rounded-lg border border-border bg-muted/40 p-3">
+              <Label
+                htmlFor={`custom-message-${request.id}`}
+                className="text-xs font-normal text-muted-foreground"
+              >
+                {t("customMessageLabel")}
+              </Label>
+              <Textarea
+                id={`custom-message-${request.id}`}
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                placeholder={t("customMessagePlaceholder")}
+                rows={4}
+                className="mt-1"
+              />
+              <Button
+                type="button"
+                size="sm"
+                disabled={isPending}
+                onClick={handleSendMessage}
+                className="mt-2"
+              >
+                {t("customMessageSubmit")}
+              </Button>
+              {messageStatus && (
+                <p className="mt-2 text-xs text-muted-foreground">{messageStatus}</p>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-3">
           {["submitted", "quote_sent", "awaiting_payment"].includes(
