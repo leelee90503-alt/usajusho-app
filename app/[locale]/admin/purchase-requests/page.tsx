@@ -50,6 +50,21 @@ export default async function AdminPurchaseRequestsPage({
 
   const requests = allRequests ?? []
 
+  // Message threads (admin <-> customer) per request, oldest first.
+  const { data: allMessages } = await supabase
+    .from("purchase_request_messages")
+    .select("id, request_id, sender_role, body, created_at")
+    .order("created_at", { ascending: true })
+  const messagesByRequestId = new Map<
+    string,
+    { id: string; sender_role: string; body: string; created_at: string }[]
+  >()
+  for (const m of allMessages ?? []) {
+    const list = messagesByRequestId.get(m.request_id) ?? []
+    list.push({ id: m.id, sender_role: m.sender_role, body: m.body, created_at: m.created_at })
+    messagesByRequestId.set(m.request_id, list)
+  }
+
   // Consolidation (합송배송/묶음배송): once a request reaches "purchasing",
   // the admin can fold it into an existing not-yet-weighed, shipping-prepaid
   // package for the same customer (created by an earlier purchase request)
@@ -175,6 +190,7 @@ export default async function AdminPurchaseRequestsPage({
               request={{
                 ...request,
                 candidatePackages: attachableCandidatesByUserId.get(request.user_id) ?? [],
+                messages: messagesByRequestId.get(request.id) ?? [],
               }}
               feeSettings={feeSettings}
             />

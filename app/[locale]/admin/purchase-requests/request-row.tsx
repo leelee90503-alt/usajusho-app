@@ -43,6 +43,7 @@ type PurchaseRequest = {
   linked_package_id: string | null
   profiles: Profile
   candidatePackages?: CandidatePackage[]
+  messages?: { id: string; sender_role: string; body: string; created_at: string }[]
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -423,6 +424,28 @@ export default function RequestRow({
               {t("viewInvoiceLink")}
             </Link>
           </p>
+        )}
+
+        {(request.messages ?? []).length > 0 && (
+          <div className="mt-3 space-y-1.5 rounded-lg border border-border bg-muted/40 p-3">
+            <h3 className="text-xs font-semibold text-foreground">{t("messagesTitle")}</h3>
+            {(request.messages ?? []).map((m) => (
+              <div
+                key={m.id}
+                className={`rounded-md px-2.5 py-1.5 text-xs ${
+                  m.sender_role === "admin"
+                    ? "bg-white text-slate-700"
+                    : "bg-teal-50 text-teal-900"
+                }`}
+              >
+                <p className="text-[10px] text-muted-foreground">
+                  {m.sender_role === "admin" ? t("messageFromAdmin") : t("messageFromCustomer")} ·{" "}
+                  {new Date(m.created_at).toLocaleString()}
+                </p>
+                <p className="mt-0.5 whitespace-pre-wrap">{m.body}</p>
+              </div>
+            ))}
+          </div>
         )}
 
         <div className="mt-3">

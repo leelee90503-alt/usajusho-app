@@ -61,6 +61,73 @@ export async function submitPurchaseRequest(formData: FormData) {
   return { success: true }
 }
 
+// Customer reply on a purchase request's message thread (the admin's
+// "send message" on /admin/purchase-requests starts the thread). RLS on
+// purchase_request_messages only allows the request's owner to insert a
+// 'customer' row for it; admins are notified in-app + by email.
+export async function replyToPurchaseRequest(requestId: string, message: string) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: "ログインしてください。" }
+  }
+
+  const trimmed = message.trim()
+  if (!trimmed) {
+    return { error: "メッセージを入力してください。" }
+  }
+  if (trimmed.length > 2000) {
+    return { error: "メッセージは2000文字以内で入力してください。" }
+  }
+
+  const { data: request } = await supabase
+    .from("purchase_requests")
+    .select("id, product_description")
+    .eq("id", requestId)
+    .eq("user_id", user.id)
+    .single()
+
+  if (!request) {
+    return { error: "リクエストが見つかりません。" }
+  }
+
+  const { error } = await supabase.from("purchase_request_messages").insert({
+    request_id: requestId,
+    sender_id: user.id,
+    sender_role: "customer",
+    body: trimmed,
+  })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, suite_number")
+    .eq("id", user.id)
+    .single()
+  const who = `${profile?.full_name ?? "お客様"}${
+    profile?.suite_number ? ` (#${profile.suite_number})` : ""
+  }`
+  const shortDescription = request.product_description.slice(0, 50)
+
+  await notifyAdmins({
+    title: "購入代行リクエストに返信がありました",
+    body: `${who} さんから「${shortDescription}」に返信がありました：\n${trimmed}`,
+    titleEn: "A customer replied on a purchase request",
+    bodyEn: `${who} replied on "${shortDescription}":\n${trimmed}`,
+  })
+
+  revalidatePath(`/dashboard/purchase-requests/${requestId}`)
+  revalidatePath("/admin/purchase-requests")
+  return { success: true }
+}
+
 export async function cancelPurchaseRequest(requestId: string) {
   const supabase = await createClient()
 

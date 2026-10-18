@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getSquareClientConfig, buildBillingContact } from "@/lib/square"
 import PayButton from "./pay-button"
 import CancelButton from "./cancel-button"
+import MessageThread from "./message-thread"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft } from "lucide-react"
@@ -53,6 +54,12 @@ export default async function PurchaseRequestDetailPage({
   }
 
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+
+  const { data: messages } = await supabase
+    .from("purchase_request_messages")
+    .select("id, sender_role, body, created_at")
+    .eq("request_id", request.id)
+    .order("created_at", { ascending: true })
 
   const canPay = request.status === "quote_sent" && request.quote_total_cents
   const canCancel = ["submitted", "quote_sent", "awaiting_payment"].includes(
@@ -134,6 +141,15 @@ export default async function PurchaseRequestDetailPage({
                 {canCancel && <CancelButton requestId={request.id} />}
               </CardFooter>
             )}
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">{t("messagesTitle")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MessageThread requestId={request.id} messages={messages ?? []} />
+            </CardContent>
           </Card>
 
           {request.quote_total_cents != null && (

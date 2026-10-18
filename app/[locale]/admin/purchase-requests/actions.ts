@@ -121,11 +121,31 @@ export async function sendRequestMessage(requestId: string, message: string) {
     return { error: "リクエストが見つかりません。" }
   }
 
+  const {
+    data: { user: admin },
+  } = await supabase.auth.getUser()
+
+  // Keep the message in the request's thread so the customer can reply to it
+  // from the request detail page (see purchase_request_messages). A failure
+  // here (e.g. the migration not applied yet) must not block the notification.
+  const { error: threadError } = await supabase
+    .from("purchase_request_messages")
+    .insert({
+      request_id: requestId,
+      sender_id: admin?.id ?? null,
+      sender_role: "admin",
+      body: trimmed,
+    })
+  if (threadError) {
+    console.error("Failed to store purchase request message:", threadError.message)
+  }
+
   await notifyUser(supabase, {
     userId: request.user_id,
     title: "購入代行のご依頼に関するご連絡",
-    body: trimmed,
+    body: `${trimmed}\n\n※ご返信は、ダッシュボードの「購入代行」から該当のご依頼を開いてお送りください。`,
     titleEn: "A message about your purchase request",
+    bodyEn: `${trimmed}\n\nYou can reply from your dashboard: open the request under "Purchase Agency".`,
   })
 
   revalidatePath("/admin/purchase-requests")
